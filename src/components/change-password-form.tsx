@@ -1,0 +1,73 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+
+export function ChangePasswordForm() {
+    const [formData, setFormData] = useState({ currentPassword: "", newPassword: "" });
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const res = await fetch("/api/auth/change-password", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+            const json = await res.json();
+
+            if (res.ok) {
+                alert("Password changed successfully!");
+                setFormData({ currentPassword: "", newPassword: "" });
+            } else {
+                alert("Error: " + json.error);
+            }
+        } catch (e) {
+            alert("Failed to change password");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <Card className="max-w-md">
+            <CardHeader>
+                <CardTitle>Change Password</CardTitle>
+                <CardDescription>Update your login credentials securely.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="current">Current Password</Label>
+                        <Input
+                            id="current"
+                            type="password"
+                            value={formData.currentPassword}
+                            onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="new">New Password</Label>
+                        <Input
+                            id="new"
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <Button type="submit" disabled={loading}>
+                        {loading ? "Updating..." : "Update Password"}
+                    </Button>
+                </form>
+            </CardContent>
+        </Card>
+    );
+}

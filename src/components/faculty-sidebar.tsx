@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, LogOut, Calendar } from "lucide-react";
+import { LayoutDashboard, LogOut, Calendar, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const routes = [
@@ -17,7 +17,12 @@ const routes = [
         href: "/faculty/timetable",
         color: "text-violet-500",
     },
-    // We can add more faculty specific routes here later
+    {
+        label: "Settings",
+        icon: Settings,
+        href: "/faculty/settings",
+        color: "text-gray-500",
+    },
 ];
 
 export function FacultySidebar() {

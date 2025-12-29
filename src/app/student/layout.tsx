@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, LayoutDashboard, QrCode, History } from "lucide-react";
+import { LogOut, LayoutDashboard, QrCode, History, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export default function StudentLayout({
@@ -34,6 +34,10 @@ export default function StudentLayout({
                 <Link href="/student/history" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
                     <History className="w-5 h-5 mb-1" />
                     History
+                </Link>
+                <Link href="/student/settings" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
+                    <Settings className="w-5 h-5 mb-1" />
+                    Settings
                 </Link>
             </nav>
         </div>
