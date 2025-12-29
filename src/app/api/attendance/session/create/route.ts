@@ -56,13 +56,24 @@ export async function POST(request: Request) {
         // A hash or a JWT signed with session ID and expiry
         const qrContent = uuidv4();
 
-        // 4. Create Session
+        // 4. Resolve Faculty ID
+        // The session.u.id is a USER_ID. We need the FACULTY_ID.
+        const userId = (session.user as any).id;
+        let facultyId = null;
+
+        const facultyRes = await query('SELECT id FROM faculty WHERE user_id = $1', [userId]);
+        if (facultyRes.rowCount > 0) {
+            facultyId = facultyRes.rows[0].id;
+        }
+        // If Admin (no faculty record), facultyId remains null.
+
+        // 5. Create Session
         const createRes = await query(`
-      INSERT INTO attendance_sessions 
-      (timetable_id, faculty_id, start_time, end_time, qr_code)
-      VALUES ($1, $2, NOW(), $3, $4)
-      RETURNING id, qr_code
-    `, [timetable_id, (session.user as any).id, endTime, qrContent]); // Using actual endTime from timetable
+            INSERT INTO attendance_sessions 
+            (timetable_id, faculty_id, start_time, end_time, qr_code)
+            VALUES ($1, $2, NOW(), $3, $4)
+            RETURNING id, qr_code
+        `, [timetable_id, facultyId, endTime, qrContent]);
 
         return NextResponse.json({
             success: true,
