@@ -43,11 +43,15 @@ const routes = [
     },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+    onNavigate?: () => void;
+}
+
+export function Sidebar({ onNavigate }: SidebarProps) {
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
             <div className="px-3 py-2 flex-1">
-                <Link href="/admin/dashboard" className="flex items-center pl-3 mb-14">
+                <Link href="/admin/dashboard" className="flex items-center pl-3 mb-14" onClick={onNavigate}>
                     <h1 className="text-2xl font-bold">Admin Portal</h1>
                 </Link>
                 <div className="space-y-1">
@@ -55,6 +59,7 @@ export function Sidebar() {
                         <Link
                             key={route.href}
                             href={route.href}
+                            onClick={onNavigate}
                             className={cn(
                                 "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition",
                                 // Active state logic can be added here if this was a client component with usePathname

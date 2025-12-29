@@ -25,11 +25,15 @@ const routes = [
     },
 ];
 
-export function FacultySidebar() {
+interface FacultySidebarProps {
+    onNavigate?: () => void;
+}
+
+export function FacultySidebar({ onNavigate }: FacultySidebarProps) {
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
             <div className="px-3 py-2 flex-1">
-                <Link href="/faculty/dashboard" className="flex items-center pl-3 mb-14">
+                <Link href="/faculty/dashboard" className="flex items-center pl-3 mb-14" onClick={onNavigate}>
                     <h1 className="text-2xl font-bold">Faculty Portal</h1>
                 </Link>
                 <div className="space-y-1">
@@ -37,6 +41,7 @@ export function FacultySidebar() {
                         <Link
                             key={route.href}
                             href={route.href}
+                            onClick={onNavigate}
                             className={cn(
                                 "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition",
                             )}

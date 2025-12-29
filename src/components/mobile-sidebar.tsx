@@ -15,6 +15,8 @@ interface MobileSidebarProps {
 export const MobileSidebar = ({ role }: MobileSidebarProps) => {
     const [isMounted, setIsMounted] = useState(false);
 
+    const [open, setOpen] = useState(false);
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
@@ -24,7 +26,7 @@ export const MobileSidebar = ({ role }: MobileSidebarProps) => {
     }
 
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                     <Menu />
@@ -34,7 +36,11 @@ export const MobileSidebar = ({ role }: MobileSidebarProps) => {
                 <SheetHeader className="sr-only">
                     <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
-                {role === "admin" ? <AdminSidebar /> : <FacultySidebar />}
+                {role === "admin" ? (
+                    <AdminSidebar onNavigate={() => setOpen(false)} />
+                ) : (
+                    <FacultySidebar onNavigate={() => setOpen(false)} />
+                )}
             </SheetContent>
         </Sheet>
     );
