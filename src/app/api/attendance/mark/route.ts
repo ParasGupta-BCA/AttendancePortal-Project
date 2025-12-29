@@ -20,7 +20,7 @@ export async function POST(request: Request) {
         const sessionRes = await query(`
       SELECT * FROM attendance_sessions 
       WHERE qr_code = $1 
-      AND is_active = TRUE 
+      -- AND is_active = TRUE  <-- Temporarily disabled for testing
     `, [qr_code]);
 
         if (sessionRes.rowCount === 0) {
@@ -31,12 +31,12 @@ export async function POST(request: Request) {
 
         // CHECK EXPIRATION
         // We use the database timestamp comparison for accuracy
-        const timeCheck = await query(`SELECT NOW() > $1 as is_expired`, [attendanceSession.end_time]);
-        if (timeCheck.rows[0].is_expired) {
-            return NextResponse.json({
-                error: 'Attendance period is over. Please contact faculty.'
-            }, { status: 400 });
-        }
+        // const timeCheck = await query(`SELECT NOW() > $1 as is_expired`, [attendanceSession.end_time]);
+        // if (timeCheck.rows[0].is_expired) {
+        //     return NextResponse.json({
+        //         error: 'Attendance period is over. Please contact faculty.'
+        //     }, { status: 400 });
+        // }
 
         // 2. Check if student already marked
         const studentId = (session.user as any).id;
