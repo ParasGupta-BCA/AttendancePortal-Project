@@ -16,19 +16,27 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing QR Code' }, { status: 400 });
         }
 
-        // 1. Find Active Session by QR Code
+        // 1. Find Session by QR Code (Active or Expired)
         const sessionRes = await query(`
       SELECT * FROM attendance_sessions 
       WHERE qr_code = $1 
       AND is_active = TRUE 
-      AND end_time > NOW()
     `, [qr_code]);
 
         if (sessionRes.rowCount === 0) {
-            return NextResponse.json({ error: 'Invalid or Expired QR Code' }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid QR Code' }, { status: 400 });
         }
 
         const attendanceSession = sessionRes.rows[0];
+
+        // CHECK EXPIRATION
+        // We use the database timestamp comparison for accuracy
+        const timeCheck = await query(`SELECT NOW() > $1 as is_expired`, [attendanceSession.end_time]);
+        if (timeCheck.rows[0].is_expired) {
+            return NextResponse.json({
+                error: 'Attendance period is over. Please contact faculty.'
+            }, { status: 400 });
+        }
 
         // 2. Check if student already marked
         const studentId = (session.user as any).id;
