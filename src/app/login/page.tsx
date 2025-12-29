@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 
 export default function LoginPage() {
     const router = useRouter();
-    const [email, setEmail] = useState("admin@college.edu"); // Default for demo
-    const [password, setPassword] = useState("hashed_secret");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const [loading, setLoading] = useState(false);
 

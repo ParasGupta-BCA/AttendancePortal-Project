@@ -22,19 +22,7 @@ export default function Home() {
               </Button>
             </Link>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Demo Accounts</span>
-              </div>
-            </div>
 
-            <div className="text-sm text-muted-foreground text-center space-y-1 bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
-              <p><strong>Admin:</strong> admin@college.edu / hashed_secret</p>
-              <p><strong>Student:</strong> student@college.edu / pass</p>
-            </div>
           </div>
         </CardContent>
       </Card>
