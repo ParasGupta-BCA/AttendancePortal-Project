@@ -41,8 +41,22 @@ export async function GET() {
         t.start_time ASC
     `, [facultyId]);
 
+        const timetableWithSessions = await Promise.all(timetableRes.rows.map(async (slot) => {
+            const sessionRes = await query(`
+            SELECT id, qr_code FROM attendance_sessions 
+            WHERE timetable_id = $1 
+            AND is_active = TRUE 
+            AND end_time > NOW()
+        `, [slot.id]);
+
+            return {
+                ...slot,
+                activeSession: sessionRes.rows[0] || null
+            };
+        }));
+
         return NextResponse.json({
-            timetable: timetableRes.rows
+            timetable: timetableWithSessions
         });
 
     } catch (error: any) {
