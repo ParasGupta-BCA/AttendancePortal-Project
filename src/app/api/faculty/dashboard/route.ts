@@ -60,7 +60,7 @@ export async function GET() {
         }));
 
         // 3. Stats: classes taken today, total students marked present today in MY classes
-        const statsRes = await query(`
+        const todayStatsRes = await query(`
         SELECT COUNT(*) as present_count
         FROM attendance_records ar
         JOIN attendance_sessions s ON ar.session_id = s.id
@@ -68,10 +68,43 @@ export async function GET() {
         AND ar.marked_at::date = CURRENT_DATE
     `, [facultyId]);
 
+        // 4. Global Analysis: Total Present vs Total Absent across ALL sesions
+        // A. Total Actual Present
+        const globalPresentRes = await query(`
+            SELECT COUNT(*) as total_present
+            FROM attendance_records ar
+            JOIN attendance_sessions s ON ar.session_id = s.id
+            WHERE s.faculty_id = $1
+        `, [facultyId]);
+        const totalPresent = parseInt(globalPresentRes.rows[0].total_present || '0');
+
+        // B. Total Expected (Sum of class size for every session held)
+        // Logic: For every session this faculty created, how many students were in that class?
+        const globalExpectedRes = await query(`
+            WITH ClassCounts AS (
+                SELECT c.id as class_id, COUNT(s.id) as student_count
+                FROM classes c
+                JOIN students s ON c.name = s.course_year AND c.section = s.section
+                GROUP BY c.id
+            )
+            SELECT SUM(cc.student_count) as total_expected
+            FROM attendance_sessions s
+            JOIN timetable t ON s.timetable_id = t.id
+            JOIN ClassCounts cc ON t.class_id = cc.class_id
+            WHERE s.faculty_id = $1
+        `, [facultyId]);
+
+        const totalExpected = parseInt(globalExpectedRes.rows[0].total_expected || '0');
+        const totalAbsent = Math.max(0, totalExpected - totalPresent);
+
         return NextResponse.json({
             stats: {
                 classesToday: todaySchedule.length,
-                studentsPresent: parseInt(statsRes.rows[0].present_count)
+                studentsPresent: parseInt(todayStatsRes.rows[0].present_count),
+            },
+            analysis: {
+                totalPresent,
+                totalAbsent
             },
             todaySchedule
         });

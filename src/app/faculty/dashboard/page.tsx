@@ -49,6 +49,7 @@ export default function FacultyDashboard() {
         <div className="flex-1 space-y-4 p-8 pt-6">
             <h2 className="text-3xl font-bold tracking-tight">Faculty Dashboard</h2>
 
+            <h3 className="text-xl font-bold mb-4">Daily Overview</h3>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -67,6 +68,30 @@ export default function FacultyDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">{stats?.studentsPresent || 0}</div>
                         <p className="text-xs text-muted-foreground">in your classes today</p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <h3 className="text-xl font-bold mt-8 mb-4">Class Analysis</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+                <Card className="border-l-4 border-l-green-500">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Present</CardTitle>
+                        <Users className="h-4 w-4 text-green-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-green-600">{data?.analysis?.totalPresent || 0}</div>
+                        <p className="text-xs text-muted-foreground">Students marked present across all your classes</p>
+                    </CardContent>
+                </Card>
+                <Card className="border-l-4 border-l-red-500">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Absent</CardTitle>
+                        <Users className="h-4 w-4 text-red-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-red-600">{data?.analysis?.totalAbsent || 0}</div>
+                        <p className="text-xs text-muted-foreground">Students absent across all your classes</p>
                     </CardContent>
                 </Card>
             </div>
