@@ -40,7 +40,7 @@ export default function Home() {
       </Card>
 
       <div className="fixed bottom-4 text-center text-xs text-gray-400">
-        <p>Deployed on Vercel | Secured by NextAuth</p>
+        <p>Deployed on Vercel | Secured by NextAuth | v1.0 Ready</p>
       </div>
     </div>
   );
