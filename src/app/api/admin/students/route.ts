@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
         const { full_name, email, enrollment_no, erp_id } = await request.json();
 
-        const defaultPassword = "password@123";
+        const defaultPassword = "student";
         const hashedPassword = await bcrypt.hash(defaultPassword, 10); // Hashing the password
 
         // Simplification: In real app, transaction needed
