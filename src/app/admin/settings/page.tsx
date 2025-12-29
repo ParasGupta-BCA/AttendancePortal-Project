@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChangePasswordForm } from "@/components/change-password-form";
 
 export default function SettingsPage() {
     const [users, setUsers] = useState<any[]>([]);
@@ -43,55 +44,70 @@ export default function SettingsPage() {
 
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
-            <h2 className="text-3xl font-bold tracking-tight">Settings & User Management</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>All Users</CardTitle>
-                    <CardDescription>Manage user roles and permissions.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Current Role</TableHead>
-                                <TableHead>Action</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {users.map((user) => (
-                                <TableRow key={user.id}>
-                                    <TableCell className="font-medium">{user.full_name}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'faculty' ? 'default' : 'secondary'}>
-                                            {user.role}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Select
-                                            defaultValue={user.role}
-                                            onValueChange={(val) => handleRoleChange(user.id, val)}
-                                        >
-                                            <SelectTrigger className="w-[140px]">
-                                                <SelectValue placeholder="Select Role" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="admin">Admin</SelectItem>
-                                                <SelectItem value="faculty">Faculty</SelectItem>
-                                                <SelectItem value="student">Student</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {users.length === 0 && !loading && <TableRow><TableCell colSpan={4} className="text-center">No users found.</TableCell></TableRow>}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            <Tabs defaultValue="users" className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="users">User Management</TabsTrigger>
+                    <TabsTrigger value="account">My Account</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="users" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>All Users</CardTitle>
+                            <CardDescription>Manage user roles and permissions.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Current Role</TableHead>
+                                        <TableHead>Action</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {users.map((user) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell className="font-medium">{user.full_name}</TableCell>
+                                            <TableCell>{user.email}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={user.role === 'admin' ? 'destructive' : user.role === 'faculty' ? 'default' : 'secondary'}>
+                                                    {user.role}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Select
+                                                    defaultValue={user.role}
+                                                    onValueChange={(val) => handleRoleChange(user.id, val)}
+                                                >
+                                                    <SelectTrigger className="w-[140px]">
+                                                        <SelectValue placeholder="Select Role" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="admin">Admin</SelectItem>
+                                                        <SelectItem value="faculty">Faculty</SelectItem>
+                                                        <SelectItem value="student">Student</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {users.length === 0 && !loading && <TableRow><TableCell colSpan={4} className="text-center">No users found.</TableCell></TableRow>}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="account">
+                    <div className="max-w-md">
+                        <ChangePasswordForm />
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }
