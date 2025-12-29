@@ -19,7 +19,7 @@ export async function GET() {
         // Note: If admin is testing as faculty role but has no faculty profile, this might fail.
         // Handling graceful degradation or assuming profile exists.
         let facultyId = null;
-        if (facultyRes.rowCount > 0) {
+        if ((facultyRes.rowCount ?? 0) > 0) {
             facultyId = facultyRes.rows[0].id;
         } else {
             // Fallback for demo users who might not have profile
