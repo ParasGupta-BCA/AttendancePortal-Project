@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         let facultyId = null;
 
         const facultyRes = await query('SELECT id FROM faculty WHERE user_id = $1', [userId]);
-        if (facultyRes.rowCount > 0) {
+        if ((facultyRes.rowCount ?? 0) > 0) {
             facultyId = facultyRes.rows[0].id;
         }
         // If Admin (no faculty record), facultyId remains null.
