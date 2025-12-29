@@ -57,9 +57,9 @@ export async function POST(request: Request) {
         const endTime = new Date(endTimeIso);
 
         // Security: Don't allow starting a session if the class is already over
-        // if (new Date() > endTime) {
-        //     return NextResponse.json({ error: 'Cannot start session: Class time is already over.' }, { status: 400 });
-        // }
+        if (new Date() > endTime) {
+            return NextResponse.json({ error: 'Cannot start session: Class time is already over.' }, { status: 400 });
+        }
 
         // Allow a buffer? e.g. 10 mins before start? Let's be strict but allow 5 mins early start.
         const bufferMs = 5 * 60 * 1000;
