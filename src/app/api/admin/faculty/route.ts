@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
         // Default password for new faculty
         // They will be forced to change it on first login
-        const defaultPassword = "password@123";
+        const defaultPassword = "faculty";
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
         // 1. Create User
