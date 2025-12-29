@@ -11,6 +11,12 @@ const routes = [
         href: "/faculty/dashboard",
         color: "text-sky-500",
     },
+    {
+        label: "Timetable & Attendance",
+        icon: Calendar,
+        href: "/faculty/timetable",
+        color: "text-violet-500",
+    },
     // We can add more faculty specific routes here later
 ];
 
