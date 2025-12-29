@@ -1,7 +1,6 @@
-"use client";
-
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, QrCode, History, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, QrCode, History, Settings, Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export default function StudentLayout({
@@ -9,12 +8,42 @@ export default function StudentLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        // Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            setIsDark(true);
+            document.documentElement.classList.add('dark');
+        } else {
+            setIsDark(false);
+            document.documentElement.classList.remove('dark');
+        }
+    }, []);
+
+    const toggleTheme = () => {
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            setIsDark(false);
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            setIsDark(true);
+        }
+    };
+
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 pb-16">
-            <header className="bg-white dark:bg-gray-800 shadow px-4 py-3 flex justify-between items-center sticky top-0 z-50">
-                <h1 className="font-bold text-lg">Student Portal</h1>
-                <button onClick={() => signOut({ callbackUrl: '/login' })} className="text-red-500">
-                    <LogOut className="w-5 h-5" />
+        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 transition-colors duration-300">
+            <header className="bg-white dark:bg-gray-800 shadow px-4 py-3 flex justify-between items-center sticky top-0 z-50 transition-colors duration-300">
+                <h1 className="font-bold text-lg dark:text-white">Student Portal</h1>
+                <button
+                    onClick={toggleTheme}
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                    aria-label="Toggle Theme"
+                >
+                    {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
             </header>
             <main className="flex-1 p-4">
