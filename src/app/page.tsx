@@ -1,14 +1,18 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push("/login"); // Client-side backup
+  }, [router]);
+
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4">Attendance Portal</h1>
-        <Link href="/login" className="text-blue-500 hover:underline">
-          Go to Login
-        </Link>
-      </div>
+      <p>Redirecting...</p>
     </div>
   );
 }
