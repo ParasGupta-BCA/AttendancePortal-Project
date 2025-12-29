@@ -20,37 +20,37 @@ export default function StudentLayout({
             <main className="flex-1 p-4">
                 {children}
             </main>
-            <nav className="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t z-50 safe-area-bottom h-16">
-                <div className="relative flex justify-between items-center h-full px-6">
-                    {/* Left Side */}
-                    <div className="flex gap-8">
-                        <Link href="/student/dashboard" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                            <LayoutDashboard className="w-5 h-5 mb-1" />
-                            Home
-                        </Link>
-                    </div>
+            <nav className="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t z-50 safe-area-bottom h-16 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+                <div className="flex justify-around items-end h-full pb-2">
+                    <Link href="/student/dashboard" className="flex flex-col items-center gap-1 w-16 text-gray-500 hover:text-blue-500 transition-colors">
+                        <LayoutDashboard className="w-5 h-5" />
+                        <span className="text-[10px] font-medium">Home</span>
+                    </Link>
 
-                    {/* Center Floating Button */}
-                    <div className="absolute left-1/2 -translate-x-1/2 -top-6">
-                        <Link href="/student/scan" className="flex flex-col items-center">
-                            <div className="bg-blue-600 rounded-full p-4 shadow-lg border-4 border-gray-50 dark:border-gray-900 transform transition-transform hover:scale-105">
-                                <QrCode className="w-7 h-7 text-white" />
+                    <Link href="/student/history" className="flex flex-col items-center gap-1 w-16 text-gray-500 hover:text-blue-500 transition-colors">
+                        <History className="w-5 h-5" />
+                        <span className="text-[10px] font-medium">History</span>
+                    </Link>
+
+                    {/* Floating Scan Button */}
+                    <div className="relative -top-6">
+                        <Link href="/student/scan" className="flex flex-col items-center group">
+                            <div className="bg-blue-600 rounded-full p-3.5 shadow-xl border-[4px] border-gray-50 dark:border-gray-900 transform transition-all duration-300 group-hover:scale-110 group-active:scale-95 group-hover:shadow-blue-500/25">
+                                <QrCode className="w-6 h-6 text-white" />
                             </div>
-                            <span className="text-xs text-gray-500 mt-1 font-medium">Scan</span>
+                            <span className="text-[10px] font-medium text-gray-500 mt-1 group-hover:text-blue-500 transition-colors">Scan</span>
                         </Link>
                     </div>
 
-                    {/* Right Side */}
-                    <div className="flex gap-8">
-                        <Link href="/student/history" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                            <History className="w-5 h-5 mb-1" />
-                            History
-                        </Link>
-                        <Link href="/student/settings" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                            <Settings className="w-5 h-5 mb-1" />
-                            Settings
-                        </Link>
-                    </div>
+                    <Link href="/student/settings" className="flex flex-col items-center gap-1 w-16 text-gray-500 hover:text-blue-500 transition-colors">
+                        <Settings className="w-5 h-5" />
+                        <span className="text-[10px] font-medium">Settings</span>
+                    </Link>
+
+                    <button onClick={() => signOut({ callbackUrl: '/login' })} className="flex flex-col items-center gap-1 w-16 text-red-500 hover:text-red-700 transition-colors">
+                        <LogOut className="w-5 h-5" />
+                        <span className="text-[10px] font-medium">Logout</span>
+                    </button>
                 </div>
             </nav>
         </div>
