@@ -33,12 +33,12 @@ export default function StudentLayout({
                     </Link>
 
                     {/* Floating Scan Button */}
-                    <div className="relative -top-6">
-                        <Link href="/student/scan" className="flex flex-col items-center group">
-                            <div className="bg-blue-600 rounded-full p-3.5 shadow-xl border-[4px] border-gray-50 dark:border-gray-900 transform transition-all duration-300 group-hover:scale-110 group-active:scale-95 group-hover:shadow-blue-500/25">
-                                <QrCode className="w-6 h-6 text-white" />
+                    <div className="relative w-16 flex justify-center">
+                        <Link href="/student/scan" className="flex flex-col items-center group w-full">
+                            <div className="absolute -top-12 bg-blue-600 rounded-full p-4 shadow-xl border-[4px] border-gray-50 dark:border-gray-900 transform transition-all duration-300 group-hover:scale-110 group-active:scale-95 group-hover:shadow-blue-500/25">
+                                <QrCode className="w-7 h-7 text-white" />
                             </div>
-                            <span className="text-[10px] font-medium text-gray-500 mt-1 group-hover:text-blue-500 transition-colors">Scan</span>
+                            <span className="text-[10px] font-medium text-gray-500 group-hover:text-blue-500 transition-colors pt-4">Scan</span>
                         </Link>
                     </div>
 
