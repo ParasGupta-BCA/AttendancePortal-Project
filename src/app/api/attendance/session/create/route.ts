@@ -28,16 +28,33 @@ export async function POST(request: Request) {
 
         // 2. Validate Time (Strict Mode)
         // "Attendance must strictly follow this timetable and can only be marked during the active class session."
-        const now = new Date();
+        // 2. Validate Time (Strict Mode)
+        // "Attendance must strictly follow this timetable and can only be marked during the active class session."
+        const now = new Date(); // This is UTC in Vercel/Neon
+
         // Helper to parse TIME string "10:10:00" to today's Date object
         const [startH, startM] = slot.start_time.split(':');
         const [endH, endM] = slot.end_time.split(':');
 
-        // Create Date objects for start and end times today
-        const startTime = new Date();
-        startTime.setHours(parseInt(startH), parseInt(startM), 0);
-        const endTime = new Date();
-        endTime.setHours(parseInt(endH), parseInt(endM), 0);
+        // We need to construct a Date that represents "Today at 10:10 IST"
+        // Since the server is UTC, if we just set hours, we get "Today at 10:10 UTC" which is 15:40 IST (Wrong).
+
+        // Correct approach:
+        // 1. Get current date in IST context
+        const istDateString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+        const istDate = new Date(istDateString);
+
+        const year = istDate.getFullYear();
+        const month = String(istDate.getMonth() + 1).padStart(2, '0');
+        const day = String(istDate.getDate()).padStart(2, '0');
+
+        // 2. Construct ISO string with fixed offset for IST (+05:30)
+        // Format: YYYY-MM-DDTHH:mm:00+05:30
+        const startTimeIso = `${year}-${month}-${day}T${startH}:${startM}:00+05:30`;
+        const endTimeIso = `${year}-${month}-${day}T${endH}:${endM}:00+05:30`;
+
+        const startTime = new Date(startTimeIso);
+        const endTime = new Date(endTimeIso);
 
         // Allow a buffer? e.g. 10 mins before start? Let's be strict but allow 5 mins early start.
         const bufferMs = 5 * 60 * 1000;
