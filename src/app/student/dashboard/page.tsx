@@ -2,26 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, CheckCircle2, XCircle } from "lucide-react";
+import { CalendarDays, CheckCircle2, XCircle, RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
-// Mock data or fetch from API
 export default function StudentDashboard() {
-    const [stats, setStats] = useState<any>(null);
+    const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // In real app, fetch /api/student/stats
-        // Mocking for MVP demo
-        setTimeout(() => {
-            setStats({
-                attendance: 85,
-                present: 42,
-                absent: 8,
-                totalClasses: 50
-            });
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/student/dashboard");
+            const json = await res.json();
+            if (res.ok) {
+                setData(json);
+            }
+        } catch (error) {
+            console.error("Failed to fetch dashboard data", error);
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
     }, []);
 
     if (loading) return <div className="p-4 space-y-4">
@@ -29,11 +34,22 @@ export default function StudentDashboard() {
         <Skeleton className="h-20 w-full" />
     </div>;
 
+    if (!data) return <div className="p-4">Failed to load data. <Button onClick={fetchData}>Retry</Button></div>;
+
+    const { stats, todayClasses, studentDetails } = data;
+
     return (
         <div className="space-y-6">
             <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg">
-                <h2 className="text-xl font-bold mb-1">Welcome back!</h2>
-                <p className="opacity-90 text-sm">BCA VI (Morning)</p>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-xl font-bold mb-1">Welcome!</h2>
+                        <p className="opacity-90 text-sm">{studentDetails.course} ({studentDetails.section})</p>
+                    </div>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={fetchData}>
+                        <RefreshCcw className="w-5 h-5" />
+                    </Button>
+                </div>
 
                 <div className="mt-6 flex items-end justify-between">
                     <div>
@@ -65,24 +81,25 @@ export default function StudentDashboard() {
 
             <div className="space-y-2">
                 <h3 className="font-semibold text-lg">Today's Classes</h3>
-                <Card className="p-4 border-l-4 border-l-blue-500">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h4 className="font-bold">Web Programming</h4>
-                            <p className="text-xs text-gray-500">10:10 AM - 11:05 AM</p>
-                        </div>
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Active</span>
-                    </div>
-                </Card>
-                <Card className="p-4 border-l-4 border-l-gray-300 opacity-60">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h4 className="font-bold">Digital Marketing</h4>
-                            <p className="text-xs text-gray-500">11:20 AM - 12:15 PM</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">Upcoming</span>
-                    </div>
-                </Card>
+                {todayClasses.length === 0 ? (
+                    <p className="text-sm text-gray-500">No classes scheduled for today.</p>
+                ) : (
+                    todayClasses.map((cls: any) => (
+                        <Card key={cls.id} className={`p-4 border-l-4 ${cls.isActive ? 'border-l-green-500 shadow-md' : 'border-l-blue-500'}`}>
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h4 className="font-bold">{cls.subject_name}</h4>
+                                    <p className="text-xs text-gray-500">{cls.start_time} - {cls.end_time}</p>
+                                </div>
+                                {cls.isActive ? (
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full animate-pulse">Active Now</span>
+                                ) : (
+                                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">Scheduled</span>
+                                )}
+                            </div>
+                        </Card>
+                    ))
+                )}
             </div>
         </div>
     );
