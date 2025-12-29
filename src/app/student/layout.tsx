@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { LogOut, LayoutDashboard, QrCode, History, Settings, Moon, Sun } from "lucide-react";
