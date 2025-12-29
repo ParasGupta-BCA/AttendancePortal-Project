@@ -20,7 +20,6 @@ export default function FacultyPage() {
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
-        password: "",
         designation: ""
     });
 
@@ -49,7 +48,7 @@ export default function FacultyPage() {
 
             if (res.ok) {
                 setOpen(false);
-                setFormData({ full_name: "", email: "", password: "", designation: "" });
+                setFormData({ full_name: "", email: "", designation: "" });
                 fetchFaculty(); // Refresh list
                 router.refresh();
             } else {
@@ -95,17 +94,6 @@ export default function FacultyPage() {
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="col-span-3"
-                                    required
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="password" className="text-right">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="col-span-3"
                                     required
                                 />

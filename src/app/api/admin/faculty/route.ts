@@ -29,20 +29,21 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = await req.json();
-        const { full_name, email, password, designation } = body;
+        const { full_name, email, designation } = await req.json();
 
-        if (!full_name || !email || !password || !designation) {
+        if (!full_name || !email || !designation) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Default password for new faculty
+        // They will be forced to change it on first login
+        const defaultPassword = "password@123";
+        const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
         // 1. Create User
         // Note: In a real app, use a transaction (BEGIN...COMMIT)
         const userRes = await query(
-            `INSERT INTO users (full_name, email, password_hash, role) VALUES ($1, $2, $3, 'faculty') RETURNING id`,
+            `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'faculty', TRUE) RETURNING id`,
             [full_name, email, hashedPassword]
         );
         const userId = userRes.rows[0].id;

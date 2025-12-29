@@ -13,7 +13,7 @@ export default function StudentsPage() {
     const [loading, setLoading] = useState(true);
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
-        full_name: "", email: "", password: "pass", enrollment_no: "", erp_id: ""
+        full_name: "", email: "", enrollment_no: "", erp_id: ""
     });
 
     const fetchStudents = () => {
@@ -38,7 +38,7 @@ export default function StudentsPage() {
         });
         setOpen(false);
         fetchStudents();
-        setFormData({ full_name: "", email: "", password: "pass", enrollment_no: "", erp_id: "" });
+        setFormData({ full_name: "", email: "", enrollment_no: "", erp_id: "" });
     };
 
     return (

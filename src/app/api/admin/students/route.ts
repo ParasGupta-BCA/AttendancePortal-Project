@@ -26,16 +26,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { full_name, email, password, enrollment_no, erp_id } = await request.json();
+        const { full_name, email, enrollment_no, erp_id } = await request.json();
+
+        const defaultPassword = "password@123";
+        const hashedPassword = await bcrypt.hash(defaultPassword, 10); // Hashing the password
 
         // Simplification: In real app, transaction needed
         // 1. Create User
-        const userRes = await query(`
-      INSERT INTO users (email, password_hash, full_name, role)
-      VALUES ($1, $2, $3, 'student')
-      RETURNING id
-    `, [email, password, full_name]);
-        const userId = userRes.rows[0].id;
+        const res = await query(
+            `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'student', TRUE) RETURNING id`,
+            [full_name, email, hashedPassword]
+        );
+        const userId = res.rows[0].id; // Corrected variable name from userRes to res
 
         // 2. Create Student Profile
         await query(`

@@ -34,7 +34,9 @@ export default function LoginPage() {
                 const sessionRes = await fetch("/api/auth/session");
                 const session = await sessionRes.json();
 
-                if (session?.user?.role === 'student') {
+                if (session?.user?.must_change_password) {
+                    router.push("/setup-password");
+                } else if (session?.user?.role === 'student') {
                     router.push("/student/dashboard");
                 } else if (session?.user?.role === 'faculty') {
                     router.push("/faculty/dashboard");
