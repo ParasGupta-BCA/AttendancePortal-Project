@@ -20,25 +20,38 @@ export default function StudentLayout({
             <main className="flex-1 p-4">
                 {children}
             </main>
-            <nav className="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t flex justify-around py-3 z-50 safe-area-bottom">
-                <Link href="/student/dashboard" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                    <LayoutDashboard className="w-5 h-5 mb-1" />
-                    Home
-                </Link>
-                <Link href="/student/scan" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                    <div className="bg-blue-600 rounded-full p-3 -mt-8 shadow-lg border-4 border-gray-50 dark:border-gray-900">
-                        <QrCode className="w-6 h-6 text-white" />
+            <nav className="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t z-50 safe-area-bottom h-16">
+                <div className="relative flex justify-between items-center h-full px-6">
+                    {/* Left Side */}
+                    <div className="flex gap-8">
+                        <Link href="/student/dashboard" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
+                            <LayoutDashboard className="w-5 h-5 mb-1" />
+                            Home
+                        </Link>
                     </div>
-                    Scan
-                </Link>
-                <Link href="/student/history" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                    <History className="w-5 h-5 mb-1" />
-                    History
-                </Link>
-                <Link href="/student/settings" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
-                    <Settings className="w-5 h-5 mb-1" />
-                    Settings
-                </Link>
+
+                    {/* Center Floating Button */}
+                    <div className="absolute left-1/2 -translate-x-1/2 -top-6">
+                        <Link href="/student/scan" className="flex flex-col items-center">
+                            <div className="bg-blue-600 rounded-full p-4 shadow-lg border-4 border-gray-50 dark:border-gray-900 transform transition-transform hover:scale-105">
+                                <QrCode className="w-7 h-7 text-white" />
+                            </div>
+                            <span className="text-xs text-gray-500 mt-1 font-medium">Scan</span>
+                        </Link>
+                    </div>
+
+                    {/* Right Side */}
+                    <div className="flex gap-8">
+                        <Link href="/student/history" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
+                            <History className="w-5 h-5 mb-1" />
+                            History
+                        </Link>
+                        <Link href="/student/settings" className="flex flex-col items-center text-xs text-gray-500 hover:text-blue-500">
+                            <Settings className="w-5 h-5 mb-1" />
+                            Settings
+                        </Link>
+                    </div>
+                </div>
             </nav>
         </div>
     );
