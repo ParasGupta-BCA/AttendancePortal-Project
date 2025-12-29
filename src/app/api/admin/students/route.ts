@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
 
