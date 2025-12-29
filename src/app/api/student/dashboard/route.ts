@@ -15,8 +15,9 @@ export async function GET() {
         const userId = (session.user as any).id;
 
         // 1. Get Student ID
+        // 1. Get Student ID
         const studentRes = await query('SELECT id, course_year, section FROM students WHERE user_id = $1', [userId]);
-        if (studentRes.rowCount === 0) {
+        if ((studentRes.rowCount ?? 0) === 0) {
             return NextResponse.json({ error: 'Student profile not found' }, { status: 404 });
         }
         const student = studentRes.rows[0];
@@ -60,7 +61,7 @@ export async function GET() {
 
             return {
                 ...cls,
-                isActive: sessionRes.rowCount > 0
+                isActive: (sessionRes.rowCount ?? 0) > 0
             };
         }));
 
