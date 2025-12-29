@@ -23,26 +23,52 @@ export async function GET() {
         // But for dashboard summary, this is a common metric.
         const absentToday = totalStudents - presentToday;
 
-        // 4. Monthly Attendance Rate (Avg of daily presence)
-        // Complex query, simplified for MVP: (Total Present Records in Month / (Total Sessions * Total Students)) * 100
-        // Actually, let's just take the average attendance % of all sessions in current month.
+        // 4. Monthly Attendance Rate
+        const currentMonthStart = new Date();
+        currentMonthStart.setDate(1);
+        const monthStatsRes = await query(`
+            SELECT 
+                COUNT(*) FILTER (WHERE status = 'Present') as present,
+                COUNT(*) as total
+            FROM attendance_records
+            WHERE marked_at >= $1
+        `, [currentMonthStart]);
 
-        // Default to 85% for initial seed if no data
-        const monthlyRate = 85;
+        const monthPresent = parseInt(monthStatsRes.rows[0].present);
+        const monthTotal = parseInt(monthStatsRes.rows[0].total);
+        const monthlyRate = monthTotal > 0 ? Math.round((monthPresent / monthTotal) * 100) : 0;
 
-        // Recent Activity (Last 5 records)
+        // 3. Recent Activity (Last 5 records)
         const recentActivityRes = await query(`
-        SELECT ar.marked_at, s.enrollment_no, sub.code as subject_code
-        FROM attendance_records ar
-        JOIN students s ON ar.student_id = s.id
-        JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
-        JOIN timetable t ON as_sess.timetable_id = t.id
-        JOIN subjects sub ON t.subject_id = sub.id
-        ORDER BY ar.marked_at DESC
-        LIMIT 5
-    `);
-
+            SELECT ar.marked_at, s.enrollment_no, sub.code as subject_code
+            FROM attendance_records ar
+            JOIN students s ON ar.student_id = s.id
+            JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
+            JOIN timetable t ON as_sess.timetable_id = t.id
+            JOIN subjects sub ON t.subject_id = sub.id
+            ORDER BY ar.marked_at DESC
+            LIMIT 5
+        `);
         const recentActivity = recentActivityRes.rows;
+
+        // 5. Chart Data (Last 7 Days)
+        const chartRes = await query(`
+            SELECT 
+                to_char(marked_at, 'Dy') as name,
+                COUNT(*) FILTER (WHERE status = 'Present') as present,
+                COUNT(*) FILTER (WHERE status = 'Absent') as absent
+            FROM attendance_records
+            WHERE marked_at > CURRENT_DATE - INTERVAL '7 days'
+            GROUP BY 1, marked_at::date
+            ORDER BY marked_at::date
+        `);
+
+        // Fill in missing days if needed, but for now just return what we have
+        const chartData = chartRes.rows.map(row => ({
+            name: row.name,
+            present: parseInt(row.present),
+            absent: parseInt(row.absent)
+        }));
 
         return NextResponse.json({
             stats: {
@@ -52,13 +78,8 @@ export async function GET() {
                 monthlyRate,
             },
             recentActivity,
-            chartData: [
-                { name: 'Mon', present: 40, absent: 20 },
-                { name: 'Tue', present: 45, absent: 15 },
-                { name: 'Wed', present: 30, absent: 30 },
-                { name: 'Thu', present: 50, absent: 10 },
-                { name: 'Fri', present: 48, absent: 12 },
-                { name: 'Sat', present: 35, absent: 25 },
+            chartData: chartData.length > 0 ? chartData : [
+                { name: 'No Data', present: 0, absent: 0 }
             ]
         });
 
