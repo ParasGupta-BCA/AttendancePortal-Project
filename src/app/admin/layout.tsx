@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/admin-sidebar";
+import { MobileSidebar } from "@/components/mobile-sidebar";
 
 export default function AdminLayout({
     children,
@@ -11,6 +12,9 @@ export default function AdminLayout({
                 <Sidebar />
             </div>
             <main className="md:pl-72">
+                <div className="flex items-center p-4 md:hidden">
+                    <MobileSidebar role="admin" />
+                </div>
                 {children}
             </main>
         </div>

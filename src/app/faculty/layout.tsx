@@ -1,4 +1,5 @@
 import { FacultySidebar } from "@/components/faculty-sidebar";
+import { MobileSidebar } from "@/components/mobile-sidebar";
 
 export default function FacultyLayout({
     children,
@@ -14,6 +15,9 @@ export default function FacultyLayout({
                 <FacultySidebar />
             </div>
             <main className="md:pl-72">
+                <div className="flex items-center p-4 md:hidden">
+                    <MobileSidebar role="faculty" />
+                </div>
                 {children}
             </main>
         </div>
