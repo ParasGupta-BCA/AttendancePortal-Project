@@ -34,11 +34,28 @@ export async function POST(request: Request) {
 
         // Simplification: In real app, transaction needed
         // 1. Create User
-        const res = await query(
-            `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'student', TRUE) RETURNING id`,
-            [full_name, email, hashedPassword]
-        );
-        const userId = res.rows[0].id; // Corrected variable name from userRes to res
+        let userId;
+        try {
+            const res = await query(
+                `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'student', TRUE) RETURNING id`,
+                [full_name, email, hashedPassword]
+            );
+            userId = res.rows[0].id;
+        } catch (e: any) {
+            // Error 42703: column does not exist
+            if (e.code === '42703' || e.message.includes('must_change_password')) {
+                console.log("Applying missing schema migration...");
+                await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT FALSE');
+                // Retry insert
+                const res = await query(
+                    `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'student', TRUE) RETURNING id`,
+                    [full_name, email, hashedPassword]
+                );
+                userId = res.rows[0].id;
+            } else {
+                throw e;
+            }
+        }
 
         // 2. Create Student Profile
         await query(`

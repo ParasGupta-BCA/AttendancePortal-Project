@@ -42,11 +42,25 @@ export async function POST(req: Request) {
 
         // 1. Create User
         // Note: In a real app, use a transaction (BEGIN...COMMIT)
-        const userRes = await query(
-            `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'faculty', TRUE) RETURNING id`,
-            [full_name, email, hashedPassword]
-        );
-        const userId = userRes.rows[0].id;
+        let userId;
+        try {
+            const userRes = await query(
+                `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'faculty', TRUE) RETURNING id`,
+                [full_name, email, hashedPassword]
+            );
+            userId = userRes.rows[0].id;
+        } catch (e: any) {
+            if (e.code === '42703' || e.message.includes('must_change_password')) {
+                await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT FALSE');
+                const userRes = await query(
+                    `INSERT INTO users (full_name, email, password_hash, role, must_change_password) VALUES ($1, $2, $3, 'faculty', TRUE) RETURNING id`,
+                    [full_name, email, hashedPassword]
+                );
+                userId = userRes.rows[0].id;
+            } else {
+                throw e;
+            }
+        }
 
         // 2. Create Faculty Profile
         await query(
