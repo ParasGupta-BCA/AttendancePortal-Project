@@ -68,7 +68,7 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
-            import {signOut} from "next-auth/react";
+
             <div className="px-3 py-2">
                 <div
                     onClick={() => signOut({ callbackUrl: "/login" })}
