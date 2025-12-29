@@ -12,6 +12,10 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        // AUTO-HEALING: Remove sessions with invalid duration (due to timezone bug)
+        // If duration > 3 hours, it's a bugged session (valid classes are ~1 hr)
+        await query(`DELETE FROM attendance_sessions WHERE EXTRACT(EPOCH FROM (end_time - start_time)) > 10800`);
+
         const userId = (session.user as any).id;
 
         // 1. Get Student ID
