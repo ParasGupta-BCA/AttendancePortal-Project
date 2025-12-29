@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 export default function ScanPage() {
     const router = useRouter();
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'expired'>('idle');
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         // ... same scanner setup ...
@@ -130,8 +131,8 @@ export default function ScanPage() {
                     {/* Text */}
                     <div className="text-center space-y-2">
                         <h3 className={`text-2xl font-bold ${status === 'success' ? 'text-green-600' :
-                                status === 'error' ? 'text-red-600' :
-                                    status === 'expired' ? 'text-yellow-600' : 'text-blue-600'
+                            status === 'error' ? 'text-red-600' :
+                                status === 'expired' ? 'text-yellow-600' : 'text-blue-600'
                             }`}>
                             {status === 'loading' ? 'Processing...' :
                                 status === 'success' ? 'Success!' :
