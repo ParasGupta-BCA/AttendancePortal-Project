@@ -63,7 +63,7 @@ export function ChangePasswordForm() {
                             required
                         />
                     </div>
-                    <Button type="submit" disabled={loading}>
+                    <Button type="submit" disabled={loading} className="w-full mt-4">
                         {loading ? "Updating..." : "Update Password"}
                     </Button>
                 </form>
