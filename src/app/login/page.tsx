@@ -1,18 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function LoginPage() {
+    const { data: session, status } = useSession();
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (status === "authenticated" && session?.user) {
+            const user = session.user as any;
+            if (user.role === 'student') {
+                router.replace("/student/dashboard");
+            } else if (user.role === 'faculty') {
+                router.replace("/faculty/dashboard");
+            } else {
+                router.replace("/admin/dashboard");
+            }
+        }
+    }, [status, session, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,6 +63,14 @@ export default function LoginPage() {
             }
         }
     };
+
+    if (status === "loading") {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+                <p>Checking session...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
