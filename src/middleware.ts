@@ -12,7 +12,15 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+
+    // Strict Cache-Control headers to prevent Back button access after logout
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    response.headers.set('Surrogate-Control', 'no-store');
+
+    return response;
 }
 
 export const config = {
