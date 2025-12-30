@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,8 +25,8 @@ export function ChangePasswordForm() {
             const json = await res.json();
 
             if (res.ok) {
-                alert("Password changed successfully!");
-                setFormData({ currentPassword: "", newPassword: "" });
+                alert("Password changed successfully! Please login again.");
+                await signOut({ callbackUrl: "/login" });
             } else {
                 alert("Error: " + json.error);
             }

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 export function ChangeEmailForm() {
     const [newEmail, setNewEmail] = useState("");
@@ -29,9 +30,7 @@ export function ChangeEmailForm() {
 
             if (res.ok) {
                 alert("Email updated successfully! Please login with your new email.");
-                // Optionally sign out the user
-                // signOut();
-                router.refresh(); // Or redirect
+                await signOut({ callbackUrl: "/login" });
             } else {
                 alert(data.error || "Failed to update email");
             }
