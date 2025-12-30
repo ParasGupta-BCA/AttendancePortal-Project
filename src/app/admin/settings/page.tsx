@@ -104,7 +104,7 @@ export default function SettingsPage() {
                 </TabsContent>
 
                 <TabsContent value="account">
-                    <div className="grid gap-6 md:grid-cols-2 max-w-4xl">
+                    <div className="grid gap-10 md:grid-cols-2 max-w-4xl">
                         <ChangePasswordForm />
                         <ChangeEmailForm />
                     </div>
