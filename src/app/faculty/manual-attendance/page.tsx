@@ -123,21 +123,26 @@ export default function ManualAttendancePage() {
         s.enrollment_no.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const presentCount = students.filter(s => attendanceMap[s.id] === 'Present').length;
+    const absentCount = students.length - presentCount;
+
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
-            <h1 className="text-2xl font-bold">Manual Attendance</h1>
+        <div className="flex-1 space-y-4 p-8 pt-6">
+            <div className="flex items-center justify-between space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">Manual Attendance</h2>
+            </div>
 
             {/* Filters */}
-            <Card>
+            <Card className="border-t-4 border-t-blue-500 shadow-md">
                 <CardHeader>
-                    <CardTitle>Select Class Session</CardTitle>
+                    <CardTitle className="text-lg">Select Class Session</CardTitle>
                     <CardDescription>Choose the class details to mark attendance.</CardDescription>
                 </CardHeader>
-                <CardContent className="grid md:grid-cols-3 gap-4">
+                <CardContent className="grid md:grid-cols-3 gap-6">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Class & Section</label>
+                        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Class & Section</label>
                         <Select onValueChange={setSelectedClassRaw} value={selectedClassRaw}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select Class" />
                             </SelectTrigger>
                             <SelectContent>
@@ -151,9 +156,9 @@ export default function ManualAttendancePage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Subject</label>
+                        <label className="text-sm font-medium leading-none">Subject</label>
                         <Select onValueChange={setSelectedSubject} value={selectedSubject}>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select Subject" />
                             </SelectTrigger>
                             <SelectContent>
@@ -167,9 +172,10 @@ export default function ManualAttendancePage() {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Date</label>
+                        <label className="text-sm font-medium leading-none">Date</label>
                         <Input
                             type="date"
+                            className="w-full"
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
                         />
@@ -179,78 +185,121 @@ export default function ManualAttendancePage() {
 
             {/* Student List */}
             {selectedClassRaw && selectedSubject && students.length > 0 && (
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                            <CardTitle>Students ({filteredStudents.length})</CardTitle>
-                            <div className="mt-2 flex gap-2">
-                                <Button size="sm" variant="outline" onClick={() => markAll('Present')}>Mark All Present</Button>
-                                <Button size="sm" variant="outline" onClick={() => markAll('Absent')}>Mark All Absent</Button>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Search className="w-4 h-4 text-gray-500" />
-                            <Input
-                                placeholder="Search student..."
-                                className="w-[200px]"
-                                value={searchQuery}
-                                onChange={e => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {loading ? (
-                            <div className="text-center py-8 text-gray-500">Loading records...</div>
-                        ) : (
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {filteredStudents.map((student) => {
-                                    const isPresent = attendanceMap[student.id] === 'Present';
-                                    return (
-                                        <div
-                                            key={student.id}
-                                            onClick={() => toggleAttendance(student.id)}
-                                            className={`
-                                                cursor-pointer flex items-center justify-between p-3 rounded-lg border transition-all
-                                                ${isPresent
-                                                    ? 'bg-green-50 border-green-200 hover:bg-green-100'
-                                                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-blue-300'
-                                                }
-                                            `}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={`
-                                                    w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
-                                                    ${isPresent ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-600'}
-                                                `}>
-                                                    {student.full_name.substring(0, 2).toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <p className="font-semibold text-sm">{student.full_name}</p>
-                                                    <p className="text-xs text-gray-500">{student.enrollment_no}</p>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                {isPresent ? <Check className="w-5 h-5 text-green-600" /> : <X className="w-5 h-5 text-gray-300" />}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Summary Stats for this session */}
+                    <div className="grid gap-4 md:grid-cols-3">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Students</CardTitle>
+                                <User className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{students.length}</div>
+                            </CardContent>
+                        </Card>
+                        <Card className="border-l-4 border-l-green-500">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Marked Present</CardTitle>
+                                <Check className="h-4 w-4 text-green-500" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-green-600">{presentCount}</div>
+                            </CardContent>
+                        </Card>
+                        <Card className="border-l-4 border-l-red-500">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Marked Absent</CardTitle>
+                                <X className="h-4 w-4 text-red-500" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-red-600">{absentCount}</div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                        <div className="mt-8 flex justify-end sticky bottom-4 bg-white/90 p-4 border-t backdrop-blur-sm rounded-lg shadow-lg">
-                            <Button size="lg" onClick={handleSave} disabled={saving} className="w-full md:w-auto">
-                                <Save className="w-4 h-4 mr-2" />
-                                {saving ? 'Saving...' : 'Save Attendance Record'}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                    <Card className="shadow-lg">
+                        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div>
+                                <CardTitle>Student List</CardTitle>
+                                <CardDescription>Manage attendance for the selected session.</CardDescription>
+                            </div>
+                            <div className="flex w-full md:w-auto flex-col md:flex-row gap-3">
+                                <div className="relative">
+                                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search student..."
+                                        className="pl-9 w-full md:w-[250px]"
+                                        value={searchQuery}
+                                        onChange={e => setSearchQuery(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button size="sm" variant="outline" onClick={() => markAll('Present')} className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200">All Present</Button>
+                                    <Button size="sm" variant="outline" onClick={() => markAll('Absent')} className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">All Absent</Button>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {loading ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                            ) : (
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {filteredStudents.map((student) => {
+                                        const isPresent = attendanceMap[student.id] === 'Present';
+                                        return (
+                                            <div
+                                                key={student.id}
+                                                onClick={() => toggleAttendance(student.id)}
+                                                className={`
+                                                    group cursor-pointer flex items-center justify-between p-4 rounded-xl border transition-all duration-200
+                                                    ${isPresent
+                                                        ? 'bg-green-50/50 border-green-200 hover:border-green-300 hover:bg-green-100/50 shadow-sm'
+                                                        : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-md'
+                                                    }
+                                                `}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`
+                                                        w-12 h-12 rounded-full flex items-center justify-center font-bold text-base shadow-sm transition-colors
+                                                        ${isPresent ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600'}
+                                                    `}>
+                                                        {student.full_name.substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <p className={`font-semibold text-sm ${isPresent ? 'text-green-900' : 'text-gray-900'}`}>{student.full_name}</p>
+                                                        <p className="text-xs text-muted-foreground">{student.enrollment_no}</p>
+                                                    </div>
+                                                </div>
+                                                <div className={`
+                                                    rounded-full p-1 transition-all
+                                                    ${isPresent ? 'bg-green-200 text-green-700' : 'bg-gray-100 text-gray-300 group-hover:bg-blue-100 group-hover:text-blue-500'}
+                                                `}>
+                                                    {isPresent ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            <div className="mt-8 flex justify-end sticky bottom-6 z-10">
+                                <Button size="lg" onClick={handleSave} disabled={saving} className="shadow-xl w-full md:w-auto min-w-[200px] h-12 text-base bg-primary hover:bg-primary/90 transition-transform active:scale-95">
+                                    <Save className="w-5 h-5 mr-2" />
+                                    {saving ? 'Saving Records...' : 'Save Attendance'}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             )}
 
             {selectedClassRaw && selectedSubject && students.length === 0 && !loading && (
-                <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed">
-                    <p className="text-gray-500">No students found for this class or no timetable session matches this criteria.</p>
+                <div className="flex flex-col items-center justify-center py-16 text-center bg-gray-50/50 rounded-xl border border-dashed border-gray-200 animate-in fade-in zoom-in-95 duration-300">
+                    <User className="h-12 w-12 text-gray-300 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900">No Students Found</h3>
+                    <p className="text-gray-500 max-w-sm">There are no students registered for this class section, or the timetable does not match.</p>
                 </div>
             )}
         </div>
