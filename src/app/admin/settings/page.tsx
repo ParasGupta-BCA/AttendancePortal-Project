@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChangePasswordForm } from "@/components/change-password-form";
+import { ChangeEmailForm } from "@/components/change-email-form";
 
 export default function SettingsPage() {
     const [users, setUsers] = useState<any[]>([]);
@@ -103,8 +104,9 @@ export default function SettingsPage() {
                 </TabsContent>
 
                 <TabsContent value="account">
-                    <div className="max-w-md">
+                    <div className="grid gap-6 md:grid-cols-2 max-w-4xl">
                         <ChangePasswordForm />
+                        <ChangeEmailForm />
                     </div>
                 </TabsContent>
             </Tabs>
