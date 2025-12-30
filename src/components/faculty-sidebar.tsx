@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, LogOut, Calendar, Settings } from "lucide-react";
+import { LayoutDashboard, LogOut, Calendar, Settings, UserCheck } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const routes = [
@@ -22,6 +22,12 @@ const routes = [
         icon: Settings,
         href: "/faculty/settings",
         color: "text-gray-500",
+    },
+    {
+        label: "Manual Attendance",
+        icon: UserCheck,
+        href: "/faculty/manual-attendance",
+        color: "text-orange-500",
     },
 ];
 
