@@ -164,13 +164,20 @@ export async function POST(req: Request) {
         if (sessionRes.rowCount && sessionRes.rowCount > 0) {
             sessionId = sessionRes.rows[0].id;
         } else {
+            // Get Faculty ID
+            const facultyRes = await query('SELECT id FROM faculty WHERE user_id = $1', [(session.user as any).id]);
+            if ((facultyRes.rowCount ?? 0) === 0) {
+                return NextResponse.json({ error: 'Faculty profile not found for current user' }, { status: 404 });
+            }
+            const facultyId = facultyRes.rows[0].id;
+
             // Create new "Manual" session
             // We set end_time to now + 1 hour just to have a valid range, or matches class time
             const newSessionRes = await query(`
                 INSERT INTO attendance_sessions (timetable_id, faculty_id, start_time, end_time, qr_code, is_active, created_at)
                 VALUES ($1, $2, $3::timestamp, $3::timestamp + interval '1 hour', 'MANUAL', FALSE, $3::timestamp)
                 RETURNING id
-            `, [timetableId, (session.user as any).id, date + ' 12:00:00']); // Hacky time, but date matters
+            `, [timetableId, facultyId, date + ' 12:00:00']); // Hacky time, but date matters
             sessionId = newSessionRes.rows[0].id;
         }
 
