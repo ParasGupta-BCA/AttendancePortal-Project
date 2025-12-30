@@ -18,16 +18,16 @@ const routes = [
         color: "text-violet-500",
     },
     {
-        label: "Settings",
-        icon: Settings,
-        href: "/faculty/settings",
-        color: "text-gray-500",
-    },
-    {
         label: "Manual Attendance",
         icon: UserCheck,
         href: "/faculty/manual-attendance",
         color: "text-orange-500",
+    },
+    {
+        label: "Settings",
+        icon: Settings,
+        href: "/faculty/settings",
+        color: "text-gray-500",
     },
 ];
 
