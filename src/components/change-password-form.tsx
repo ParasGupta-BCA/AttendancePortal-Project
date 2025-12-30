@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Lock } from "lucide-react";
 
 export function ChangePasswordForm() {
     const [formData, setFormData] = useState({ currentPassword: "", newPassword: "" });
@@ -36,7 +37,7 @@ export function ChangePasswordForm() {
     };
 
     return (
-        <Card className="max-w-md">
+        <Card className="shadow-md">
             <CardHeader>
                 <CardTitle>Change Password</CardTitle>
                 <CardDescription>Update your login credentials securely.</CardDescription>
@@ -45,23 +46,33 @@ export function ChangePasswordForm() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="current">Current Password</Label>
-                        <Input
-                            id="current"
-                            type="password"
-                            value={formData.currentPassword}
-                            onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
-                            required
-                        />
+                        <div className="relative">
+                            <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                            <Input
+                                id="current"
+                                type="password"
+                                placeholder="******"
+                                className="pl-9"
+                                value={formData.currentPassword}
+                                onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                                required
+                            />
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="new">New Password</Label>
-                        <Input
-                            id="new"
-                            type="password"
-                            value={formData.newPassword}
-                            onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
-                            required
-                        />
+                        <div className="relative">
+                            <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                            <Input
+                                id="new"
+                                type="password"
+                                placeholder="******"
+                                className="pl-9"
+                                value={formData.newPassword}
+                                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                                required
+                            />
+                        </div>
                     </div>
                     <Button type="submit" disabled={loading} className="w-full mt-4">
                         {loading ? "Updating..." : "Update Password"}
