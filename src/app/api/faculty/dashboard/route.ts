@@ -66,6 +66,7 @@ export async function GET() {
         JOIN attendance_sessions s ON ar.session_id = s.id
         WHERE s.faculty_id = $1
         AND ar.marked_at::date = CURRENT_DATE
+        AND ar.status = 'Present'
     `, [facultyId]);
 
         // 4. Global Analysis: Total Present vs Total Absent across ALL sesions
@@ -75,6 +76,7 @@ export async function GET() {
             FROM attendance_records ar
             JOIN attendance_sessions s ON ar.session_id = s.id
             WHERE s.faculty_id = $1
+            AND ar.status = 'Present'
         `, [facultyId]);
         const totalPresent = parseInt(globalPresentRes.rows[0].total_present || '0');
 
