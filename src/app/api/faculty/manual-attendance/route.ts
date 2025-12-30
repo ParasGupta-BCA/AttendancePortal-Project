@@ -15,8 +15,32 @@ export async function GET(req: Request) {
 
         // 1. Init: Fetch available classes (sections) and subjects
         if (type === 'init') {
-            const classesRes = await query('SELECT DISTINCT name, section FROM classes ORDER BY name, section');
-            const subjectsRes = await query('SELECT id, name, code FROM subjects ORDER BY name');
+            const userId = (session.user as any).id;
+
+            // Get Faculty ID
+            const facultyRes = await query('SELECT id FROM faculty WHERE user_id = $1', [userId]);
+            if ((facultyRes.rowCount ?? 0) === 0) {
+                return NextResponse.json({ error: 'Faculty profile not found' }, { status: 404 });
+            }
+            const facultyId = facultyRes.rows[0].id;
+
+            // Fetch Classes assigned to this faculty
+            const classesRes = await query(`
+                SELECT DISTINCT c.name, c.section 
+                FROM classes c
+                JOIN timetable t ON c.id = t.class_id
+                WHERE t.faculty_id = $1
+                ORDER BY c.name, c.section
+            `, [facultyId]);
+
+            // Fetch Subjects assigned to this faculty
+            const subjectsRes = await query(`
+                SELECT DISTINCT s.id, s.name, s.code 
+                FROM subjects s
+                JOIN timetable t ON s.id = t.subject_id
+                WHERE t.faculty_id = $1
+                ORDER BY s.name
+            `, [facultyId]);
 
             return NextResponse.json({
                 classes: classesRes.rows,
