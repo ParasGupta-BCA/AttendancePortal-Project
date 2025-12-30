@@ -53,9 +53,9 @@ export async function GET() {
       ORDER BY t.start_time ASC
     `, [student.course_year, student.section, todayName]);
 
-        // 4. Check Active Sessions for Today's Classes
-        // We want to know if any of these classes have an active session right now
+        // 4. Check Active Sessions and Attendance Status for Today's Classes
         const todayClasses = await Promise.all(classesRes.rows.map(async (cls) => {
+            // Check if there is an active session right now
             const sessionRes = await query(`
             SELECT id FROM attendance_sessions 
             WHERE timetable_id = $1 
@@ -63,9 +63,22 @@ export async function GET() {
             AND end_time > NOW()
         `, [cls.id]);
 
+            // Check if student is ALREADY marked present for this class today (active or past session)
+            // We join with attendance_sessions to ensure it matches the same class and is TODAY
+            const attendanceRes = await query(`
+                SELECT ar.id 
+                FROM attendance_records ar
+                JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
+                WHERE as_sess.timetable_id = $1 
+                AND ar.student_id = $2 
+                AND ar.status = 'Present'
+                AND as_sess.created_at::date = CURRENT_DATE
+            `, [cls.id, student.id]);
+
             return {
                 ...cls,
-                isActive: (sessionRes.rowCount ?? 0) > 0
+                isActive: (sessionRes.rowCount ?? 0) > 0,
+                isMarkedPresent: (attendanceRes.rowCount ?? 0) > 0
             };
         }));
 
