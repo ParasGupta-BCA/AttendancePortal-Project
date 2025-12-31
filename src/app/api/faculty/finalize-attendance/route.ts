@@ -30,7 +30,8 @@ export async function POST(req: Request) {
         const { timetable_id, start_time } = sessionRes.rows[0];
 
         // 2. Identify Missing Students
-        // Find students who belong to this class/section but have NO record for this session
+        // Find students who belong to this class/section but have NO 'Present' record for this Timetable Slot on this Date.
+        // We check across ALL sessions for this timetable_id on this specific date to avoid duplicates if multiple sessions were created.
         const missingStudentsRes = await query(`
             SELECT s.id 
             FROM students s
@@ -38,9 +39,19 @@ export async function POST(req: Request) {
             JOIN timetable t ON t.class_id = c.id
             WHERE t.id = $1
             AND s.id NOT IN (
-                SELECT student_id FROM attendance_records WHERE session_id = $2
+                -- Exclude if they are Present in ANY session for this timetable ID on this date
+                SELECT ar.student_id 
+                FROM attendance_records ar
+                JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
+                WHERE as_sess.timetable_id = $1
+                AND as_sess.start_time::date = $2::date
+                AND ar.status = 'Present'
             )
-        `, [timetable_id, sessionId]);
+            AND s.id NOT IN (
+                 -- Also exclude if they already have a record (Present OR Absent) in THIS specific session
+                 SELECT student_id FROM attendance_records WHERE session_id = $3
+            )
+        `, [timetable_id, start_time, sessionId]);
 
         const missingStudentIds = missingStudentsRes.rows.map(r => r.id);
 
