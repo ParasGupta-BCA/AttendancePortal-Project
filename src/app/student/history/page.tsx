@@ -17,20 +17,32 @@ export default function HistoryPage() {
 
     const [subjects, setSubjects] = useState<string[]>([]);
 
+    const fetchData = async () => {
+        try {
+            const res = await fetch("/api/student/attendance");
+            const data = await res.json();
+            const hist = data.history || [];
+
+            setHistory(hist);
+
+            // Extract unique subjects
+            const uniqueSubjects = Array.from(new Set(hist.map((r: any) => r.subject_name))) as string[];
+            setSubjects(uniqueSubjects);
+
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
-        fetch("/api/student/attendance")
-            .then((res) => res.json())
-            .then((data) => {
-                const hist = data.history || [];
-                setHistory(hist);
+        fetchData(); // Initial load
 
-                // Extract unique subjects
-                const uniqueSubjects = Array.from(new Set(hist.map((r: any) => r.subject_name))) as string[];
-                setSubjects(uniqueSubjects);
+        const interval = setInterval(() => {
+            fetchData();
+        }, 5000); // Poll every 5 seconds
 
-                setLoading(false);
-            })
-            .catch((err) => console.error(err));
+        return () => clearInterval(interval);
     }, []);
 
     // Filter Logic
@@ -135,7 +147,7 @@ export default function HistoryPage() {
                         <button onClick={() => setSelectedDate(new Date())} className="text-blue-500 text-sm mt-2 hover:underline">Go to Today</button>
                     </div>
                 ) : (
-                    filteredRecords.map((record: any, i: number) => {
+                    filteredRecords.map((record: any) => {
                         const start = record.start_time ? new Date(record.start_time) : new Date(record.session_date);
                         // Fallback duration if end_time missing
                         const end = record.end_time ? new Date(record.end_time) : new Date(start.getTime() + 60 * 60000);
@@ -144,7 +156,7 @@ export default function HistoryPage() {
                         const isPresent = record.status === 'Present';
 
                         return (
-                            <div key={i} className={cn(
+                            <div key={record.id} className={cn(
                                 "relative overflow-hidden rounded-[2rem] p-6 transition-all hover:shadow-md border",
                                 isPresent ? "bg-[#EFFCF4] border-[#E0F5E6]" : "bg-[#FEF2F2] border-[#FEE2E2]"
                             )}>

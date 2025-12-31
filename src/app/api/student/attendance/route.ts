@@ -21,6 +21,7 @@ export async function GET() {
         // Fetch History
         const historyRes = await query(`
         SELECT 
+            ar.id,
             ar.marked_at, 
             ar.status, 
             s.name as subject_name, 
