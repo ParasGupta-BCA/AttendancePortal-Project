@@ -20,13 +20,13 @@ export async function GET() {
 
         // Fetch History
         const historyRes = await query(`
-        SELECT ar.marked_at, ar.status, s.name as subject_name, s.code as subject_code
+        SELECT ar.marked_at, ar.status, s.name as subject_name, s.code as subject_code, as_sess.start_time as session_date
         FROM attendance_records ar
         JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
         JOIN timetable t ON as_sess.timetable_id = t.id
         JOIN subjects s ON t.subject_id = s.id
         WHERE ar.student_id = $1
-        ORDER BY ar.marked_at DESC
+        ORDER BY as_sess.start_time DESC
     `, [studentId]);
 
         return NextResponse.json({ history: historyRes.rows });

@@ -36,7 +36,7 @@ export default function HistoryPage() {
                     <CardContent className="p-4 flex justify-between items-center">
                         <div>
                             <h3 className="font-semibold">{record.subject_name}</h3>
-                            <p className="text-xs text-muted-foreground">{new Date(record.marked_at).toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(record.session_date).toLocaleString()}</p>
                         </div>
                         <Badge variant={record.status === 'Present' ? 'default' : 'destructive'}>
                             {record.status}

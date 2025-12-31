@@ -182,23 +182,25 @@ export async function POST(req: Request) {
         }
 
         // 3. Upsert Attendance Records
+        // 3. Upsert Attendance Records
         const queries = Object.entries(attendance).map(([studentId, status]) => {
+            const timestamp = date + ' 12:00:00';
             if (status === 'Present') {
                 return query(`
                     INSERT INTO attendance_records (session_id, student_id, status, marked_at)
-                    VALUES ($1, $2, 'Present', NOW())
+                    VALUES ($1, $2, 'Present', $3::timestamp)
                     ON CONFLICT (session_id, student_id) 
-                    DO UPDATE SET status = 'Present', marked_at = NOW()
-                `, [sessionId, studentId]);
+                    DO UPDATE SET status = 'Present', marked_at = $3::timestamp
+                `, [sessionId, studentId, timestamp]);
             } else {
                 // If marked Absent, remove record or update to Absent?
                 // Usually we just delete the 'Present' record or set to 'Absent'
                 return query(`
                     INSERT INTO attendance_records (session_id, student_id, status, marked_at)
-                    VALUES ($1, $2, 'Absent', NOW())
+                    VALUES ($1, $2, 'Absent', $3::timestamp)
                     ON CONFLICT (session_id, student_id) 
-                    DO UPDATE SET status = 'Absent', marked_at = NOW()
-                `, [sessionId, studentId]);
+                    DO UPDATE SET status = 'Absent', marked_at = $3::timestamp
+                `, [sessionId, studentId, timestamp]);
             }
         });
 
