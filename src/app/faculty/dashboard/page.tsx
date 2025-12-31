@@ -113,9 +113,38 @@ export default function FacultyDashboard() {
                                     <DialogTrigger asChild>
                                         <Button className="w-full bg-green-600 hover:bg-green-700">View Active QR</Button>
                                     </DialogTrigger>
-                                    <DialogContent className="flex flex-col items-center">
-                                        <h3 className="text-lg font-bold mb-4">Scan to Mark Attendance</h3>
+                                    <DialogContent className="flex flex-col items-center sm:max-w-md">
+                                        <h3 className="text-xl font-bold mb-4">Scan to Mark Attendance</h3>
                                         <QRDisplay code={slot.activeSession.qr_code} />
+                                        <p className="text-sm text-muted-foreground mt-4 mb-6 text-center">
+                                            Ask students to scan this QR code with their app to mark their attendance.
+                                        </p>
+                                        <Button
+                                            variant="destructive"
+                                            className="w-full"
+                                            onClick={async () => {
+                                                if (!confirm("Are you sure? This will mark all remaining students as ABSENT.")) return;
+
+                                                try {
+                                                    const res = await fetch("/api/faculty/finalize-attendance", {
+                                                        method: "POST",
+                                                        headers: { "Content-Type": "application/json" },
+                                                        body: JSON.stringify({ sessionId: slot.activeSession.id })
+                                                    });
+                                                    const json = await res.json();
+                                                    if (json.success) {
+                                                        alert(json.message);
+                                                        window.location.reload();
+                                                    } else {
+                                                        alert("Error: " + json.error);
+                                                    }
+                                                } catch (e) {
+                                                    alert("Failed to finalize session");
+                                                }
+                                            }}
+                                        >
+                                            End Session & Mark Absentees
+                                        </Button>
                                     </DialogContent>
                                 </Dialog>
                             ) : (
@@ -137,5 +166,5 @@ function QRDisplay({ code }: { code: string }) {
     useEffect(() => {
         QRCode.toDataURL(code).then(setSrc);
     }, [code]);
-    return src ? <img src={src} alt="Attendance QR" className="w-64 h-64" /> : <p>Loading QR...</p>;
+    return src ? <img src={src} alt="Attendance QR" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" /> : <p>Loading QR...</p>;
 }

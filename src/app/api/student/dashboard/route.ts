@@ -72,7 +72,7 @@ export async function GET() {
                 WHERE as_sess.timetable_id = $1 
                 AND ar.student_id = $2 
                 AND ar.status = 'Present'
-                AND as_sess.created_at::date = CURRENT_DATE
+                AND as_sess.start_time::date = CURRENT_DATE
             `, [cls.id, student.id]);
 
             return {

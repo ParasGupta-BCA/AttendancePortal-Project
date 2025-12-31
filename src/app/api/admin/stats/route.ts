@@ -70,6 +70,21 @@ export async function GET() {
             absent: parseInt(row.absent)
         }));
 
+        // 6. Active Sessions
+        // Fetch currently active sessions to allow Admin to monitor/close them
+        const activeSessionsRes = await query(`
+            SELECT s.id, s.qr_code, sub.name as subject_name, c.name as class_name, c.section, f.designation, u.full_name as faculty_name
+            FROM attendance_sessions s
+            JOIN timetable t ON s.timetable_id = t.id
+            JOIN subjects sub ON t.subject_id = sub.id
+            JOIN classes c ON t.class_id = c.id
+            LEFT JOIN faculty f ON s.faculty_id = f.id
+            LEFT JOIN users u ON f.user_id = u.id
+            WHERE s.is_active = TRUE
+            ORDER BY s.start_time DESC
+        `);
+        const activeSessions = activeSessionsRes.rows;
+
         return NextResponse.json({
             stats: {
                 totalStudents,
@@ -78,6 +93,7 @@ export async function GET() {
                 monthlyRate,
             },
             recentActivity,
+            activeSessions,
             chartData: chartData.length > 0 ? chartData : [
                 { name: 'No Data', present: 0, absent: 0 }
             ]

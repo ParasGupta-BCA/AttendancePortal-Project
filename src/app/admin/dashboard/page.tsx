@@ -100,6 +100,8 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
             </div>
+
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="col-span-4">
                     <CardHeader>
@@ -109,30 +111,112 @@ export default function DashboardPage() {
                         <Overview data={chartData || []} />
                     </CardContent>
                 </Card>
-                <Card className="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-8">
-                            {(!recentActivity || recentActivity.length === 0) && <p className="text-sm text-muted-foreground">No recent activity.</p>}
-                            {recentActivity?.map((activity: any, i: number) => (
-                                <div key={i} className="flex items-center">
-                                    <div className="ml-4 space-y-1">
-                                        <p className="text-sm font-medium leading-none">{activity.enrollment_no}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            Marked Present in {activity.subject_code}
-                                        </p>
+
+                {/* Active Sessions & Recent Activity Column */}
+                <div className="col-span-3 space-y-4">
+                    {/* Active Sessions */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Active Sessions</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {data?.activeSessions?.length === 0 && <p className="text-sm text-muted-foreground">No active sessions.</p>}
+                                {data?.activeSessions?.map((session: any) => (
+                                    <div key={session.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                                        <div>
+                                            <p className="font-medium">{session.subject_name}</p>
+                                            <p className="text-xs text-muted-foreground">{session.class_name} ({session.section}) • {session.faculty_name || 'Admin'}</p>
+                                        </div>
+                                        <ActiveSessionDialog session={session} />
                                     </div>
-                                    <div className="ml-auto font-medium">
-                                        {new Date(activity.marked_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Recent Activity</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-8">
+                                {(!recentActivity || recentActivity.length === 0) && <p className="text-sm text-muted-foreground">No recent activity.</p>}
+                                {recentActivity?.map((activity: any, i: number) => (
+                                    <div key={i} className="flex items-center">
+                                        <div className="ml-4 space-y-1">
+                                            <p className="text-sm font-medium leading-none">{activity.enrollment_no}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Marked Present in {activity.subject_code}
+                                            </p>
+                                        </div>
+                                        <div className="ml-auto font-medium">
+                                            {new Date(activity.marked_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </div>
+        </div >
     );
+}
+
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import QRCode from "qrcode";
+
+function ActiveSessionDialog({ session }: { session: any }) {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="text-green-600 border-green-200 hover:bg-green-50">View / End</Button>
+            </DialogTrigger>
+            <DialogContent className="flex flex-col items-center sm:max-w-md">
+                <h3 className="text-xl font-bold mb-4">{session.subject_name}</h3>
+                <p className="text-sm text-muted-foreground mb-4">Scan to mark attendance</p>
+
+                <QRDisplay code={session.qr_code} />
+
+                <div className="w-full mt-6 border-t pt-4">
+                    <Button
+                        variant="destructive"
+                        className="w-full"
+                        onClick={async () => {
+                            if (!confirm("Are you sure? This will END the session and mark remaining students as ABSENT.")) return;
+
+                            try {
+                                const res = await fetch("/api/faculty/finalize-attendance", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ sessionId: session.id })
+                                });
+                                const json = await res.json();
+                                if (json.success) {
+                                    alert(json.message);
+                                    window.location.reload();
+                                } else {
+                                    alert("Error: " + json.error);
+                                }
+                            } catch (e) {
+                                alert("Failed to finalize session");
+                            }
+                        }}
+                    >
+                        End Session & Mark Absentees
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function QRDisplay({ code }: { code: string }) {
+    const [src, setSrc] = useState("");
+    useEffect(() => {
+        QRCode.toDataURL(code).then(setSrc);
+    }, [code]);
+    return src ? <img src={src} alt="Attendance QR" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" /> : <p>Loading QR...</p>;
 }
