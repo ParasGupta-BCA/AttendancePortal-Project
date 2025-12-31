@@ -86,7 +86,7 @@ export default function HistoryPage() {
             {/* Header */}
             <div className="flex justify-between items-end px-1">
                 <div>
-                    <h2 className="text-2xl font-bold">Hello</h2>
+                    <h2 className="text-2xl font-bold">History</h2>
                     <p className="text-muted-foreground">{filteredRecords.length} Lectures for {selectedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</p>
                 </div>
 
