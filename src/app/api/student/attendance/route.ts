@@ -29,13 +29,15 @@ export async function GET() {
             as_sess.start_time as session_date,
             as_sess.start_time,
             as_sess.end_time,
-            u.full_name as faculty_name
+            COALESCE(u.full_name, u_tt.full_name, 'Unknown') as faculty_name
         FROM attendance_records ar
         JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
         JOIN timetable t ON as_sess.timetable_id = t.id
         JOIN subjects s ON t.subject_id = s.id
         LEFT JOIN faculty f ON as_sess.faculty_id = f.id
         LEFT JOIN users u ON f.user_id = u.id
+        LEFT JOIN faculty f_tt ON t.faculty_id = f_tt.id
+        LEFT JOIN users u_tt ON f_tt.user_id = u_tt.id
         WHERE ar.student_id = $1
         ORDER BY as_sess.start_time DESC
     `, [studentId]);
