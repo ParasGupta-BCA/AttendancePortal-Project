@@ -63,22 +63,24 @@ export async function GET() {
             AND end_time > NOW()
         `, [cls.id]);
 
-            // Check if student is ALREADY marked present for this class today (active or past session)
+            // Check if student is ALREADY marked (Present or Absent) for this class today (active or past session)
             // We join with attendance_sessions to ensure it matches the same class and is TODAY
             const attendanceRes = await query(`
-                SELECT ar.id 
+                SELECT ar.status 
                 FROM attendance_records ar
                 JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
                 WHERE as_sess.timetable_id = $1 
                 AND ar.student_id = $2 
-                AND ar.status = 'Present'
                 AND as_sess.start_time::date = CURRENT_DATE
             `, [cls.id, student.id]);
+
+            const status = attendanceRes.rows[0]?.status || null;
 
             return {
                 ...cls,
                 isActive: (sessionRes.rowCount ?? 0) > 0,
-                isMarkedPresent: (attendanceRes.rowCount ?? 0) > 0
+                isMarkedPresent: status === 'Present', // Keep for backward compat if needed, but prefer 'status'
+                status: status
             };
         }));
 

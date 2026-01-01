@@ -91,15 +91,19 @@ export default function StudentDashboard() {
                     <p className="text-sm text-gray-500">No classes scheduled for today.</p>
                 ) : (
                     todayClasses.map((cls: any) => (
-                        <Card key={cls.id} className={`p-4 border-l-4 ${cls.isMarkedPresent ? 'border-l-green-500 bg-green-50/50' : cls.isActive ? 'border-l-blue-500 shadow-md animate-pulse' : 'border-l-gray-300'}`}>
+                        <Card key={cls.id} className={`p-4 border-l-4 ${cls.status === 'Present' ? 'border-l-green-500 bg-green-50/50' : cls.status === 'Absent' ? 'border-l-red-500 bg-red-50/50' : cls.isActive ? 'border-l-blue-500 shadow-md animate-pulse' : 'border-l-gray-300'}`}>
                             <div className="flex justify-between items-center">
                                 <div>
                                     <h4 className="font-bold">{cls.subject_name}</h4>
                                     <p className="text-xs text-gray-500">{cls.start_time} - {cls.end_time}</p>
                                 </div>
-                                {cls.isMarkedPresent ? (
+                                {cls.status === 'Present' ? (
                                     <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center gap-1 font-bold">
                                         <CheckCircle2 className="w-3 h-3" /> Present
+                                    </span>
+                                ) : cls.status === 'Absent' ? (
+                                    <span className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full flex items-center gap-1 font-bold">
+                                        <XCircle className="w-3 h-3" /> Absent
                                     </span>
                                 ) : cls.isActive ? (
                                     <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full animate-pulse">Active Now</span>
