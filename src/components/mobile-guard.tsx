@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Smartphone, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
 
 export function MobileGuard({ children }: { children: React.ReactNode }) {
     const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -84,6 +85,16 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                                 <span>Copy Link to Clipboard</span>
                             </>
                         )}
+                    </Button>
+                </div>
+
+                <div className="mt-4">
+                    <Button
+                        onClick={() => signOut({ callbackUrl: "/login" })}
+                        variant="ghost"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                    >
+                        Log Out
                     </Button>
                 </div>
             </div>
