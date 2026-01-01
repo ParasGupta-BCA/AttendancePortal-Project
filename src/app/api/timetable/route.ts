@@ -11,7 +11,13 @@ export async function GET(request: Request) {
         let queryText = `
         SELECT t.id, t.day_of_week, t.start_time, t.end_time, t.room_no,
                s.name as subject_name, s.code as subject_code,
-               f.designation as faculty_name
+               f.designation as faculty_name,
+               (SELECT json_build_object('id', ans.id, 'qr_code', ans.qr_code) 
+                FROM attendance_sessions ans 
+                WHERE ans.timetable_id = t.id 
+                AND ans.is_active = TRUE 
+                AND ans.end_time > NOW() 
+                LIMIT 1) as active_session
         FROM timetable t
         JOIN subjects s ON t.subject_id = s.id
         LEFT JOIN faculty f ON t.faculty_id = f.id

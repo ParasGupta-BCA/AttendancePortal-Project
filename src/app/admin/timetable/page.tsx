@@ -67,6 +67,22 @@ export default function TimetablePage() {
     }, [showAddModal]);
 
     const handleGenerateQR = async (slot: any) => {
+        // If already active, just show it
+        if (slot.active_session) {
+            try {
+                const qrImage = await QRCode.toDataURL(slot.active_session.qr_code);
+                setActiveSession({
+                    ...slot,
+                    qrImage,
+                    expiry: new Date(Date.now() + 10 * 60 * 1000) // Visual only
+                });
+            } catch (e) {
+                console.error(e);
+                alert("Error displaying QR");
+            }
+            return;
+        }
+
         try {
             const res = await fetch("/api/attendance/session/create", {
                 method: "POST",
@@ -76,6 +92,16 @@ export default function TimetablePage() {
             const data = await res.json();
             if (!res.ok) { alert(data.error || "Failed"); return; }
             const qrImage = await QRCode.toDataURL(data.qr_code);
+
+            // Optimistically update the list so the button turns green immediately
+            const updatedTimetable = timetable.map(t => {
+                if (t.id === slot.id) {
+                    return { ...t, active_session: { id: data.session_id, qr_code: data.qr_code } };
+                }
+                return t;
+            });
+            setTimetable(updatedTimetable);
+
             setActiveSession({ ...slot, qrImage });
         } catch (error) { alert("Error generating QR"); }
     };
@@ -143,9 +169,11 @@ export default function TimetablePage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {(grouped[day] || []).length === 0 && <p className="text-muted-foreground text-sm italic">No classes scheduled.</p>}
                             {grouped[day]?.map((slot: any) => (
-                                <Card key={slot.id} className={`relative overflow-hidden ${isEditing ? 'border-dashed border-2' : ''}`}>
+                                <Card key={slot.id} className={`relative overflow-hidden ${isEditing ? 'border-dashed border-2' : ''} ${slot.active_session ? 'border-green-500 border-2' : ''}`}>
                                     <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                                        <Badge variant="outline" className="w-fit">{slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}</Badge>
+                                        <Badge variant={slot.active_session ? "default" : "outline"} className={`w-fit ${slot.active_session ? 'bg-green-600 hover:bg-green-700' : ''}`}>
+                                            {slot.active_session ? 'Live Now' : `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}`}
+                                        </Badge>
                                         {isEditing && (
                                             <Button variant="destructive" size="icon" className="h-6 w-6" onClick={() => handleDelete(slot.id)}>
                                                 <Trash2 className="h-3 w-3" />
@@ -157,8 +185,8 @@ export default function TimetablePage() {
                                         <p className="text-sm text-muted-foreground mb-4">{slot.faculty_name || "Unknown Faculty"}</p>
 
                                         {!isEditing && (
-                                            <Button size="sm" className="w-full" onClick={() => handleGenerateQR(slot)}>
-                                                Generate QR
+                                            <Button size="sm" className={`w-full ${slot.active_session ? 'bg-green-600 hover:bg-green-700' : ''}`} onClick={() => handleGenerateQR(slot)}>
+                                                {slot.active_session ? 'View Active QR' : 'Generate QR'}
                                             </Button>
                                         )}
                                     </CardContent>
