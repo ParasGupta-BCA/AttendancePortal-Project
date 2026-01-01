@@ -28,6 +28,7 @@ export async function GET() {
       JOIN subjects s ON t.subject_id = s.id
       JOIN classes c ON t.class_id = c.id
       WHERE t.faculty_id = $1
+      AND t.is_active = TRUE
       ORDER BY 
         CASE 
           WHEN day_of_week = 'Monday' THEN 1

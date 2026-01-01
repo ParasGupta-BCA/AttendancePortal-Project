@@ -41,6 +41,7 @@ export async function GET() {
       JOIN classes c ON t.class_id = c.id
       WHERE t.faculty_id = $1
       AND t.day_of_week = $2
+      AND t.is_active = TRUE
       ORDER BY t.start_time ASC
     `, [facultyId, todayName]);
 

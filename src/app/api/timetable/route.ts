@@ -11,15 +11,16 @@ export async function GET(request: Request) {
         let queryText = `
         SELECT t.id, t.day_of_week, t.start_time, t.end_time, t.room_no,
                s.name as subject_name, s.code as subject_code,
-               f.designation as faculty_name -- Using designation as placeholder if full name joins are pending
+               f.designation as faculty_name
         FROM timetable t
         JOIN subjects s ON t.subject_id = s.id
         LEFT JOIN faculty f ON t.faculty_id = f.id
+        WHERE t.is_active = TRUE
     `;
 
         const params: any[] = [];
         if (day) {
-            queryText += ` WHERE t.day_of_week = $1`;
+            queryText += ` AND t.day_of_week = $1`;
             params.push(day);
         }
 
