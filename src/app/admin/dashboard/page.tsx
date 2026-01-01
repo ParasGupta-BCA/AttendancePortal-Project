@@ -113,9 +113,9 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Active Sessions & Recent Activity Column */}
-                <div className="col-span-3 space-y-4">
+                <div className="col-span-3 grid grid-cols-2 gap-4 md:grid-cols-1 md:space-y-4">
                     {/* Active Sessions */}
-                    <Card>
+                    <Card className="h-full">
                         <CardHeader>
                             <CardTitle>Active Sessions</CardTitle>
                         </CardHeader>
@@ -135,12 +135,12 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="h-full">
                         <CardHeader>
                             <CardTitle>Recent Activity</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-8">
+                            <div className="space-y-4">
                                 {(!recentActivity || recentActivity.length === 0) && <p className="text-sm text-muted-foreground">No recent activity.</p>}
                                 {recentActivity?.map((activity: any, i: number) => (
                                     <div key={i} className="flex items-center">
