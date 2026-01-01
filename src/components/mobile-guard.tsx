@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Smartphone, Copy, Check } from "lucide-react";
+import { Smartphone, Copy, Check, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 
@@ -64,8 +64,8 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                     The Student Portal is exclusively designed for mobile devices to provide the best scanning and attendance experience.
                 </p>
 
-                <div className="space-y-4">
-                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+                <div className="space-y-3">
+                    <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">
                         Switch to your phone
                     </p>
 
@@ -86,14 +86,13 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                             </>
                         )}
                     </Button>
-                </div>
 
-                <div className="mt-4">
                     <Button
                         onClick={() => signOut({ callbackUrl: "/login" })}
                         variant="ghost"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        className="w-full h-12 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors group"
                     >
+                        <LogOut className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform" />
                         Log Out
                     </Button>
                 </div>
