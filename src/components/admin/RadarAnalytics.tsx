@@ -4,17 +4,16 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MapPin, Target } from "lucide-react";
+import { MapPin, Target, Signal } from "lucide-react";
 
 export function RadarAnalytics() {
     const [logs, setLogs] = useState<any[]>([]);
-    const [radiusSettings, setRadiusSettings] = useState(200); // Default, should fetch
+    const [radiusSettings, setRadiusSettings] = useState(200);
 
     // Fetch logs & settings
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Parallel fetch
                 const [logsRes, settingsRes] = await Promise.all([
                     fetch("/api/admin/scan-logs"),
                     fetch("/api/admin/settings")
@@ -36,24 +35,17 @@ export function RadarAnalytics() {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 3000); // Fast update for real-time feel
+        const interval = setInterval(fetchData, 3000);
         return () => clearInterval(interval);
     }, []);
 
-    // Filter for very recent logs (e.g. last 5 mins) to show on radar to avoid clutter? 
-    // Or just show the last 20 regardless of time, but fade them out?
-    // Let's show the latest 15 logs on the radar.
     const radarBlips = logs.slice(0, 15).map((log, i) => {
-        // Generate a stable random angle based on ID so it doesn't jump around on refresh
-        // Simple hash of last char
         const idChar = log.id ? log.id.charCodeAt(log.id.length - 1) : Math.random() * 100;
         const randomAngle = (idChar % 360) * (Math.PI / 180);
 
-        // Calculate distance relative to max radius (cap at 100% + bit)
         const rawDist = log.distance_meters || 0;
-        const normalizedDist = Math.min((rawDist / radiusSettings) * 45, 48); // Stick to 48% radius max if inside
+        const normalizedDist = Math.min((rawDist / radiusSettings) * 45, 48);
 
-        // If out of range, put it on the edge or slightly outside
         const isOutOfRange = rawDist > radiusSettings;
         const finalDist = isOutOfRange ? 48 : normalizedDist;
 
@@ -66,94 +58,104 @@ export function RadarAnalytics() {
     });
 
     return (
-        <Card className="col-span-full border-green-900/20 bg-black text-green-500 overflow-hidden relative">
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
-
-            <CardHeader className="flex flex-row items-center justify-between z-10 relative border-b border-green-900/30 bg-black/50 backdrop-blur">
-                <CardTitle className="tracking-widest uppercase text-xs font-bold text-green-400 flex items-center gap-2">
-                    <Target className="w-4 h-4 animate-pulse" />
-                    Live Geolocation Radar
+        <Card className="col-span-full bg-white shadow-sm border border-gray-200 overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 pb-4">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold text-gray-800">
+                    <Signal className="w-5 h-5 text-blue-600" />
+                    Real-time Geolocation Radar
                 </CardTitle>
-                <Badge variant="outline" className="border-green-500 text-green-400 animate-pulse bg-green-900/20">
-                    Online
-                </Badge>
+                <div className="flex items-center gap-2">
+                    <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                    </span>
+                    <span className="text-xs font-medium text-gray-500">Live Monitoring</span>
+                </div>
             </CardHeader>
 
-            <CardContent className="p-0 z-10 relative">
+            <CardContent className="p-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 h-[400px]">
 
-                    {/* RADAR VISUALIZATION */}
-                    <div className="relative flex items-center justify-center bg-black overflow-hidden border-r border-green-900/30">
+                    {/* RADAR VISUALIZATION (Light Mode) */}
+                    <div className="relative flex items-center justify-center bg-gray-50/50 border-r border-gray-100">
                         {/* Radar Grid */}
-                        <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full border border-green-800/40 shadow-[0_0_50px_rgba(34,197,94,0.1)]">
-                            <div className="absolute inset-0 rounded-full border border-green-900/30 scale-75"></div>
-                            <div className="absolute inset-0 rounded-full border border-green-900/30 scale-50"></div>
-                            <div className="absolute inset-0 rounded-full border border-green-900/30 scale-25"></div>
+                        <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full border border-gray-300 bg-white shadow-sm">
+                            <div className="absolute inset-0 rounded-full border border-gray-100 scale-75"></div>
+                            <div className="absolute inset-0 rounded-full border border-gray-100 scale-50"></div>
+                            <div className="absolute inset-0 rounded-full border border-gray-100 scale-25"></div>
 
                             {/* Crosshairs */}
-                            <div className="absolute top-0 bottom-0 left-1/2 w-px bg-green-900/50"></div>
-                            <div className="absolute left-0 right-0 top-1/2 h-px bg-green-900/50"></div>
+                            <div className="absolute top-0 bottom-0 left-1/2 w-px bg-gray-200"></div>
+                            <div className="absolute left-0 right-0 top-1/2 h-px bg-gray-200"></div>
 
-                            {/* Rotating Sweep */}
-                            <div className="absolute inset-0 rounded-full animate-[spin_4s_linear_infinite] origin-center bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(34,197,94,0.3)_360deg)]"></div>
+                            {/* Rotating Sweep (Subtle Blue) */}
+                            <div className="absolute inset-0 rounded-full animate-[spin_4s_linear_infinite] origin-center bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(59,130,246,0.1)_360deg)]"></div>
 
                             {/* Campus Center */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-md z-10"></div>
 
                             {/* Blips */}
                             {radarBlips.map((blip) => (
                                 <div
                                     key={blip.id}
-                                    className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full shadow-[0_0_5px_currentColor] transition-all duration-1000 group hover:scale-150 cursor-pointer z-20"
+                                    className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full shadow-sm transition-all duration-1000 group cursor-pointer z-20 border border-white"
                                     style={{
                                         top: `${50 - Math.sin(blip.angle) * blip.r}%`,
                                         left: `${50 + Math.cos(blip.angle) * blip.r}%`,
-                                        color: blip.scan_status === 'SUCCESS' ? '#4ade80' : '#ef4444',
-                                        backgroundColor: blip.scan_status === 'SUCCESS' ? '#4ade80' : '#ef4444'
+                                        backgroundColor: blip.scan_status === 'SUCCESS' ? '#22c55e' : '#ef4444' // Green or Red
                                     }}
-                                    title={`${blip.student_name}: ${Math.round(blip.distance_meters)}m`}
                                 >
-                                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 bg-black/80 text-white px-1 py-0.5 rounded border border-green-900/50 pointer-events-none">
-                                        {blip.student_name}
-                                    </span>
-                                    {/* Pulse effect for recent blips */}
-                                    <div className="absolute inset-0 rounded-full animate-ping opacity-75 bg-current"></div>
+                                    {/* Tooltip on hover */}
+                                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-30">
+                                        {blip.student_name} ({Math.round(blip.distance_meters)}m)
+                                    </div>
+
+                                    {/* Ping animation for recent blips */}
+                                    <div className={`absolute inset-0 rounded-full animate-ping opacity-30 ${blip.scan_status === 'SUCCESS' ? 'bg-green-500' : 'bg-red-500'}`}></div>
                                 </div>
                             ))}
                         </div>
 
                         {/* Stats Overlay */}
-                        <div className="absolute bottom-4 left-4 text-xs font-mono text-green-700">
-                            RADIUS: {radiusSettings}M <br />
-                            OBJECTS: {radarBlips.length}
+                        <div className="absolute bottom-4 left-4 text-xs font-medium text-gray-400 bg-white/80 px-2 py-1 rounded backdrop-blur border border-gray-100">
+                            Range: {radiusSettings}m • Active: {radarBlips.length}
                         </div>
                     </div>
 
-                    {/* LOGS LIST */}
-                    <div className="bg-black/80 p-4 border-l border-green-900/30 font-mono text-sm h-full flex flex-col">
-                        <h4 className="text-green-600 mb-4 text-xs font-bold uppercase tracking-wider flex justify-between">
-                            <span>Signal Log</span>
-                            <span className="animate-pulse">REC</span>
+                    {/* LOGS LIST (Light Mode) */}
+                    <div className="bg-white p-4 h-full flex flex-col">
+                        <h4 className="text-gray-500 mb-4 text-xs font-bold uppercase tracking-wider">
+                            Recent Activity Log
                         </h4>
                         <ScrollArea className="flex-1 pr-4">
                             <div className="space-y-3">
                                 {logs.map((log) => (
-                                    <div key={log.id} className="grid grid-cols-[1fr_auto] gap-2 p-2 rounded border border-green-900/20 hover:bg-green-900/10 transition-colors">
-                                        <div>
-                                            <div className="text-green-400 font-bold truncate">{log.student_name || 'Unknown Signal'}</div>
-                                            <div className="text-green-800 text-xs">{log.enrollment_no}</div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className={`text-xs font-bold ${log.scan_status === 'SUCCESS' ? 'text-green-500' : 'text-red-500'}`}>
-                                                [{log.scan_status}]
+                                    <div key={log.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors group">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${log.scan_status === 'SUCCESS' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <div>
+                                                <div className="text-gray-900 font-medium text-sm">{log.student_name || 'Unknown Student'}</div>
+                                                <div className="text-gray-500 text-xs flex items-center gap-1">
+                                                    <Badge variant="secondary" className="h-5 px-1 text-[10px] font-normal text-gray-400 rounded-sm">
+                                                        {log.enrollment_no}
+                                                    </Badge>
+                                                    <span>•</span>
+                                                    <span>{new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </div>
                                             </div>
-                                            <div className="text-green-800 text-xs font-mono">
+                                        </div>
+
+                                        <div className="text-right">
+                                            <div className={`text-xs font-bold ${log.scan_status === 'SUCCESS' ? 'text-green-600' : 'text-red-600'}`}>
+                                                {log.scan_status === 'SUCCESS' ? 'Verified' : log.scan_status}
+                                            </div>
+                                            <div className="text-gray-400 text-xs">
                                                 {Math.round(log.distance_meters)}m
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                                {logs.length === 0 && <div className="text-green-900 text-center italic mt-10">Scanning for signals...</div>}
+                                {logs.length === 0 && <div className="text-gray-400 text-center py-10 text-sm">No recent scans detected.</div>}
                             </div>
                         </ScrollArea>
                     </div>
