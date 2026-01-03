@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 
-export function SubjectAnalytics() {
+export function SubjectAnalytics({ className }: { className?: string }) {
     const [subjects, setSubjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
@@ -30,7 +30,7 @@ export function SubjectAnalytics() {
     const displayedSubjects = showAll ? subjects : subjects.slice(0, 2);
 
     return (
-        <Card>
+        <Card className={className}>
             <CardHeader>
                 <CardTitle>Subject Performance</CardTitle>
             </CardHeader>

@@ -108,7 +108,7 @@ export default function DashboardPage() {
 
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <div className="col-span-4 space-y-4">
+                <div className="col-span-4 flex flex-col space-y-4">
                     <Card>
                         <CardHeader>
                             <CardTitle>Overview</CardTitle>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <SubjectAnalytics />
+                    <SubjectAnalytics className="flex-1" />
                 </div>
 
                 {/* Active Sessions & Recent Activity Column */}
