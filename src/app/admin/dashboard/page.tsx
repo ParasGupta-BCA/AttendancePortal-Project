@@ -107,14 +107,53 @@ export default function DashboardPage() {
 
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                    <CardHeader>
-                        <CardTitle>Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pl-2">
-                        <Overview data={chartData || []} />
-                    </CardContent>
-                </Card>
+                <div className="col-span-4 space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Overview</CardTitle>
+                        </CardHeader>
+                        <CardContent className="pl-2">
+                            <Overview data={chartData || []} />
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Subject Performance</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <div className="font-medium">Data Structures</div>
+                                        <div className="text-muted-foreground">85%</div>
+                                    </div>
+                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                                        <div className="h-full bg-green-500 w-[85%]"></div>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <div className="font-medium">Web Technologies</div>
+                                        <div className="text-muted-foreground">92%</div>
+                                    </div>
+                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                                        <div className="h-full bg-green-500 w-[92%]"></div>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <div className="font-medium">Operating Systems</div>
+                                        <div className="text-muted-foreground">78%</div>
+                                    </div>
+                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                                        <div className="h-full bg-yellow-500 w-[78%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
                 {/* Active Sessions & Recent Activity Column */}
                 <div className="col-span-3 space-y-4">
