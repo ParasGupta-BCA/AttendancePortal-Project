@@ -34,27 +34,39 @@ export default function ScanPage() {
 
     const markAttendance = async (qr_code: string) => {
         setStatus('loading');
-        setMessage("Processing...");
+        setMessage("Acquiring location...");
 
-        try {
-            // Location logic...
-            let lat = null, long = null;
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    await sendRequest(qr_code, position.coords.latitude, position.coords.longitude);
-                }, async (error) => {
-                    await sendRequest(qr_code, null, null);
-                });
-            } else {
-                await sendRequest(qr_code, null, null);
-            }
-        } catch (e) {
+        if (!("geolocation" in navigator)) {
             setStatus('error');
-            setMessage("Error getting location.");
+            setMessage("Geolocation is not supported by your browser.");
+            return;
         }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                setMessage("Verifying location...");
+                await sendRequest(qr_code, position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                console.error("Geo Error:", error);
+                setStatus('error');
+                if (error.code === error.PERMISSION_DENIED) {
+                    setMessage("Location permission denied. You MUST allow location access to mark attendance.");
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    setMessage("Location unavailable. Try moving to an open area.");
+                } else {
+                    setMessage("Error getting location. Please retry.");
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
     };
 
-    const sendRequest = async (qr_code: string, lat: any, long: any) => {
+    const sendRequest = async (qr_code: string, lat: number, long: number) => {
         try {
             const res = await fetch("/api/attendance/mark", {
                 method: "POST",
@@ -71,12 +83,14 @@ export default function ScanPage() {
                 const errMsg = data.error || "Failed to mark.";
                 if (errMsg.includes("period is over")) {
                     setStatus('expired');
+                } else if (errMsg.includes("away from class")) {
+                    setStatus('error'); // Keep error state for distance
                 } else {
                     setStatus('error');
                 }
                 setMessage(errMsg);
                 // Allow user to try again after delay?
-                setTimeout(() => window.location.reload(), 3000); // Reload to reset scanner
+                setTimeout(() => window.location.reload(), 4000);
             }
         } catch (e) {
             setStatus('error');
@@ -92,7 +106,10 @@ export default function ScanPage() {
                     <Card className="w-full max-w-sm p-4 bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden">
                         <div id="reader" className="w-full"></div>
                     </Card>
-                    <p className="text-sm text-gray-500 text-center">Align the QR code within the frame to mark your attendance.</p>
+                    <p className="text-sm text-gray-500 text-center max-w-xs">
+                        Align the QR code within the frame. <br />
+                        <span className="text-blue-600 font-medium">Location access is required.</span>
+                    </p>
                 </>
             )}
 

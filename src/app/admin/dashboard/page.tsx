@@ -43,6 +43,9 @@ export default function DashboardPage() {
         <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="flex items-center justify-between space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+                <div className="flex items-center space-x-2">
+                    <SettingsDialog />
+                </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -135,29 +138,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Recent Activity</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-8">
-                                {(!recentActivity || recentActivity.length === 0) && <p className="text-sm text-muted-foreground">No recent activity.</p>}
-                                {recentActivity?.map((activity: any, i: number) => (
-                                    <div key={i} className="flex items-center">
-                                        <div className="ml-4 space-y-1">
-                                            <p className="text-sm font-medium leading-none">{activity.enrollment_no}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Marked Present in {activity.subject_code}
-                                            </p>
-                                        </div>
-                                        <div className="ml-auto font-medium">
-                                            {new Date(activity.marked_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <ScanLogsView />
                 </div>
             </div>
         </div >
@@ -165,7 +146,12 @@ export default function DashboardPage() {
 }
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Settings as SettingsIcon, MapPin } from "lucide-react";
 import QRCode from "qrcode";
 
 function ActiveSessionDialog({ session }: { session: any }) {
@@ -219,4 +205,132 @@ function QRDisplay({ code }: { code: string }) {
         QRCode.toDataURL(code).then(setSrc);
     }, [code]);
     return src ? <img src={src} alt="Attendance QR" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" /> : <p>Loading QR...</p>;
+}
+
+function SettingsDialog() {
+    const [settings, setSettings] = useState({ campus_lat: '', campus_long: '', allowed_radius_meters: '' });
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            fetch("/api/admin/settings").then(r => r.json()).then(setSettings);
+        }
+    }, [open]);
+
+    const handleSave = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/admin/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(settings)
+            });
+            if (res.ok) alert("Settings Saved!");
+            else alert("Failed to save");
+        } catch (e) {
+            alert("Error saving settings");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getCurrentLocation = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                setSettings(prev => ({
+                    ...prev,
+                    campus_lat: pos.coords.latitude.toString(),
+                    campus_long: pos.coords.longitude.toString()
+                }));
+            });
+        } else {
+            alert("Geolocation not supported");
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                    <SettingsIcon className="w-4 h-4 mr-2" />
+                    Configure Location
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Attendance Settings</DialogTitle>
+                    <DialogDescription>Set the campus location and allowed radius for scanning.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>Latitude</Label>
+                            <Input value={settings.campus_lat} onChange={e => setSettings({ ...settings, campus_lat: e.target.value })} placeholder="28.1234" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Longitude</Label>
+                            <Input value={settings.campus_long} onChange={e => setSettings({ ...settings, campus_long: e.target.value })} placeholder="77.1234" />
+                        </div>
+                    </div>
+                    <Button type="button" variant="secondary" size="sm" className="w-full" onClick={getCurrentLocation}>
+                        <MapPin className="w-4 h-4 mr-2" /> Use Current Location
+                    </Button>
+                    <div className="space-y-2">
+                        <Label>Allowed Radius (meters)</Label>
+                        <Input value={settings.allowed_radius_meters} onChange={e => setSettings({ ...settings, allowed_radius_meters: e.target.value })} placeholder="100" />
+                    </div>
+                    <Button className="w-full" onClick={handleSave} disabled={loading}>
+                        {loading ? "Saving..." : "Save Configuration"}
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function ScanLogsView() {
+    const [logs, setLogs] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchLogs = () => fetch("/api/admin/scan-logs").then(r => r.json()).then(d => setLogs(d.logs || []));
+        fetchLogs();
+        const interval = setInterval(fetchLogs, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <Card className="col-span-full mt-4">
+            <CardHeader>
+                <CardTitle>Real-time Scan Analytics</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ScrollArea className="h-[300px]">
+                    <div className="space-y-4">
+                        {logs.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No recent scans.</p>}
+                        {logs.map((log) => (
+                            <div key={log.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                                <div className="space-y-1">
+                                    <p className="text-sm font-medium">{log.student_name || 'Unknown'}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        ID: {log.enrollment_no || 'N/A'} • {new Date(log.created_at).toLocaleTimeString()}
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <Badge variant={log.scan_status === 'SUCCESS' ? 'default' : 'destructive'}>
+                                        {log.scan_status}
+                                    </Badge>
+                                    {log.distance_meters && (
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                            {Math.round(log.distance_meters)}m away
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </ScrollArea>
+            </CardContent>
+        </Card>
+    );
 }
