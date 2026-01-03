@@ -86,25 +86,33 @@ export async function GET() {
         const activeSessions = activeSessionsRes.rows;
 
         // 7. Subject Performance (Avg Attendance per Subject)
+        // Modified to include ALL subjects via LEFT JOIN, even if no records yet
         const subjectStatsRes = await query(`
             SELECT 
                 sub.name as subject,
-                COUNT(*) FILTER (WHERE ar.status = 'Present') as present_count,
-                COUNT(*) as total_records
-            FROM attendance_records ar
-            JOIN attendance_sessions s ON ar.session_id = s.id
-            JOIN timetable t ON s.timetable_id = t.id
-            JOIN subjects sub ON t.subject_id = sub.id
+                COUNT(ar.id) FILTER (WHERE ar.status = 'Present') as present_count,
+                COUNT(ar.id) as total_records
+            FROM subjects sub
+            LEFT JOIN timetable t ON sub.id = t.subject_id
+            LEFT JOIN attendance_sessions s ON t.id = s.timetable_id
+            LEFT JOIN attendance_records ar ON s.id = ar.session_id
             GROUP BY sub.name
-            HAVING COUNT(*) > 0
-            ORDER BY (COUNT(*) FILTER (WHERE ar.status = 'Present')::float / COUNT(*)) DESC
-            LIMIT 5
+            ORDER BY 
+                CASE WHEN COUNT(ar.id) > 0 THEN 1 ELSE 0 END DESC, -- Put active subjects first
+                (COUNT(ar.id) FILTER (WHERE ar.status = 'Present')::float / NULLIF(COUNT(ar.id), 0)) DESC NULLS LAST,
+                sub.name ASC
+            LIMIT 20
         `);
 
-        const subjectPerformance = subjectStatsRes.rows.map(row => ({
-            subject: row.subject,
-            percentage: Math.round((parseInt(row.present_count) / parseInt(row.total_records)) * 100)
-        }));
+        const subjectPerformance = subjectStatsRes.rows.map(row => {
+            const total = parseInt(row.total_records);
+            const present = parseInt(row.present_count);
+            return {
+                subject: row.subject,
+                percentage: total > 0 ? Math.round((present / total) * 100) : 0,
+                hasData: total > 0 // Flag to optionally show "No Data" vs "0%"
+            };
+        });
 
         return NextResponse.json({
             stats: {
