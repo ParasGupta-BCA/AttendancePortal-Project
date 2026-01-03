@@ -27,7 +27,7 @@ export function SubjectAnalytics() {
         fetchStats();
     }, []);
 
-    const displayedSubjects = showAll ? subjects : subjects.slice(0, 3);
+    const displayedSubjects = showAll ? subjects : subjects.slice(0, 2);
 
     return (
         <Card>
@@ -60,10 +60,9 @@ export function SubjectAnalytics() {
                                         ></div>
                                     </div>
                                 </div>
-
                             ))}
 
-                            {subjects.length > 3 && (
+                            {subjects.length > 2 && (
                                 <button
                                     onClick={() => setShowAll(!showAll)}
                                     className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary pt-3 transition-colors font-medium border-t mt-2"
@@ -71,7 +70,7 @@ export function SubjectAnalytics() {
                                     {showAll ? (
                                         <>Show Less <ChevronUp className="w-3 h-3" /></>
                                     ) : (
-                                        <>Show More ({subjects.length - 3} others) <ChevronDown className="w-3 h-3" /></>
+                                        <>Show More ({subjects.length - 2} others) <ChevronDown className="w-3 h-3" /></>
                                     )}
                                 </button>
                             )}
