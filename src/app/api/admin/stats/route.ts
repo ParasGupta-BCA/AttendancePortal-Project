@@ -85,6 +85,27 @@ export async function GET() {
         `);
         const activeSessions = activeSessionsRes.rows;
 
+        // 7. Subject Performance (Avg Attendance per Subject)
+        const subjectStatsRes = await query(`
+            SELECT 
+                sub.name as subject,
+                COUNT(*) FILTER (WHERE ar.status = 'Present') as present_count,
+                COUNT(*) as total_records
+            FROM attendance_records ar
+            JOIN attendance_sessions s ON ar.session_id = s.id
+            JOIN timetable t ON s.timetable_id = t.id
+            JOIN subjects sub ON t.subject_id = sub.id
+            GROUP BY sub.name
+            HAVING COUNT(*) > 0
+            ORDER BY (COUNT(*) FILTER (WHERE ar.status = 'Present')::float / COUNT(*)) DESC
+            LIMIT 5
+        `);
+
+        const subjectPerformance = subjectStatsRes.rows.map(row => ({
+            subject: row.subject,
+            percentage: Math.round((parseInt(row.present_count) / parseInt(row.total_records)) * 100)
+        }));
+
         return NextResponse.json({
             stats: {
                 totalStudents,
@@ -94,6 +115,7 @@ export async function GET() {
             },
             recentActivity,
             activeSessions,
+            subjectPerformance,
             chartData: chartData.length > 0 ? chartData : [
                 { name: 'No Data', present: 0, absent: 0 }
             ]
