@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Overview } from "@/components/overview";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, UserCheck, UserX, Activity } from "lucide-react";
+import { RadarAnalytics } from "@/components/admin/RadarAnalytics";
 
 export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
@@ -138,7 +139,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <ScanLogsView />
+                    <RadarAnalytics />
                 </div>
             </div>
         </div >
@@ -289,48 +290,3 @@ function SettingsDialog() {
     );
 }
 
-function ScanLogsView() {
-    const [logs, setLogs] = useState<any[]>([]);
-
-    useEffect(() => {
-        const fetchLogs = () => fetch("/api/admin/scan-logs").then(r => r.json()).then(d => setLogs(d.logs || []));
-        fetchLogs();
-        const interval = setInterval(fetchLogs, 5000);
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <Card className="col-span-full mt-4">
-            <CardHeader>
-                <CardTitle>Real-time Scan Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ScrollArea className="h-[300px]">
-                    <div className="space-y-4">
-                        {logs.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No recent scans.</p>}
-                        {logs.map((log) => (
-                            <div key={log.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
-                                <div className="space-y-1">
-                                    <p className="text-sm font-medium">{log.student_name || 'Unknown'}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        ID: {log.enrollment_no || 'N/A'} • {new Date(log.created_at).toLocaleTimeString()}
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <Badge variant={log.scan_status === 'SUCCESS' ? 'default' : 'destructive'}>
-                                        {log.scan_status}
-                                    </Badge>
-                                    {log.distance_meters && (
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                            {Math.round(log.distance_meters)}m away
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </ScrollArea>
-            </CardContent>
-        </Card>
-    );
-}
