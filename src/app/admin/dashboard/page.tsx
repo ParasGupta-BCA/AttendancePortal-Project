@@ -29,13 +29,28 @@ export default function DashboardPage() {
 
     if (loading) {
         return <div className="p-8 space-y-4">
+            <div className="flex items-center justify-between">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-10 w-32" />
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Skeleton className="h-32" />
                 <Skeleton className="h-32" />
                 <Skeleton className="h-32" />
                 <Skeleton className="h-32" />
             </div>
-            <Skeleton className="h-[400px]" />
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <div className="col-span-4 flex flex-col space-y-4">
+                    <Skeleton className="h-[350px] w-full" />
+                    <Skeleton className="flex-1 w-full min-h-[200px]" />
+                </div>
+                <div className="col-span-3 space-y-4">
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-[400px] w-full" />
+                </div>
+            </div>
         </div>
     }
 
