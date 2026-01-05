@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, CheckCircle2, XCircle, RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function StudentDashboard() {
     const [data, setData] = useState<any>(null);
@@ -13,7 +14,7 @@ export default function StudentDashboard() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/student/dashboard");
+            const res = await fetch("/api/student/dashboard", { cache: 'no-store' });
             const json = await res.json();
             if (res.ok) {
                 setData(json);
@@ -52,8 +53,14 @@ export default function StudentDashboard() {
                         <h2 className="text-xl font-bold mb-1">Welcome!</h2>
                         <p className="opacity-90 text-sm">{studentDetails.course} ({studentDetails.section})</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={fetchData}>
-                        <RefreshCcw className="w-5 h-5" />
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white hover:bg-white/20 transition-colors"
+                        onClick={() => fetchData()}
+                        disabled={loading}
+                    >
+                        <RefreshCcw className={cn("w-5 h-5", loading && "animate-spin")} />
                     </Button>
                 </div>
 
@@ -92,12 +99,12 @@ export default function StudentDashboard() {
                 ) : (
                     todayClasses.map((cls: any) => (
                         <Card key={cls.id} className={`p-4 border-l-4 ${cls.status === 'Present'
-                                ? 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10'
-                                : cls.status === 'Absent'
-                                    ? 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10'
-                                    : cls.isActive
-                                        ? 'border-l-blue-500 shadow-md animate-pulse dark:bg-blue-900/10'
-                                        : 'border-l-gray-300 dark:border-l-gray-600 dark:bg-gray-800/50'
+                            ? 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10'
+                            : cls.status === 'Absent'
+                                ? 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10'
+                                : cls.isActive
+                                    ? 'border-l-blue-500 shadow-md animate-pulse dark:bg-blue-900/10'
+                                    : 'border-l-gray-300 dark:border-l-gray-600 dark:bg-gray-800/50'
                             }`}>
                             <div className="flex justify-between items-center">
                                 <div>
