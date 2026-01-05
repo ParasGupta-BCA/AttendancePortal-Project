@@ -85,9 +85,9 @@ export default function HistoryPage() {
         <div className="space-y-6 pt-6">
             {/* Header Skeleton */}
             <div className="flex justify-between items-end px-1">
-                <div className="space-y-2">
-                    <Skeleton className="h-9 w-32 rounded-lg" />
-                    <Skeleton className="h-5 w-48 rounded-md opacity-70" />
+                <div className="space-y-3">
+                    <Skeleton className="h-8 w-32 rounded-lg" />
+                    <Skeleton className="h-5 w-48 rounded-md opacity-60" />
                 </div>
                 <div className="flex gap-2">
                     <Skeleton className="h-9 w-[120px] rounded-md" />
@@ -98,36 +98,39 @@ export default function HistoryPage() {
             {/* Calendar Strip Skeleton */}
             <div className="flex gap-2 overflow-hidden pb-4">
                 {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-20 min-w-[3.5rem] rounded-2xl shrink-0" />
+                    <Skeleton key={i} className="h-20 min-w-[3.5rem] rounded-2xl shrink-0 bg-muted/40" />
                 ))}
             </div>
 
-            {/* Timeline Cards Skeleton - Detailed */}
+            {/* Timeline Cards Skeleton - High Fidelity */}
             <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                    <div key={i} className="rounded-[2rem] p-6 border h-48 flex flex-col justify-between">
+                    <div key={i} className="rounded-[2rem] p-6 h-auto flex flex-col gap-6 bg-gray-50/50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800">
                         {/* Top Row: Time & Status */}
-                        <div className="flex justify-between items-start">
-                            <Skeleton className="h-5 w-40 rounded-md" />
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="h-4 w-4 rounded-full opacity-40" /> {/* Clock icon placeholder */}
+                                <Skeleton className="h-5 w-40 rounded-md" />
+                            </div>
                             <Skeleton className="h-7 w-20 rounded-full" />
                         </div>
 
                         {/* Middle: Subject */}
                         <div className="space-y-2">
                             <Skeleton className="h-7 w-3/4 rounded-lg" />
-                            <Skeleton className="h-4 w-1/3 rounded-md opacity-60" />
+                            <Skeleton className="h-4 w-1/4 rounded-md opacity-50" />
                         </div>
 
                         {/* Bottom: Faculty */}
-                        <div className="flex justify-between items-center mt-2">
+                        <div className="flex justify-between items-center mt-1">
                             <div className="flex items-center gap-3">
-                                <Skeleton className="w-8 h-8 rounded-full" />
-                                <div className="space-y-1">
+                                <Skeleton className="w-9 h-9 rounded-full" />
+                                <div className="space-y-1.5">
                                     <Skeleton className="h-3 w-16 opacity-50" />
-                                    <Skeleton className="h-4 w-32" />
+                                    <Skeleton className="h-4 w-28" />
                                 </div>
                             </div>
-                            <Skeleton className="w-6 h-6 rounded-md opacity-50" />
+                            <Skeleton className="w-6 h-6 rounded-md opacity-30" />
                         </div>
                     </div>
                 ))}
