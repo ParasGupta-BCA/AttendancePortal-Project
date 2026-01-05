@@ -77,9 +77,13 @@ export default function StudentSettingsPage() {
                 {activeTab === 'profile' && (
                     <Card className="overflow-hidden border-none shadow-xl bg-white dark:bg-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-500 ring-1 ring-gray-200 dark:ring-gray-800">
                         {/* Modern Gradient Header */}
-                        <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 relative">
-                            {/* Optional subtle overlay pattern if desired, otherwise just gradient */}
-                            <div className="absolute inset-0 bg-white/10 dark:bg-black/10 opacity-20" />
+                        <div className="h-32 relative bg-gray-100 dark:bg-gray-800">
+                            <img
+                                src="/student-profile-cover.webp"
+                                alt="Profile Cover"
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/10" />
                         </div>
 
                         <div className="px-6 pb-8">
