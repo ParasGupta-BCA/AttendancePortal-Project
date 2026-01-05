@@ -82,30 +82,54 @@ export default function HistoryPage() {
     filteredRecords.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
     if (loading) return (
-        <div className="space-y-6 p-4">
+        <div className="space-y-6 pt-6">
             {/* Header Skeleton */}
-            <div className="flex justify-between items-end">
+            <div className="flex justify-between items-end px-1">
                 <div className="space-y-2">
-                    <Skeleton className="h-8 w-32" />
-                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-9 w-32 rounded-lg" />
+                    <Skeleton className="h-5 w-48 rounded-md opacity-70" />
                 </div>
                 <div className="flex gap-2">
-                    <Skeleton className="h-9 w-[120px]" />
-                    <Skeleton className="h-9 w-[90px]" />
+                    <Skeleton className="h-9 w-[120px] rounded-md" />
+                    <Skeleton className="h-9 w-[90px] rounded-md" />
                 </div>
             </div>
 
             {/* Calendar Strip Skeleton */}
-            <div className="flex gap-2 overflow-hidden">
-                {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-20 min-w-[3.5rem] rounded-2xl" />
+            <div className="flex gap-2 overflow-hidden pb-4">
+                {[...Array(6)].map((_, i) => (
+                    <Skeleton key={i} className="h-20 min-w-[3.5rem] rounded-2xl shrink-0" />
                 ))}
             </div>
 
-            {/* Timeline Cards Skeleton */}
+            {/* Timeline Cards Skeleton - Detailed */}
             <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-40 w-full rounded-[2rem]" />
+                    <div key={i} className="rounded-[2rem] p-6 border h-48 flex flex-col justify-between">
+                        {/* Top Row: Time & Status */}
+                        <div className="flex justify-between items-start">
+                            <Skeleton className="h-5 w-40 rounded-md" />
+                            <Skeleton className="h-7 w-20 rounded-full" />
+                        </div>
+
+                        {/* Middle: Subject */}
+                        <div className="space-y-2">
+                            <Skeleton className="h-7 w-3/4 rounded-lg" />
+                            <Skeleton className="h-4 w-1/3 rounded-md opacity-60" />
+                        </div>
+
+                        {/* Bottom: Faculty */}
+                        <div className="flex justify-between items-center mt-2">
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="w-8 h-8 rounded-full" />
+                                <div className="space-y-1">
+                                    <Skeleton className="h-3 w-16 opacity-50" />
+                                    <Skeleton className="h-4 w-32" />
+                                </div>
+                            </div>
+                            <Skeleton className="w-6 h-6 rounded-md opacity-50" />
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>
