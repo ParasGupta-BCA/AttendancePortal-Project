@@ -148,10 +148,10 @@ export default function ScanPage() {
             {/* 2. GPS Error */}
             {status === 'gps-error' && (
                 <div className="flex flex-col items-center space-y-4">
-                    <div className="bg-red-100 p-4 rounded-full">
-                        <MapPin className="w-12 h-12 text-red-600" />
+                    <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full">
+                        <MapPin className="w-12 h-12 text-red-600 dark:text-red-500" />
                     </div>
-                    <h3 className="text-xl font-bold text-red-600">Location Required</h3>
+                    <h3 className="text-xl font-bold text-red-600 dark:text-red-500">Location Required</h3>
                     <p className="text-gray-600 dark:text-gray-300 max-w-xs">
                         {message}
                     </p>
@@ -165,8 +165,8 @@ export default function ScanPage() {
             {status === 'scanning' && (
                 <>
                     <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Scan QR Code</h2>
-                    <div className="flex items-center space-x-2 text-green-600 bg-green-50 px-3 py-1 rounded-full text-xs font-medium">
-                        <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
+                    <div className="flex items-center space-x-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full text-xs font-medium">
+                        <div className="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full animate-pulse"></div>
                         <span>GPS Active</span>
                     </div>
 

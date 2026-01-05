@@ -126,8 +126,8 @@ export default function HistoryPage() {
                             onClick={() => setSelectedDate(date)}
                             className={cn(
                                 "flex flex-col items-center justify-center min-w-[3.5rem] h-20 rounded-2xl transition-all duration-200 snap-center shrink-0",
-                                isSelected ? "bg-blue-600 text-white scale-105 shadow-md" : "bg-white border hover:bg-accent text-muted-foreground",
-                                isToday && !isSelected && "border-blue-400 text-blue-500"
+                                isSelected ? "bg-blue-600 text-white scale-105 shadow-md" : "bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-accent dark:hover:bg-gray-700 text-muted-foreground dark:text-gray-400",
+                                isToday && !isSelected && "border-blue-400 text-blue-500 dark:text-blue-400"
                             )}
                         >
                             <span className="text-[10px] font-bold tracking-wider opacity-80">{days[date.getDay()]}</span>
@@ -141,7 +141,7 @@ export default function HistoryPage() {
             {/* Timeline Cards */}
             <div className="space-y-4">
                 {filteredRecords.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-accent/20 rounded-3xl border-dashed border-2">
+                    <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-accent/20 dark:bg-gray-800/50 rounded-3xl border-dashed border-2 dark:border-gray-700">
                         <CalendarIcon className="w-12 h-12 mb-3 opacity-20" />
                         <p>No classes found for this date.</p>
                         <button onClick={() => setSelectedDate(new Date())} className="text-blue-500 text-sm mt-2 hover:underline">Go to Today</button>
@@ -158,19 +158,23 @@ export default function HistoryPage() {
                         return (
                             <div key={record.id} className={cn(
                                 "relative overflow-hidden rounded-[2rem] p-6 transition-all hover:shadow-md border",
-                                isPresent ? "bg-[#EFFCF4] border-[#E0F5E6]" : "bg-[#FEF2F2] border-[#FEE2E2]"
+                                isPresent
+                                    ? "bg-[#EFFCF4] border-[#E0F5E6] dark:bg-green-950/20 dark:border-green-900/50"
+                                    : "bg-[#FEF2F2] border-[#FEE2E2] dark:bg-red-950/20 dark:border-red-900/50"
                             )}>
                                 {/* Status Icon Top Right */}
                                 <div className={cn(
                                     "absolute top-6 right-6 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full",
-                                    isPresent ? "bg-white text-green-600 shadow-sm" : "bg-white text-red-600 shadow-sm"
+                                    isPresent
+                                        ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
+                                        : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
                                 )}>
                                     {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
                                     <span>{record.status}</span>
                                 </div>
 
                                 {/* Time & Duration */}
-                                <div className="flex items-center gap-3 text-sm font-medium opacity-80 mb-3">
+                                <div className="flex items-center gap-3 text-sm font-medium opacity-80 mb-3 dark:text-gray-300">
                                     <Clock className="w-4 h-4 opacity-50" />
                                     <span>
                                         {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -183,25 +187,31 @@ export default function HistoryPage() {
 
                                 {/* Subject & Class Info */}
                                 <div className="mb-6">
-                                    <h3 className={cn("text-lg font-bold mb-1 leading-tight", isPresent ? "text-green-950" : "text-red-950")}>
+                                    <h3 className={cn("text-lg font-bold mb-1 leading-tight",
+                                        isPresent ? "text-green-950 dark:text-green-100" : "text-red-950 dark:text-red-100"
+                                    )}>
                                         {record.subject_name}
                                     </h3>
-                                    <p className="text-xs font-semibold opacity-60 uppercase tracking-wider">Sem 6 (Morning)</p>
+                                    <p className="text-xs font-semibold opacity-60 uppercase tracking-wider dark:text-gray-400">Sem 6 (Morning)</p>
                                 </div>
 
                                 {/* Footer: Faculty */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isPresent ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700")}>
+                                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center",
+                                            isPresent
+                                                ? "bg-green-200 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                                                : "bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                                        )}>
                                             <User className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-muted-foreground font-semibold">Faculty</p>
-                                            <p className="text-sm font-bold opacity-90">{record.faculty_name || "Unknown"}</p>
+                                            <p className="text-xs text-muted-foreground font-semibold dark:text-gray-500">Faculty</p>
+                                            <p className="text-sm font-bold opacity-90 dark:text-gray-200">{record.faculty_name || "Unknown"}</p>
                                         </div>
                                     </div>
 
-                                    <Video className="w-5 h-5 opacity-30" />
+                                    <Video className="w-5 h-5 opacity-30 dark:opacity-50 dark:text-gray-400" />
                                 </div>
                             </div>
                         );
