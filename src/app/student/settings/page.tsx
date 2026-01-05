@@ -75,54 +75,73 @@ export default function StudentSettingsPage() {
                 </div>
 
                 {activeTab === 'profile' && (
-                    <Card className="overflow-hidden border shadow-sm dark:bg-gray-800 dark:border-gray-700 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <CardHeader className="bg-blue-600/10 dark:bg-blue-900/20 border-b dark:border-gray-700 pb-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-300">
-                                    <User className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                                        {profile?.name || session?.user?.name || "Student"}
-                                    </CardTitle>
-                                    <p className="text-sm text-muted-foreground dark:text-gray-400">Student Profile</p>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-6 grid gap-6 md:grid-cols-2">
-                            {/* Email */}
-                            <div className="flex items-start gap-3">
-                                <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</p>
-                                    <p className="font-semibold text-gray-900 dark:text-gray-200">{profile?.email || session?.user?.email || "Loading..."}</p>
+                    <Card className="overflow-hidden border-none shadow-xl bg-white dark:bg-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-500 ring-1 ring-gray-200 dark:ring-gray-800">
+                        {/* Modern Gradient Header */}
+                        <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-900 dark:to-indigo-900 relative">
+                            {/* Optional subtle overlay pattern if desired, otherwise just gradient */}
+                            <div className="absolute inset-0 bg-white/10 dark:bg-black/10 opacity-20" />
+                        </div>
+
+                        <div className="px-6 pb-8">
+                            {/* Avatar - Overlapping Header */}
+                            <div className="relative -mt-16 mb-4 flex justify-center">
+                                <div className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-900 bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                    <User className="w-16 h-16" />
                                 </div>
                             </div>
 
-                            {/* Course & Section */}
-                            <div className="flex items-start gap-3">
-                                <BookOpen className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Batch Info</p>
-                                    {loading ? (
-                                        <Skeleton className="h-5 w-32 mt-1" />
-                                    ) : (
-                                        <p className="font-semibold text-gray-900 dark:text-gray-200">
-                                            {profile ? `${profile.course} (${profile.section})` : "Not Available"}
-                                        </p>
-                                    )}
+                            {/* User Info - Centered */}
+                            <div className="text-center mb-8">
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                                    {profile?.name || session?.user?.name || "Student"}
+                                </h3>
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium">
+                                    <Shield className="w-3.5 h-3.5" />
+                                    <span className="capitalize">{(session?.user as any)?.role || "Student"} Profile</span>
                                 </div>
                             </div>
 
-                            {/* Role */}
-                            <div className="flex items-start gap-3">
-                                <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
-                                <div>
-                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Account Type</p>
-                                    <p className="font-semibold text-gray-900 dark:text-gray-200 capitalize">{(session?.user as any)?.role || "Student"}</p>
+                            {/* Details Grid */}
+                            <div className="grid gap-4 md:grid-cols-2 max-w-2xl mx-auto">
+                                {/* Email Card */}
+                                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
+                                    <div className="flex items-start gap-4">
+                                        <div className="p-2.5 rounded-lg bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                                            <Mail className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                                                Email Address
+                                            </p>
+                                            <p className="font-medium text-gray-900 dark:text-gray-100 break-all">
+                                                {profile?.email || session?.user?.email || "Loading..."}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Batch Card */}
+                                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group">
+                                    <div className="flex items-start gap-4">
+                                        <div className="p-2.5 rounded-lg bg-white dark:bg-gray-700 shadow-sm text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                                            <BookOpen className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                                                Academic Batch
+                                            </p>
+                                            {loading ? (
+                                                <Skeleton className="h-5 w-24" />
+                                            ) : (
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                                    {profile ? `${profile.course} (${profile.section})` : "Not Available"}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
                 )}
 
