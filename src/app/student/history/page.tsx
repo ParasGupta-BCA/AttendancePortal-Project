@@ -102,10 +102,10 @@ export default function HistoryPage() {
                 ))}
             </div>
 
-            {/* Timeline Cards Skeleton - Theme Adaptive */}
+            {/* Timeline Cards Skeleton - High Fidelity */}
             <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                    <div key={i} className="rounded-[2rem] p-6 h-auto flex flex-col gap-6 bg-card border border-border shadow-sm">
+                    <div key={i} className="rounded-[2rem] p-6 h-auto flex flex-col gap-6 bg-gray-50/50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800">
                         {/* Top Row: Time & Status */}
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
