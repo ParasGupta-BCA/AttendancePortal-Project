@@ -96,12 +96,12 @@ export default function StudentSettingsPage() {
 
                             {/* User Info - Centered */}
                             <div className="text-center mb-8">
-                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                                     {profile?.name || session?.user?.name || "Student"}
                                 </h3>
-                                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-medium">
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium">
                                     <Shield className="w-3.5 h-3.5" />
-                                    <span className="capitalize">{(session?.user as any)?.role || "Student"}</span>
+                                    <span className="capitalize">{(session?.user as any)?.role || "Student"} Profile</span>
                                 </div>
                             </div>
 
