@@ -23,7 +23,7 @@ export default function StudentSettingsPage() {
                     email: data.studentDetails.email,
                     course: data.studentDetails.course,
                     section: data.studentDetails.section,
-                    role: session?.user?.role || "Student"
+                    role: (session?.user as any)?.role || "Student"
                 });
             }
         } catch (error) {
@@ -55,7 +55,7 @@ export default function StudentSettingsPage() {
                             </div>
                             <div>
                                 <CardTitle className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                                    {session?.user?.name || "Student"}
+                                    {profile?.name || session?.user?.name || "Student"}
                                 </CardTitle>
                                 <p className="text-sm text-muted-foreground dark:text-gray-400">Student Profile</p>
                             </div>
@@ -67,7 +67,7 @@ export default function StudentSettingsPage() {
                             <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</p>
-                                <p className="font-semibold text-gray-900 dark:text-gray-200">{session?.user?.email || "Loading..."}</p>
+                                <p className="font-semibold text-gray-900 dark:text-gray-200">{profile?.email || session?.user?.email || "Loading..."}</p>
                             </div>
                         </div>
 
@@ -80,7 +80,7 @@ export default function StudentSettingsPage() {
                                     <Skeleton className="h-5 w-32 mt-1" />
                                 ) : (
                                     <p className="font-semibold text-gray-900 dark:text-gray-200">
-                                        {academicInfo ? `${academicInfo.course} (${academicInfo.section})` : "Not Available"}
+                                        {profile ? `${profile.course} (${profile.section})` : "Not Available"}
                                     </p>
                                 )}
                             </div>
@@ -91,7 +91,7 @@ export default function StudentSettingsPage() {
                             <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
                             <div>
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Account Type</p>
-                                <p className="font-semibold text-gray-900 dark:text-gray-200 capitalize">{session?.user?.role || "Student"}</p>
+                                <p className="font-semibold text-gray-900 dark:text-gray-200 capitalize">{(session?.user as any)?.role || "Student"}</p>
                             </div>
                         </div>
                     </CardContent>
