@@ -19,8 +19,14 @@ export async function GET() {
         const userId = (session.user as any).id;
 
         // 1. Get Student ID
-        // 1. Get Student ID
-        const studentRes = await query('SELECT id, course_year, section FROM students WHERE user_id = $1', [userId]);
+        // 1. Get Student ID and Details
+        const studentRes = await query(`
+            SELECT s.id, s.course_year, s.section, u.full_name, u.email 
+            FROM students s
+            JOIN users u ON s.user_id = u.id
+            WHERE s.user_id = $1
+        `, [userId]);
+
         if ((studentRes.rowCount ?? 0) === 0) {
             return NextResponse.json({ error: 'Student profile not found' }, { status: 404 });
         }
@@ -94,6 +100,8 @@ export async function GET() {
             },
             todayClasses: todayClasses,
             studentDetails: {
+                name: student.full_name,
+                email: student.email,
                 course: student.course_year,
                 section: student.section
             }
