@@ -43,6 +43,35 @@ export default function StudentSettingsPage() {
         return () => clearInterval(interval);
     }, [session]);
 
+    if (loading) return (
+        <div className="space-y-6 p-4 pt-6 pb-20">
+            <Skeleton className="h-8 w-32 mb-4" />
+
+            <div className="max-w-4xl space-y-6">
+                {/* Tabs Skeleton */}
+                <Skeleton className="h-10 w-full max-w-md mx-auto rounded-full" />
+
+                {/* Profile Card Skeleton */}
+                <div className="rounded-xl overflow-hidden border shadow-sm bg-white dark:bg-gray-900">
+                    <Skeleton className="h-32 w-full" /> {/* Cover */}
+                    <div className="px-6 pb-8">
+                        <div className="relative -mt-16 mb-4 flex justify-center">
+                            <Skeleton className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-900" />
+                        </div>
+                        <div className="flex flex-col items-center gap-2 mb-8">
+                            <Skeleton className="h-8 w-48" />
+                            <Skeleton className="h-6 w-32 rounded-full" />
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-2 max-w-2xl mx-auto">
+                            <Skeleton className="h-24 rounded-xl" />
+                            <Skeleton className="h-24 rounded-xl" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div className="flex-1 space-y-6 p-4 pt-6 pb-20">
             <h2 className="text-2xl font-bold tracking-tight mb-4">Settings</h2>

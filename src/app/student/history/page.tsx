@@ -81,11 +81,35 @@ export default function HistoryPage() {
     // Sort records by time
     filteredRecords.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-    if (loading) return <div className="p-4 space-y-4">
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
-    </div>;
+    if (loading) return (
+        <div className="space-y-6 p-4">
+            {/* Header Skeleton */}
+            <div className="flex justify-between items-end">
+                <div className="space-y-2">
+                    <Skeleton className="h-8 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                </div>
+                <div className="flex gap-2">
+                    <Skeleton className="h-9 w-[120px]" />
+                    <Skeleton className="h-9 w-[90px]" />
+                </div>
+            </div>
+
+            {/* Calendar Strip Skeleton */}
+            <div className="flex gap-2 overflow-hidden">
+                {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-20 min-w-[3.5rem] rounded-2xl" />
+                ))}
+            </div>
+
+            {/* Timeline Cards Skeleton */}
+            <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-40 w-full rounded-[2rem]" />
+                ))}
+            </div>
+        </div>
+    );
 
     const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
