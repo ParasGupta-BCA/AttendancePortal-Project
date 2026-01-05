@@ -14,15 +14,34 @@ export default function StudentLayout({
     const [isDark, setIsDark] = useState(false);
 
     useEffect(() => {
-        // Check local storage or system preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            setIsDark(true);
-            document.documentElement.classList.add('dark');
-        } else {
-            setIsDark(false);
-            document.documentElement.classList.remove('dark');
-        }
+        // Function to apply theme
+        const applyTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                setIsDark(true);
+                document.documentElement.classList.add('dark');
+            } else {
+                setIsDark(false);
+                document.documentElement.classList.remove('dark');
+            }
+        };
+
+        // Apply on mount
+        applyTheme();
+
+        // Listen for system changes
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = () => {
+            // Only adapt to system if no manual override is set
+            if (!localStorage.getItem('theme')) {
+                applyTheme();
+            }
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
     }, []);
 
     const toggleTheme = () => {
