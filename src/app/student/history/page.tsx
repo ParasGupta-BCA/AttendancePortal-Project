@@ -19,40 +19,42 @@ const SessionCard = memo(({ record, index }: { record: any, index: number }) => 
     return (
         <div
             className={cn(
-                "relative overflow-hidden rounded-[2rem] p-6 transition-all hover:shadow-md border animate-in fade-in slide-in-from-bottom-4 duration-500",
+                "relative overflow-hidden rounded-[2rem] p-4 sm:p-6 transition-all hover:shadow-md border animate-in fade-in slide-in-from-bottom-4 duration-500",
                 isPresent
                     ? "bg-[#EFFCF4] border-[#E0F5E6] dark:bg-green-950/20 dark:border-green-900/50"
                     : "bg-[#FEF2F2] border-[#FEE2E2] dark:bg-red-950/20 dark:border-red-900/50"
             )}
             style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
         >
-            {/* Status Icon Top Right */}
-            <div className={cn(
-                "absolute top-6 right-6 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full",
-                isPresent
-                    ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
-                    : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
-            )}>
-                {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                <span>{record.status}</span>
-            </div>
+            <div className="flex justify-between items-start mb-3 gap-2">
+                {/* Time & Duration */}
+                <div className="flex flex-wrap items-center gap-3 text-sm font-medium opacity-80 dark:text-gray-300">
+                    <div className="flex items-center gap-1.5 bg-white/50 dark:bg-black/20 px-2 py-1 rounded-md">
+                        <CalendarIcon className="w-3.5 h-3.5 opacity-50" />
+                        <span className="text-xs">{sessionDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 opacity-50" />
+                        <span>
+                            {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {' - '}
+                            {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                    </div>
+                    <span className="hidden sm:inline w-px h-3 bg-current opacity-30"></span>
+                    <span className="text-xs opacity-60">({durationMin} Min)</span>
+                </div>
 
-            {/* Time & Duration */}
-            <div className="flex flex-wrap items-center gap-3 text-sm font-medium opacity-80 mb-3 dark:text-gray-300">
-                <div className="flex items-center gap-1.5 bg-white/50 dark:bg-black/20 px-2 py-1 rounded-md">
-                    <CalendarIcon className="w-3.5 h-3.5 opacity-50" />
-                    <span className="text-xs">{sessionDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
+                {/* Status Icon */}
+                <div className={cn(
+                    "flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shrink-0",
+                    isPresent
+                        ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
+                        : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
+                )}>
+                    {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                    <span>{record.status}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 opacity-50" />
-                    <span>
-                        {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        {' - '}
-                        {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                </div>
-                <span className="hidden sm:inline w-px h-3 bg-current opacity-30"></span>
-                <span className="text-xs opacity-60">({durationMin} Min)</span>
             </div>
 
             {/* Subject & Class Info */}
