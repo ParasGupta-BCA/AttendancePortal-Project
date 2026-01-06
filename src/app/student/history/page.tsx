@@ -1,11 +1,92 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Video, Calendar as CalendarIcon, Clock, CheckCircle2, XCircle, Filter, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// --- Extracted Components to prevent re-renders ---
+
+const SessionCard = memo(({ record, index }: { record: any, index: number }) => {
+    const start = record.start_time ? new Date(record.start_time) : new Date(record.session_date);
+    const end = record.end_time ? new Date(record.end_time) : new Date(start.getTime() + 60 * 60000);
+    const durationMin = Math.round((end.getTime() - start.getTime()) / 60000);
+    const isPresent = record.status === 'Present';
+    const sessionDate = new Date(record.session_date);
+
+    return (
+        <div
+            className={cn(
+                "relative overflow-hidden rounded-[2rem] p-6 transition-all hover:shadow-md border animate-in fade-in slide-in-from-bottom-4 duration-500",
+                isPresent
+                    ? "bg-[#EFFCF4] border-[#E0F5E6] dark:bg-green-950/20 dark:border-green-900/50"
+                    : "bg-[#FEF2F2] border-[#FEE2E2] dark:bg-red-950/20 dark:border-red-900/50"
+            )}
+            style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+        >
+            {/* Status Icon Top Right */}
+            <div className={cn(
+                "absolute top-6 right-6 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full",
+                isPresent
+                    ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
+                    : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
+            )}>
+                {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                <span>{record.status}</span>
+            </div>
+
+            {/* Time & Duration */}
+            <div className="flex flex-wrap items-center gap-3 text-sm font-medium opacity-80 mb-3 dark:text-gray-300">
+                <div className="flex items-center gap-1.5 bg-white/50 dark:bg-black/20 px-2 py-1 rounded-md">
+                    <CalendarIcon className="w-3.5 h-3.5 opacity-50" />
+                    <span className="text-xs">{sessionDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 opacity-50" />
+                    <span>
+                        {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {' - '}
+                        {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                </div>
+                <span className="hidden sm:inline w-px h-3 bg-current opacity-30"></span>
+                <span className="text-xs opacity-60">({durationMin} Min)</span>
+            </div>
+
+            {/* Subject & Class Info */}
+            <div className="mb-6">
+                <h3 className={cn("text-lg font-bold mb-1 leading-tight",
+                    isPresent ? "text-green-950 dark:text-green-100" : "text-red-950 dark:text-red-100"
+                )}>
+                    {record.subject_name}
+                </h3>
+                <p className="text-xs font-semibold opacity-60 uppercase tracking-wider dark:text-gray-400">Sem 6 (Morning)</p>
+            </div>
+
+            {/* Footer: Faculty */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className={cn("w-8 h-8 rounded-full flex items-center justify-center",
+                        isPresent
+                            ? "bg-green-200 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                            : "bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                    )}>
+                        <User className="w-4 h-4" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-muted-foreground font-semibold dark:text-gray-500">Faculty</p>
+                        <p className="text-sm font-bold opacity-90 dark:text-gray-200">{record.faculty_name || "Unknown"}</p>
+                    </div>
+                </div>
+
+                <Video className="w-5 h-5 opacity-30 dark:opacity-50 dark:text-gray-400" />
+            </div>
+        </div>
+    )
+});
+SessionCard.displayName = "SessionCard";
 
 export default function HistoryPage() {
     const [history, setHistory] = useState<any[]>([]);
@@ -110,85 +191,6 @@ export default function HistoryPage() {
     };
 
     const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-
-    // Reusable Session Card Component
-    const SessionCard = ({ record, index }: { record: any, index: number }) => {
-        const start = record.start_time ? new Date(record.start_time) : new Date(record.session_date);
-        const end = record.end_time ? new Date(record.end_time) : new Date(start.getTime() + 60 * 60000);
-        const durationMin = Math.round((end.getTime() - start.getTime()) / 60000);
-        const isPresent = record.status === 'Present';
-        const sessionDate = new Date(record.session_date);
-
-        return (
-            <div
-                className={cn(
-                    "relative overflow-hidden rounded-[2rem] p-6 transition-all hover:shadow-md border animate-in fade-in slide-in-from-bottom-4 duration-500",
-                    isPresent
-                        ? "bg-[#EFFCF4] border-[#E0F5E6] dark:bg-green-950/20 dark:border-green-900/50"
-                        : "bg-[#FEF2F2] border-[#FEE2E2] dark:bg-red-950/20 dark:border-red-900/50"
-                )}
-                style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
-            >
-                {/* Status Icon Top Right */}
-                <div className={cn(
-                    "absolute top-6 right-6 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full",
-                    isPresent
-                        ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
-                        : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
-                )}>
-                    {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                    <span>{record.status}</span>
-                </div>
-
-                {/* Time & Duration */}
-                <div className="flex flex-wrap items-center gap-3 text-sm font-medium opacity-80 mb-3 dark:text-gray-300">
-                    <div className="flex items-center gap-1.5 bg-white/50 dark:bg-black/20 px-2 py-1 rounded-md">
-                        <CalendarIcon className="w-3.5 h-3.5 opacity-50" />
-                        <span className="text-xs">{sessionDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4 opacity-50" />
-                        <span>
-                            {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            {' - '}
-                            {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                    </div>
-                    <span className="hidden sm:inline w-px h-3 bg-current opacity-30"></span>
-                    <span className="text-xs opacity-60">({durationMin} Min)</span>
-                </div>
-
-                {/* Subject & Class Info */}
-                <div className="mb-6">
-                    <h3 className={cn("text-lg font-bold mb-1 leading-tight",
-                        isPresent ? "text-green-950 dark:text-green-100" : "text-red-950 dark:text-red-100"
-                    )}>
-                        {record.subject_name}
-                    </h3>
-                    <p className="text-xs font-semibold opacity-60 uppercase tracking-wider dark:text-gray-400">Sem 6 (Morning)</p>
-                </div>
-
-                {/* Footer: Faculty */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center",
-                            isPresent
-                                ? "bg-green-200 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                                : "bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                        )}>
-                            <User className="w-4 h-4" />
-                        </div>
-                        <div>
-                            <p className="text-xs text-muted-foreground font-semibold dark:text-gray-500">Faculty</p>
-                            <p className="text-sm font-bold opacity-90 dark:text-gray-200">{record.faculty_name || "Unknown"}</p>
-                        </div>
-                    </div>
-
-                    <Video className="w-5 h-5 opacity-30 dark:opacity-50 dark:text-gray-400" />
-                </div>
-            </div>
-        )
-    };
 
     if (loading) return (
         <div className="space-y-6 pt-6">
