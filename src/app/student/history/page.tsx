@@ -221,7 +221,7 @@ export default function HistoryPage() {
                     <div className="flex gap-2">
                         {/* Compact Filters */}
                         <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                            <SelectTrigger className="w-[140px] h-[40px] rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none px-4 hover:bg-gray-50 transition-colors">
+                            <SelectTrigger className="w-[120px] h-8 rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none px-3 hover:bg-gray-50 transition-colors">
                                 <SelectValue placeholder="Subject" />
                             </SelectTrigger>
                             <SelectContent align="end">
@@ -230,7 +230,7 @@ export default function HistoryPage() {
                             </SelectContent>
                         </Select>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[110px] h-[40px] rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none hover:bg-gray-50 transition-colors">
+                            <SelectTrigger className="w-[70px] h-8 rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none hover:bg-gray-50 transition-colors">
                                 <SelectValue placeholder="Status" />
                             </SelectTrigger>
                             <SelectContent align="end">
