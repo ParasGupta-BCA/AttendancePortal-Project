@@ -25,17 +25,16 @@ export default function HistoryPage() {
             const data = await res.json();
             const hist = data.history || [];
 
-            // Simple deep compare to avoid unnecessary re-renders (fixes flashing)
-            setHistory(prev => {
-                const isSame = JSON.stringify(prev) === JSON.stringify(hist);
-                if (isSame) return prev;
+            // Perform deep comparison before calling any state setters
+            const isSameHistory = JSON.stringify(history) === JSON.stringify(hist);
+
+            if (!isSameHistory) {
+                setHistory(hist);
 
                 // Extract unique subjects only if data changed
                 const uniqueSubjects = Array.from(new Set(hist.map((r: any) => r.subject_name))) as string[];
                 setSubjects(uniqueSubjects);
-
-                return hist;
-            });
+            }
 
             setLoading(false);
         } catch (err) {
@@ -220,8 +219,8 @@ export default function HistoryPage() {
                     <div className="flex gap-2">
                         {/* Compact Filters */}
                         <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                            <SelectTrigger className="w-[40px] h-[40px] p-0 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 border shadow-sm">
-                                <Filter className="w-4 h-4 text-muted-foreground" />
+                            <SelectTrigger className="w-[130px] h-[40px] rounded-full text-xs font-medium bg-white dark:bg-gray-800 border shadow-sm px-3">
+                                <SelectValue placeholder="Subject" />
                             </SelectTrigger>
                             <SelectContent align="end">
                                 <SelectItem value="all">All Subjects</SelectItem>
