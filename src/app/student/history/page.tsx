@@ -224,7 +224,7 @@ export default function HistoryPage() {
                             <SelectTrigger className="w-[120px] h-8 rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none px-3 hover:bg-gray-50 transition-colors">
                                 <SelectValue placeholder="Subject" />
                             </SelectTrigger>
-                            <SelectContent align="end">
+                            <SelectContent align="end" className="max-h-[250px] w-[240px]">
                                 <SelectItem value="all">All Subjects</SelectItem>
                                 {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                             </SelectContent>
@@ -233,7 +233,7 @@ export default function HistoryPage() {
                             <SelectTrigger className="w-[70px] h-8 rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none hover:bg-gray-50 transition-colors">
                                 <SelectValue placeholder="Status" />
                             </SelectTrigger>
-                            <SelectContent align="end">
+                            <SelectContent align="end" className="max-h-[250px]">
                                 <SelectItem value="all">All</SelectItem>
                                 <SelectItem value="Present">Present</SelectItem>
                                 <SelectItem value="Absent">Absent</SelectItem>
