@@ -209,7 +209,7 @@ export default function HistoryPage() {
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between items-end px-1">
                     <div>
-                        <h2 className="text-2xl font-bold">Attendance</h2>
+                        <h2 className="text-2xl font-bold">History</h2>
                         <p className="text-muted-foreground text-sm mt-1">
                             {activeTab === 'calendar'
                                 ? `${calendarViewRecords.length} Lectures on ${selectedDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}`
@@ -221,7 +221,7 @@ export default function HistoryPage() {
                     <div className="flex gap-2">
                         {/* Compact Filters */}
                         <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                            <SelectTrigger className="w-[140px] h-[40px] rounded-full text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none px-4 hover:bg-gray-50 transition-colors">
+                            <SelectTrigger className="w-[140px] h-[40px] rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none px-4 hover:bg-gray-50 transition-colors">
                                 <SelectValue placeholder="Subject" />
                             </SelectTrigger>
                             <SelectContent align="end">
@@ -230,11 +230,11 @@ export default function HistoryPage() {
                             </SelectContent>
                         </Select>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[110px] h-[40px] rounded-full text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none hover:bg-gray-50 transition-colors">
+                            <SelectTrigger className="w-[110px] h-[40px] rounded-lg text-xs font-normal bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-none hover:bg-gray-50 transition-colors">
                                 <SelectValue placeholder="Status" />
                             </SelectTrigger>
                             <SelectContent align="end">
-                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="all">All</SelectItem>
                                 <SelectItem value="Present">Present</SelectItem>
                                 <SelectItem value="Absent">Absent</SelectItem>
                             </SelectContent>
