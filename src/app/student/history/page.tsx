@@ -25,11 +25,17 @@ export default function HistoryPage() {
             const data = await res.json();
             const hist = data.history || [];
 
-            setHistory(hist);
+            // Simple deep compare to avoid unnecessary re-renders (fixes flashing)
+            setHistory(prev => {
+                const isSame = JSON.stringify(prev) === JSON.stringify(hist);
+                if (isSame) return prev;
 
-            // Extract unique subjects
-            const uniqueSubjects = Array.from(new Set(hist.map((r: any) => r.subject_name))) as string[];
-            setSubjects(uniqueSubjects);
+                // Extract unique subjects only if data changed
+                const uniqueSubjects = Array.from(new Set(hist.map((r: any) => r.subject_name))) as string[];
+                setSubjects(uniqueSubjects);
+
+                return hist;
+            });
 
             setLoading(false);
         } catch (err) {
@@ -42,7 +48,7 @@ export default function HistoryPage() {
 
         const interval = setInterval(() => {
             fetchData();
-        }, 5000); // Poll every 5 seconds
+        }, 5000); // Poll every 5 seconds (Silent update)
 
         return () => clearInterval(interval);
     }, []);
