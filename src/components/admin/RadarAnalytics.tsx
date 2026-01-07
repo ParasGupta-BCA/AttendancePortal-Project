@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { MapPin, Target, Signal } from "lucide-react";
 
 export function RadarAnalytics() {
@@ -127,7 +126,7 @@ export function RadarAnalytics() {
                         <h4 className="text-gray-500 mb-4 text-xs font-bold uppercase tracking-wider">
                             Recent Activity Log
                         </h4>
-                        <ScrollArea className="flex-1 pr-4">
+                        <div className="flex-1 overflow-y-auto pr-2 min-h-0">
                             <div className="space-y-3">
                                 {logs.map((log) => (
                                     <div key={log.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors group">
@@ -157,7 +156,7 @@ export function RadarAnalytics() {
                                 ))}
                                 {logs.length === 0 && <div className="text-gray-400 text-center py-10 text-sm">No recent scans detected.</div>}
                             </div>
-                        </ScrollArea>
+                        </div>
                     </div>
                 </div>
             </CardContent>
