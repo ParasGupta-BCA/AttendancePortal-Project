@@ -14,8 +14,8 @@ export function RadarAnalytics() {
         const fetchData = async () => {
             try {
                 const [logsRes, settingsRes] = await Promise.all([
-                    fetch("/api/admin/scan-logs"),
-                    fetch("/api/admin/settings")
+                    fetch("/api/admin/scan-logs", { cache: "no-store", headers: { "Pragma": "no-cache" } }),
+                    fetch("/api/admin/settings", { cache: "no-store", headers: { "Pragma": "no-cache" } })
                 ]);
 
                 if (logsRes.ok) {
@@ -34,7 +34,7 @@ export function RadarAnalytics() {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 3000);
+        const interval = setInterval(fetchData, 2000);
         return () => clearInterval(interval);
     }, []);
 
