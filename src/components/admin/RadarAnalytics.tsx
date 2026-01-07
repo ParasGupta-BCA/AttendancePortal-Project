@@ -127,7 +127,7 @@ export function RadarAnalytics() {
                         <h4 className="text-gray-500 mb-4 text-xs font-bold uppercase tracking-wider">
                             Recent Activity Log
                         </h4>
-                        <ScrollArea className="flex-1 pr-4">
+                        <ScrollArea className="flex-1 pr-4" type="always">
                             <div className="space-y-3">
                                 {logs.map((log) => (
                                     <div key={log.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors group">
