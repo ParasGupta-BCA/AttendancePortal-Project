@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Loader2, Server, CheckCircle2, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
+
+// Removed 'sonner' import to fix build error
+// Removed 'Textarea' import to fix build error (using standard <textarea> with Tailwind classes)
 
 export function PHPSupportForm() {
     const [isLoading, setIsLoading] = useState(false);
@@ -27,12 +28,6 @@ export function PHPSupportForm() {
 
         try {
             // 1. Attempt to hit the LOCAL PHP backend
-            // NOTE: This URL assumes XAMPP is running on localhost:80 and the folder is in htdocs/attendance-php
-            // Adjust the URL if you place the folder differently.
-            // For now, we assume standard localhost/php-backend setup.
-
-            // TIP: If running from a separate folder, efficient path might be: http://localhost/attendance-portal/php-backend/contact.php
-            // We'll try a generic one, but this usually fails in Production (Vercel) which is EXPECTED.
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
 
@@ -51,7 +46,7 @@ export function PHPSupportForm() {
             if (data.status === "success") {
                 setStatus('success-php');
                 setServerInfo(data.server_software || "PHP Server");
-                toast.success("Message sent to PHP Backend!");
+                // Removed toast call
             } else {
                 throw new Error(data.message || "Unknown error");
             }
@@ -60,13 +55,10 @@ export function PHPSupportForm() {
             console.warn("PHP Integration: Backend not found, switching to Simulation Mode.", error);
 
             // 2. FAIL-SAFE: If PHP is not found (e.g. on Vercel), fall back to Simulation
-            // This ensures the App NEVER crashes for the user.
-
-            // Artificial delay to simulate network
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             setStatus('success-simulation');
-            toast.info("PHP Backend unreachable (Expected on Vercel). Message saved locally.");
+            // Removed toast call
         } finally {
             setIsLoading(false);
             setName("");
@@ -103,13 +95,14 @@ export function PHPSupportForm() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="message">Query / Feedback</Label>
-                        <Textarea
+                        {/* Replaced missing Textarea component with standard HTML textarea + Tailwind */}
+                        <textarea
                             id="message"
                             placeholder="Describe your issue..."
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             required
-                            className="min-h-[100px]"
+                            className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                     </div>
 
