@@ -1,39 +1,83 @@
 # Project Synopsis: Smart Attendance Management System
 
 ## 1. Introduction
-The **Smart Attendance Management System** is a modern, high-performance web application designed to streamline the process of recording, tracking, and analyzing student attendance. Built with a "Hybrid Architecture," it leverages the speed of modern JavaScript frameworks for the user interface while maintaining compatibility with traditional PHP backend systems for data handling and reporting.
+The **Smart Attendance Management System** is a cutting-edge web application designed to revolutionize the educational attendance process. By replacing error-prone manual methods with a high-performance, digital solution, it ensures accuracy, real-time tracking, and seamless accessibility. The system utilizes a modern tech stack to deliver a native app-like experience via Progressive Web App (PWA) standards, catering to Students, Faculty, and Administrators with distinct, secure portals.
 
 ## 2. Problem Statement
-Traditional attendance systems are manual, prone to errors, and lack real-time accessibility. Existing digital solutions are often clunky, non-responsive on mobile devices, and difficult to integrate with modern PWA (Progressive Web App) standards.
+Traditional attendance tracking in educational institutions relies on manual paper registers, which are time-consuming, susceptible to proxy attendance, and lack immediate data insight. Existing digital solutions often suffer from poor mobile responsiveness, clunky user interfaces, and the inability to function offline or in low-connectivity environments.
 
 ## 3. Objectives
--   **Modern UX**: To provide an app-like experience (PWA) that works offline and feels native on mobile devices.
--   **Security**: To implement robust role-based access control (Student, Faculty, Admin).
--   **Performance**: To ensure instant loading times using Static Site Generation (SSG) and Server-Side Rendering (SSR).
--   **Hybrid Integration**: To demonstrate the capability of integrating modern Frontends (React/Next.js) with Legacy Backends (PHP).
+-   **Modern User Experience**: Deliver a fluid, responsive UI with PWA capabilities (offline support, installability) that rivals native mobile apps.
+-   **Security & Integrity**: Implement robust Role-Based Access Control (RBAC) and anti-proxy measures like Geo-fencing and device fingerprinting.
+-   **Automation**: Streamline attendance marking via dynamic QR codes and instant database updates.
+-   **Scalability**: Built on a serverless-ready architecture to handle growing student and faculty databases efficiently.
 
-## 4. Technology Stack (Hybrid Architecture)
+## 4. Technology Stack
 
-### Frontend (Client-Side)
--   **Framework**: Next.js 14 (React Framework)
--   **Language**: TypeScript (for Type Safety)
--   **Styling**: Tailwind CSS (Utility-first CSS)
--   **PWA**: Service Workers & Manifest for Installability
+### Frontend & Core
+-   **Framework**: Next.js 16.1 (App Router) - Leveraging Server Components for performance.
+-   **Library**: React 19 - For a component-based, interactive UI.
+-   **Styling**: Tailwind CSS v4 - Utilizing the latest utility-first engine for rapid, responsive design.
+-   **Language**: TypeScript - Ensuring type safety and code maintainability.
+-   **PWA**: `@ducanh2912/next-pwa` - Enabling offline caching, installability, and splash screens.
 
-### Backend (Server-Side)
--   **Primary Logic**: Node.js (Next.js API Routes)
--   **Legacy/Admin Logic**: PHP 8.2 (Simulated/Integrated modules)
--   **APIs**: RESTful architecture communicating via JSON
+### Backend & Database
+-   **API**: Next.js API Routes (Serverless Functions).
+-   **Database**: PostgreSQL (Neon Serverless) - Robust, scalable relational data storage.
+-   **ORM/Query**: Direct SQL / `pg` client for optimized performance.
+-   **Authentication**: NextAuth.js (v4) with custom credential providers and Bcrypt hashing.
 
-### Database
--   **Primary**: PostgreSQL / MongoDB (Cloud-based persistence)
--   **Secondary**: MySQL (linked via PHP for college reporting)
+### Visuals & Tools
+-   **Icons**: Lucide React.
+-   **Charts**: Recharts for data visualization.
+-   **QR**: `qrcode` (Generation) and `html5-qrcode` (Scanning).
+-   **Date Handling**: `date-fns`.
 
-## 5. Key Features
-1.  **PWA Splash Screen**: A cinematic, native-like entry experience with haptic feedback and animations.
-2.  **Dashboard**: Role-specific dashboards (Admin view vs Student view).
-3.  **Support System**: A PHP-powered feedback form demonstrating cross-technology communication.
-4.  **Optimized Performance**: 90+ Lighthouse score on Performance and Accessibility.
+## 5. Key Features & Modules
 
-## 6. Conclusion
-This project represents a cutting-edge approach to educational software, bridging the gap between modern, responsive design and robust, standardized backend protocols.
+### A. Security & Authentication
+-   **Role-Based Access Control (RBAC)**: Distinct login flows and dashboard restrictions for **Admins**, **Faculty**, and **Students**.
+-   **Secure Login**: Hashed passwords and session management via NextAuth.
+-   **Password Gate**: Specific UI flows for initial setup and password changes.
+
+### B. Attendance System
+-   **Dynamic QR Codes**: Faculty generate unique, time-bound QR codes for specific class sessions to prevent sharing.
+-   **Geo-Fencing**: Validates student location (Latitude/Longitude) during scanning to ensure physical presence.
+-   **Device Fingerprinting**: Captures device info to discourage proxy attendance tracking.
+-   **Manual Attendance**: Fallback option for faculty to mark attendance manually if technical issues arise.
+
+### C. Role-Specific Dashboards
+1.  **Admin Portal**:
+    -   **User Management**: Create and manage Student and Faculty profiles.
+    -   **Academic Structure**: Configure Subjects, Classes/Sections, and Timetables.
+    -   **Global Settings**: System-wide configurations.
+
+2.  **Faculty Portal**:
+    -   **Session Management**: Create attendance sessions linked to the timetable.
+    -   **Live Tracking**: Monitor incoming attendance scans in real-time.
+    -   **Reports**: View class-wise attendance summaries.
+
+3.  **Student Portal**:
+    -   **QR Scanner**: Integration camera access to scan class codes.
+    -   **History**: View personal attendance records and percentage aggregations.
+    -   **Profile**: Manage personal settings and view academic details.
+
+### D. Advanced Features
+-   **Timetable Management**: Visual representation of weekly schedules for all roles.
+-   **Analytics**: Interactive charts displaying attendance trends and subject-wise performance.
+-   **PWA Integration**:
+    -   **Splash Screen**: Custom startup visual for a branded feel.
+    -   **Mobile-First Design**: Optimized touch targets and layout for smartphones.
+    -   **App Icon**: Installable to home screen without app store requirements.
+
+## 6. Database Schema Overview
+The system relies on a relational schema with these core entities:
+-   **Users**: Central identity table for all roles.
+-   **Faculty & Students**: Extended profile tables linked to Users.
+-   **Subjects & Classes**: Academic metadata.
+-   **Timetable**: Schedules linking Classes, Subjects, and Faculty.
+-   **Attendance_Sessions**: Instances of a class for a specific date/time.
+-   **Attendance_Records**: Individual logs linked to Students and Sessions.
+
+## 7. Conclusion
+This project demonstrates a production-grade application of the latest web technologies (Next.js 16, React 19) to solve a critical institutional problem. It balances aesthetic excellence with functional rigor, providing a secure, efficient, and user-friendly platform for modern education management.
