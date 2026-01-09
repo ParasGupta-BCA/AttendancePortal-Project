@@ -48,7 +48,7 @@ export function PWASplashScreen() {
 
     return (
         <div
-            className={`fixed inset-0 z-[9999] flex items-center justify-center bg-background transition-all duration-1000 ease-in-out ${show ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none scale-110"
+            className={`fixed inset-0 z-[100] flex items-center justify-center bg-background transition-all duration-1000 ease-in-out ${show ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none scale-110"
                 }`}
         >
             <div className="relative h-56 w-56 md:h-72 md:w-72 animate-breathe">
