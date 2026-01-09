@@ -34,7 +34,10 @@ export function PWASplashScreen() {
                 }`}
         >
             <div className="relative h-56 w-56 md:h-72 md:w-72 animate-breathe">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-full h-full drop-shadow-2xl">
+                {/* Shockwave Effect Behind Logo */}
+                <div className="absolute inset-0 -z-10 rounded-3xl animate-shockwave bg-blue-500/20 blur-xl opacity-0" />
+
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="relative w-full h-full drop-shadow-2xl overflow-hidden rounded-[20%]">
                     <defs>
                         <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style={{ stopColor: "#2563eb", stopOpacity: 1 }} />
@@ -63,6 +66,11 @@ export function PWASplashScreen() {
                         className="animate-draw-check"
                     />
                 </svg>
+
+                {/* Glass Shine Effect Overlay */}
+                <div className="absolute inset-0 z-20 overflow-hidden rounded-[20%] pointer-events-none">
+                    <div className="absolute top-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/40 to-transparent -skew-x-25 animate-shine" />
+                </div>
             </div>
         </div>
     );
