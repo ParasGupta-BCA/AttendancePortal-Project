@@ -16,6 +16,10 @@ export function PWASplashScreen() {
         if (isPWA) {
             setShow(true);
 
+            // Disable scroll and refresh (pull-to-refresh)
+            document.body.style.overflow = "hidden";
+            document.body.style.overscrollBehavior = "none";
+
             // Haptic Feedback (Sync with wireframe completion ~1.6s)
             const hapticTimer = setTimeout(() => {
                 if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -25,11 +29,17 @@ export function PWASplashScreen() {
 
             const timer = setTimeout(() => {
                 setShow(false);
+                // Re-enable scroll and refresh
+                document.body.style.overflow = "";
+                document.body.style.overscrollBehavior = "";
             }, 4500); // 4.5s total duration
 
             return () => {
                 clearTimeout(timer);
                 clearTimeout(hapticTimer);
+                // Cleanup in case component unmounts early
+                document.body.style.overflow = "";
+                document.body.style.overscrollBehavior = "";
             };
         }
     }, []);
