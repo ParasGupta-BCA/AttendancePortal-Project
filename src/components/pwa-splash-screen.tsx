@@ -33,7 +33,7 @@ export function PWASplashScreen() {
             className={`fixed inset-0 z-[100] flex items-center justify-center bg-background transition-all duration-1000 ease-in-out ${show ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none scale-110"
                 }`}
         >
-            <div className="relative h-24 w-24 md:h-28 md:w-28 animate-in fade-in zoom-in duration-1000 fill-mode-forwards">
+            <div className="relative h-32 w-32 md:h-40 md:w-40 animate-breathe">
                 <Image
                     src="/logo.svg"
                     alt="App Logo"
