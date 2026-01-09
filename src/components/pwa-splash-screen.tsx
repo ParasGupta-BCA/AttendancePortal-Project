@@ -14,33 +14,39 @@ export function PWASplashScreen() {
             (window.navigator as any).standalone === true;
 
         if (isPWA) {
-            setShow(true);
+            // Check if splash has already been shown in this session (survives refresh, clears on close)
+            const hasShown = sessionStorage.getItem("pwa_splash_shown");
 
-            // Disable scroll and refresh (pull-to-refresh)
-            document.body.style.overflow = "hidden";
-            document.body.style.overscrollBehavior = "none";
+            if (!hasShown) {
+                setShow(true);
+                sessionStorage.setItem("pwa_splash_shown", "true");
 
-            // Haptic Feedback (Sync with wireframe completion ~1.6s)
-            const hapticTimer = setTimeout(() => {
-                if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                    navigator.vibrate(50); // Crisp 50ms vibration
-                }
-            }, 1600);
+                // Disable scroll and refresh (pull-to-refresh)
+                document.body.style.overflow = "hidden";
+                document.body.style.overscrollBehavior = "none";
 
-            const timer = setTimeout(() => {
-                setShow(false);
-                // Re-enable scroll and refresh
-                document.body.style.overflow = "";
-                document.body.style.overscrollBehavior = "";
-            }, 4500); // 4.5s total duration
+                // Haptic Feedback (Sync with wireframe completion ~1.6s)
+                const hapticTimer = setTimeout(() => {
+                    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                        navigator.vibrate(50); // Crisp 50ms vibration
+                    }
+                }, 1600);
 
-            return () => {
-                clearTimeout(timer);
-                clearTimeout(hapticTimer);
-                // Cleanup in case component unmounts early
-                document.body.style.overflow = "";
-                document.body.style.overscrollBehavior = "";
-            };
+                const timer = setTimeout(() => {
+                    setShow(false);
+                    // Re-enable scroll and refresh
+                    document.body.style.overflow = "";
+                    document.body.style.overscrollBehavior = "";
+                }, 4500); // 4.5s total duration
+
+                return () => {
+                    clearTimeout(timer);
+                    clearTimeout(hapticTimer);
+                    // Cleanup in case component unmounts early
+                    document.body.style.overflow = "";
+                    document.body.style.overscrollBehavior = "";
+                };
+            }
         }
     }, []);
 
