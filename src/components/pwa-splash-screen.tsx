@@ -4,55 +4,44 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 export function PWASplashScreen() {
-  const [show, setShow] = useState(false);
-  const [mounted, setMounted] = useState(false);
+    const [show, setShow] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    // Check if running in standalone mode (PWA)
-    const isPWA =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      // For iOS Safari
-      (window.navigator as any).standalone === true;
+    useEffect(() => {
+        setMounted(true);
+        // Check if running in standalone mode (PWA)
+        const isPWA =
+            window.matchMedia("(display-mode: standalone)").matches ||
+            // For iOS Safari
+            (window.navigator as any).standalone === true;
 
-    // Uncomment true for development testing
-    if (isPWA /* || true */) {
-      setShow(true);
-      const timer = setTimeout(() => {
-        setShow(false);
-      }, 2500); // Show for 2.5 seconds
+        // Uncomment true for development testing
+        if (isPWA /* || true */) {
+            setShow(true);
+            const timer = setTimeout(() => {
+                setShow(false);
+            }, 2500); // Show for 2.5 seconds
 
-      return () => clearTimeout(timer);
-    }
-  }, []);
+            return () => clearTimeout(timer);
+        }
+    }, []);
 
-  if (!mounted || !show) return null;
+    if (!mounted || !show) return null;
 
-  return (
-    <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-background transition-opacity duration-700 ${
-        show ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div className="flex flex-col items-center animate-in fade-in zoom-in duration-1000 slide-in-from-bottom-5">
-        <div className="relative h-32 w-32 mb-6 animate-pulse">
-          <Image
-            src="/logo.svg"
-            alt="App Logo"
-            fill
-            className="object-contain"
-            priority
-          />
+    return (
+        <div
+            className={`fixed inset-0 z-[100] flex items-center justify-center bg-background transition-all duration-1000 ease-in-out ${show ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none scale-110"
+                }`}
+        >
+            <div className="relative h-24 w-24 md:h-28 md:w-28 animate-in fade-in zoom-in duration-1000 fill-mode-forwards">
+                <Image
+                    src="/logo.svg"
+                    alt="App Logo"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    priority
+                />
+            </div>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground/90 font-sans">
-          Attendance Portal
-        </h1>
-        <div className="mt-8 flex space-x-2">
-            <div className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="h-2 w-2 bg-primary rounded-full animate-bounce"></div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
