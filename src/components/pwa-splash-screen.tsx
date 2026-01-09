@@ -95,13 +95,12 @@ export function PWASplashScreen() {
                     {/* Checkmark with Draw Animation (Always draws) */}
                     <path
                         d="M180 250l60 60 110 -110"
-                        stroke="#0070f3"
+                        stroke="white" // Start white (default)
                         strokeWidth="40"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         className="animate-draw-check z-50"
-                        style={{ stroke: "white" }} // Override to white for contrast on blue bg
                     />
                 </svg>
 

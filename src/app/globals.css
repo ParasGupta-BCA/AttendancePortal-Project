@@ -102,6 +102,16 @@
   }
 }
 
+@keyframes stroke-white-to-blue {
+  from {
+    stroke: white;
+  }
+
+  to {
+    stroke: #0070f3;
+  }
+}
+
 
 .animate-breathe {
   animation: breathe 4s ease-in-out infinite;
@@ -112,8 +122,9 @@
   stroke-dasharray: 250;
   /* Roughly the length of the tick path */
   stroke-dashoffset: 0;
-  animation: draw-check 1.5s ease-out forwards;
-  /* Slight delay after splash load */
+  animation: draw-check 1.5s ease-out forwards, stroke-white-to-blue 1s ease-out forwards;
+  animation-delay: 0.2s, 1.0s;
+  /* Draw starts at 0.2s, Color shift starts at 1.0s (synced with fill-in) */
 }
 
 .animate-draw-shield {
