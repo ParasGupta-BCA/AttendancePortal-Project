@@ -6,7 +6,6 @@ import Image from "next/image";
 export function PWASplashScreen() {
     const [show, setShow] = useState(false);
     const [mounted, setMounted] = useState(false);
-    const [greeting, setGreeting] = useState("");
 
     useEffect(() => {
         setMounted(true);
@@ -16,12 +15,6 @@ export function PWASplashScreen() {
 
         if (isPWA) {
             setShow(true);
-
-            // Dynamic Greeting
-            const hour = new Date().getHours();
-            if (hour < 12) setGreeting("Good Morning");
-            else if (hour < 18) setGreeting("Good Afternoon");
-            else setGreeting("Good Evening");
 
             // Haptic Feedback (Sync with wireframe completion ~1.6s)
             const hapticTimer = setTimeout(() => {
@@ -108,13 +101,6 @@ export function PWASplashScreen() {
                 <div className="absolute inset-0 z-20 overflow-hidden rounded-[20%] pointer-events-none">
                     <div className="absolute top-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/40 to-transparent -skew-x-25 animate-shine" />
                 </div>
-            </div>
-
-            {/* Dynamic Greeting Text */}
-            <div className={`absolute bottom-24 left-0 right-0 text-center transition-opacity duration-1000 delay-[2000ms] ${show ? "opacity-100" : "opacity-0"}`}>
-                <p className="text-2xl font-medium tracking-wide text-muted-foreground/80 font-sans">
-                    {greeting}
-                </p>
             </div>
         </div>
     );
