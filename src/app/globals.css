@@ -30,6 +30,79 @@
   }
 }
 
+@keyframes rotate-aurora {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes draw-shield {
+  0% {
+    stroke-dashoffset: 1000;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes fill-in {
+  from {
+    fill-opacity: 0;
+  }
+
+  to {
+    fill-opacity: 1;
+  }
+}
+
+@keyframes shockwave {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+
+  70% {
+    transform: scale(1.5);
+    opacity: 1;
+    box-shadow: 0 0 0 20px rgba(37, 99, 235, 0);
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.5;
+  }
+
+  100% {
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+
 .animate-breathe {
   animation: breathe 4s ease-in-out infinite;
   /* Slow, smooth breathing */
@@ -40,8 +113,33 @@
   /* Roughly the length of the tick path */
   stroke-dashoffset: 0;
   animation: draw-check 1.5s ease-out forwards;
-  animation-delay: 0.2s;
   /* Slight delay after splash load */
+}
+
+.animate-draw-shield {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 0;
+  animation: draw-shield 1.5s ease-out forwards;
+}
+
+.animate-fill-in {
+  fill-opacity: 0;
+  animation: fill-in 1s ease-out forwards;
+  animation-delay: 1.0s;
+  /* Start filling as outline finishes */
+}
+
+.animate-rotate-aurora {
+  animation: rotate-aurora 10s linear infinite;
+}
+
+.animate-shockwave {
+  animation: shockwave 2s ease-out infinite;
+  animation-delay: 0.5s;
+}
+
+.animate-shine {
+  animation: shine 2s ease-in-out infinite;
 }
 
 @theme inline {
