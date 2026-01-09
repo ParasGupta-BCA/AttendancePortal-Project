@@ -6,23 +6,38 @@ import Image from "next/image";
 export function PWASplashScreen() {
     const [show, setShow] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [greeting, setGreeting] = useState("");
 
     useEffect(() => {
         setMounted(true);
-        // Check if running in standalone mode (PWA)
         const isPWA =
             window.matchMedia("(display-mode: standalone)").matches ||
-            // For iOS Safari
             (window.navigator as any).standalone === true;
 
-        // Uncomment true for development testing
-        if (isPWA /* || true */) {
+        if (isPWA) {
             setShow(true);
+
+            // Dynamic Greeting
+            const hour = new Date().getHours();
+            if (hour < 12) setGreeting("Good Morning");
+            else if (hour < 18) setGreeting("Good Afternoon");
+            else setGreeting("Good Evening");
+
+            // Haptic Feedback (Sync with wireframe completion ~1.6s)
+            const hapticTimer = setTimeout(() => {
+                if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                    navigator.vibrate(50); // Crisp 50ms vibration
+                }
+            }, 1600);
+
             const timer = setTimeout(() => {
                 setShow(false);
-            }, 2500); // Show for 2.5 seconds
+            }, 4500); // 4.5s total duration
 
-            return () => clearTimeout(timer);
+            return () => {
+                clearTimeout(timer);
+                clearTimeout(hapticTimer);
+            };
         }
     }, []);
 
@@ -34,6 +49,9 @@ export function PWASplashScreen() {
                 }`}
         >
             <div className="relative h-56 w-56 md:h-72 md:w-72 animate-breathe">
+                {/* Rear Aurora Effect (Rotating Energy Core) */}
+                <div className="absolute inset-[-20%] -z-10 rounded-full animate-rotate-aurora opacity-50 blur-2xl bg-[conic-gradient(from_0deg,transparent_0deg,#2563eb_90deg,transparent_180deg,#0070f3_270deg,transparent_360deg)]" />
+
                 {/* Shockwave Effect Behind Logo */}
                 <div className="absolute inset-0 -z-10 rounded-3xl animate-shockwave bg-blue-500/20 blur-xl opacity-0" />
 
@@ -44,18 +62,37 @@ export function PWASplashScreen() {
                             <stop offset="100%" style={{ stopColor: "#0070f3", stopOpacity: 1 }} />
                         </linearGradient>
                     </defs>
-                    <rect width="512" height="512" rx="100" fill="url(#g1)" />
-                    {/* Shield/Checkmark Combo */}
-                    <path
-                        d="M256 64c-60 0-110 20-130 50v140c0 90 50 170 130 210c80-40 130-120 130-210V114c-20-30-70-50-130-50z"
-                        fill="white"
-                        opacity="0.2"
-                    />
-                    <path
-                        d="M256 84c-50 0-100 20-110 40v130c0 80 40 150 110 190c70-40 110-110 110-190V124c-10-20-60-40-110-40z"
-                        fill="white"
-                    />
-                    {/* Checkmark with Draw Animation */}
+
+                    {/* 1. Base Structure: Hidden initially, Fades in (Fill-In Animation) */}
+                    <g className="animate-fill-in">
+                        <rect width="512" height="512" rx="100" fill="url(#g1)" />
+                        <path
+                            d="M256 64c-60 0-110 20-130 50v140c0 90 50 170 130 210c80-40 130-120 130-210V114c-20-30-70-50-130-50z"
+                            fill="white"
+                            opacity="0.2"
+                        />
+                        <path
+                            d="M256 84c-50 0-100 20-110 40v130c0 80 40 150 110 190c70-40 110-110 110-190V124c-10-20-60-40-110-40z"
+                            fill="white"
+                        />
+                    </g>
+
+                    {/* 2. Wireframe / Tracing Layer (Draws outlines) */}
+                    <g>
+                        {/* Border Outline */}
+                        <rect width="512" height="512" rx="100" fill="none" stroke="#2563eb" strokeWidth="6" className="animate-draw-shield" />
+
+                        {/* Shield Outline */}
+                        <path
+                            d="M256 84c-50 0-100 20-110 40v130c0 80 40 150 110 190c70-40 110-110 110-190V124c-10-20-60-40-110-40z"
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="8"
+                            className="animate-draw-shield"
+                        />
+                    </g>
+
+                    {/* Checkmark with Draw Animation (Always draws) */}
                     <path
                         d="M180 250l60 60 110 -110"
                         stroke="#0070f3"
@@ -63,7 +100,8 @@ export function PWASplashScreen() {
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="animate-draw-check"
+                        className="animate-draw-check z-50"
+                        style={{ stroke: "white" }} // Override to white for contrast on blue bg
                     />
                 </svg>
 
@@ -71,6 +109,13 @@ export function PWASplashScreen() {
                 <div className="absolute inset-0 z-20 overflow-hidden rounded-[20%] pointer-events-none">
                     <div className="absolute top-0 w-1/2 h-full bg-linear-to-r from-transparent via-white/40 to-transparent -skew-x-25 animate-shine" />
                 </div>
+            </div>
+
+            {/* Dynamic Greeting Text */}
+            <div className={`absolute bottom-24 left-0 right-0 text-center transition-opacity duration-1000 delay-[2000ms] ${show ? "opacity-100" : "opacity-0"}`}>
+                <p className="text-2xl font-medium tracking-wide text-muted-foreground/80 font-sans">
+                    {greeting}
+                </p>
             </div>
         </div>
     );
