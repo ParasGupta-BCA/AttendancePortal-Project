@@ -4,16 +4,44 @@
 @custom-variant dark (&:is(.dark *));
 
 @keyframes breathe {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
-    transform: scale(1.05); /* Gentle 5% scale up */
+    transform: scale(1.05);
+    /* Gentle 5% scale up */
+  }
+}
+
+@keyframes draw-check {
+  0% {
+    stroke-dashoffset: 250;
+    /* Start hidden */
+    opacity: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    /* Fully drawn */
+    opacity: 1;
   }
 }
 
 .animate-breathe {
-  animation: breathe 4s ease-in-out infinite; /* Slow, smooth breathing */
+  animation: breathe 4s ease-in-out infinite;
+  /* Slow, smooth breathing */
+}
+
+.animate-draw-check {
+  stroke-dasharray: 250;
+  /* Roughly the length of the tick path */
+  stroke-dashoffset: 0;
+  animation: draw-check 1.5s ease-out forwards;
+  animation-delay: 0.2s;
+  /* Slight delay after splash load */
 }
 
 @theme inline {
@@ -132,6 +160,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
