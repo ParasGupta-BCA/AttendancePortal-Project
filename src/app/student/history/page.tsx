@@ -35,55 +35,56 @@ const SessionCard = memo(({ record, index }: { record: any, index: number }) => 
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Clock className="w-4 h-4 opacity-50" />
-                        {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
-                        {' - '}
-                        {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
-                    </span>
+                        <span>
+                            {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
+                            {' - '}
+                            {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })}
+                        </span>
+                    </div>
+                    <span className="hidden sm:inline w-px h-3 bg-current opacity-30"></span>
+                    <span className="text-xs opacity-60">({durationMin} Min)</span>
                 </div>
-                <span className="hidden sm:inline w-px h-3 bg-current opacity-30"></span>
-                <span className="text-xs opacity-60">({durationMin} Min)</span>
+
+                {/* Status Icon */}
+                <div className={cn(
+                    "flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shrink-0",
+                    isPresent
+                        ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
+                        : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
+                )}>
+                    {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                    <span>{record.status}</span>
+                </div>
             </div>
 
-            {/* Status Icon */}
-            <div className={cn(
-                "flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full shrink-0",
-                isPresent
-                    ? "bg-white text-green-600 shadow-sm dark:bg-green-900/40 dark:text-green-300"
-                    : "bg-white text-red-600 shadow-sm dark:bg-red-900/40 dark:text-red-300"
-            )}>
-                {isPresent ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-                <span>{record.status}</span>
+            {/* Subject & Class Info */}
+            <div className="mb-6">
+                <h3 className={cn("text-lg font-bold mb-1 leading-tight",
+                    isPresent ? "text-green-950 dark:text-green-100" : "text-red-950 dark:text-red-100"
+                )}>
+                    {record.subject_name}
+                </h3>
+                <p className="text-xs font-semibold opacity-60 uppercase tracking-wider dark:text-gray-400">Sem 6 (Morning)</p>
             </div>
-        </div>
 
-            {/* Subject & Class Info */ }
-    <div className="mb-6">
-        <h3 className={cn("text-lg font-bold mb-1 leading-tight",
-            isPresent ? "text-green-950 dark:text-green-100" : "text-red-950 dark:text-red-100"
-        )}>
-            {record.subject_name}
-        </h3>
-        <p className="text-xs font-semibold opacity-60 uppercase tracking-wider dark:text-gray-400">Sem 6 (Morning)</p>
-    </div>
+            {/* Footer: Faculty */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className={cn("w-8 h-8 rounded-full flex items-center justify-center",
+                        isPresent
+                            ? "bg-green-200 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                            : "bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                    )}>
+                        <User className="w-4 h-4" />
+                    </div>
+                    <div>
+                        <p className="text-xs text-muted-foreground font-semibold dark:text-gray-500">Faculty</p>
+                        <p className="text-sm font-bold opacity-90 dark:text-gray-200">{record.faculty_name || "Unknown"}</p>
+                    </div>
+                </div>
 
-    {/* Footer: Faculty */ }
-    <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center",
-                isPresent
-                    ? "bg-green-200 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                    : "bg-red-200 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-            )}>
-                <User className="w-4 h-4" />
+                <Video className="w-5 h-5 opacity-30 dark:opacity-50 dark:text-gray-400" />
             </div>
-            <div>
-                <p className="text-xs text-muted-foreground font-semibold dark:text-gray-500">Faculty</p>
-                <p className="text-sm font-bold opacity-90 dark:text-gray-200">{record.faculty_name || "Unknown"}</p>
-            </div>
-        </div>
-
-        <Video className="w-5 h-5 opacity-30 dark:opacity-50 dark:text-gray-400" />
-    </div>
         </div >
     )
 });
