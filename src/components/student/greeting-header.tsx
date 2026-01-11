@@ -39,18 +39,20 @@ export function GreetingHeader() {
     const firstName = session?.user?.name?.split(" ")[0] || "Student";
 
     return (
-        <div className="h-8 overflow-hidden flex items-center relative min-w-[200px]">
-            <div className={`absolute left-0 transition-transform duration-700 ease-in-out transform ${showGreeting ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
-                <h1 className="font-bold text-lg dark:text-white whitespace-nowrap">
+    return (
+        <div className="h-8 overflow-hidden grid place-items-start relative">
+            <div className={`col-start-1 row-start-1 transition-all duration-700 ease-in-out transform ${showGreeting ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
+                <h1 className="font-bold text-lg text-gray-900 dark:text-white whitespace-nowrap">
                     Student Portal
                 </h1>
             </div>
 
-            <div className={`absolute left-0 transition-transform duration-700 ease-in-out transform ${showGreeting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
-                <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate max-w-[250px] whitespace-nowrap">
+            <div className={`col-start-1 row-start-1 transition-all duration-700 ease-in-out transform ${showGreeting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+                <h1 className="font-bold text-lg text-gray-900 dark:text-white truncate max-w-[250px] whitespace-nowrap">
                     {greeting}, {firstName}
                 </h1>
             </div>
         </div>
+    );
     );
 }
