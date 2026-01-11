@@ -39,7 +39,6 @@ export function GreetingHeader() {
     const firstName = session?.user?.name?.split(" ")[0] || "Student";
 
     return (
-    return (
         <div className="h-8 overflow-hidden grid place-items-start relative">
             <div className={`col-start-1 row-start-1 transition-all duration-700 ease-in-out transform ${showGreeting ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
                 <h1 className="font-bold text-lg text-gray-900 dark:text-white whitespace-nowrap">
@@ -53,6 +52,5 @@ export function GreetingHeader() {
                 </h1>
             </div>
         </div>
-    );
     );
 }
