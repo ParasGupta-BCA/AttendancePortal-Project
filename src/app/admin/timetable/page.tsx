@@ -19,6 +19,7 @@ export default function TimetablePage() {
     // Edit Mode State
     const [isEditing, setIsEditing] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
 
     // Form Data Lists
     const [classes, setClasses] = useState<any[]>([]);
@@ -118,23 +119,65 @@ export default function TimetablePage() {
         } catch (e) { alert("Error deleting"); }
     };
 
-    const handleAddSlot = async () => {
+    const handleSaveSlot = async () => {
         try {
+            const method = editingSlotId ? "PUT" : "POST";
+            const body = editingSlotId ? { ...newSlot, id: editingSlotId } : newSlot;
+
             const res = await fetch("/api/admin/timetable/manage", {
-                method: "POST",
+                method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newSlot)
+                body: JSON.stringify(body)
             });
             if (res.ok) {
                 setShowAddModal(false);
                 refreshTimetable();
-                setNewSlot({ ...newSlot, start_time: "", end_time: "" }); // Reset times
+                setNewSlot({
+                    class_id: "",
+                    subject_id: "",
+                    faculty_id: "",
+                    day_of_week: "Monday",
+                    start_time: "",
+                    end_time: "",
+                    room_no: "Lab 1"
+                });
+                setEditingSlotId(null);
             } else {
                 const d = await res.json();
-                alert(d.error || "Failed using Add API");
+                alert(d.error || "Failed using Add/Edit API");
             }
-        } catch (e) { alert("Error adding"); }
+        } catch (e) { alert("Error saving"); }
     };
+
+    const handleEdit = (slot: any) => {
+        setEditingSlotId(slot.id);
+        setNewSlot({
+            class_id: slot.class_id,
+            subject_id: slot.subject_id,
+            faculty_id: slot.faculty_id,
+            day_of_week: slot.day_of_week,
+            start_time: slot.start_time,
+            end_time: slot.end_time,
+            room_no: slot.room_no
+        });
+        setShowAddModal(true);
+    };
+
+    // Reset when modal closes (if cancelled)
+    useEffect(() => {
+        if (!showAddModal) {
+            setEditingSlotId(null);
+            setNewSlot({
+                class_id: "",
+                subject_id: "",
+                faculty_id: "",
+                day_of_week: "Monday",
+                start_time: "",
+                end_time: "",
+                room_no: "Lab 1"
+            });
+        }
+    }, [showAddModal]);
 
     // Group by Day
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -175,9 +218,14 @@ export default function TimetablePage() {
                                             {slot.active_session ? 'Live Now' : `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}`}
                                         </Badge>
                                         {isEditing && (
-                                            <Button variant="destructive" size="icon" className="h-6 w-6" onClick={() => handleDelete(slot.id)}>
-                                                <Trash2 className="h-3 w-3" />
-                                            </Button>
+                                            <div className="flex gap-1">
+                                                <Button variant="secondary" size="icon" className="h-6 w-6" onClick={() => handleEdit(slot)}>
+                                                    <Edit className="h-3 w-3" />
+                                                </Button>
+                                                <Button variant="destructive" size="icon" className="h-6 w-6" onClick={() => handleDelete(slot.id)}>
+                                                    <Trash2 className="h-3 w-3" />
+                                                </Button>
+                                            </div>
                                         )}
                                     </CardHeader>
                                     <CardContent>
@@ -211,7 +259,7 @@ export default function TimetablePage() {
             <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Add New Class</DialogTitle>
+                        <DialogTitle>{editingSlotId ? "Edit Class" : "Add New Class"}</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -264,7 +312,9 @@ export default function TimetablePage() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button onClick={handleAddSlot}>Save Class</Button>
+                        <DialogFooter>
+                            <Button onClick={handleSaveSlot}>{editingSlotId ? "Update Class" : "Save Class"}</Button>
+                        </DialogFooter>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
