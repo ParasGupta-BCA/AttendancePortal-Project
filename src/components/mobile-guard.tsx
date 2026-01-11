@@ -94,9 +94,29 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
 
     // Mobile Users BUT NOT Installed (Browser Mode) -> New "Install App" Screen
     if (isMobile && !isStandalone) {
-        // Automatic Redirect Logic
+        // Check for installed related apps (PWA) - Supported mainly on Android/Chrome
+        const [isAppInstalled, setIsAppInstalled] = useState(false);
+
         useEffect(() => {
-            if (!sessionStorage.getItem("pwa_redirect_attempted")) {
+            const checkInstalledApps = async () => {
+                if ('getInstalledRelatedApps' in navigator) {
+                    try {
+                        const relatedApps = await (navigator as any).getInstalledRelatedApps();
+                        // If any related app matches our manifest (or if list > 0 as a loose check since we didn't config manifest heavily)
+                        if (relatedApps.length > 0) {
+                            setIsAppInstalled(true);
+                        }
+                    } catch (e) {
+                        console.error("Error checking installed apps", e);
+                    }
+                }
+            };
+            checkInstalledApps();
+        }, []);
+
+        // Automatic Redirect Logic - ONLY if installed
+        useEffect(() => {
+            if (isAppInstalled && !sessionStorage.getItem("pwa_redirect_attempted")) {
                 sessionStorage.setItem("pwa_redirect_attempted", "true");
                 // Use a small timeout to allow the component to mount, then try to redirect
                 setTimeout(() => {
@@ -108,7 +128,7 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                     document.body.removeChild(link);
                 }, 500);
             }
-        }, []);
+        }, [isAppInstalled]);
 
         const handleOpenApp = () => {
             // Programmatic link click is often more effective than window.location for triggering intents
@@ -137,14 +157,16 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                         </p>
                     </div>
 
-                    {/* Open App Button (For users who already have it) */}
-                    <Button
-                        onClick={handleOpenApp}
-                        variant="secondary"
-                        className="w-full bg-blue-600 hover:bg-blue-500 text-white border-none"
-                    >
-                        Already Installed? Open App
-                    </Button>
+                    {/* Open App Button - ONLY shown if app is detected as installed */}
+                    {isAppInstalled && (
+                        <Button
+                            onClick={handleOpenApp}
+                            variant="secondary"
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white border-none"
+                        >
+                            Open App
+                        </Button>
+                    )}
 
                     {/* Installation Instructions */}
                     <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md mt-4">
