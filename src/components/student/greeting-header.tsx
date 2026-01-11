@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { AnimatePresence, motion } from "framer-motion"; // We need to check if framer-motion is installed. If not, I'll use standard CSS transitions to avoid adding heavy deps unless necessary. Wait, the user said "premium", framer-motion is standard for that. But let's check package.json first. 
+
 // Actually, looking at package.json from history, "tw-animate-css" is there, but not "framer-motion". 
 // I will use pure Tailwind CSS and React for the animation to keep it lightweight and consistent with the "no new deps unless needed" philosophy, unless the user specifically asked for a library on previous turns.
 // The plan said "Tailwind CSS transition classes". So I will stick to that.
@@ -45,7 +45,7 @@ export function GreetingHeader() {
                     Student Portal
                 </h1>
             </div>
-            
+
             <div className={`absolute left-0 transition-transform duration-700 ease-in-out transform ${showGreeting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
                 <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent truncate max-w-[250px] whitespace-nowrap">
                     {greeting}, {firstName}
