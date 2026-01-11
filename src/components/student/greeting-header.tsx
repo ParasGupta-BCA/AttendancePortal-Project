@@ -39,7 +39,7 @@ export function GreetingHeader() {
     const firstName = session?.user?.name?.split(" ")[0] || "Student";
 
     return (
-        <div className="h-8 overflow-hidden grid place-items-start relative">
+        <div className="h-8 overflow-hidden grid place-items-center relative justify-items-start">
             <div
                 className={`col-start-1 row-start-1 transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] transform ${showGreeting ? '-translate-y-full opacity-0 blur-sm scale-95' : 'translate-y-0 opacity-100 blur-0 scale-100'
                     }`}
