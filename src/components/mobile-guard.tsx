@@ -95,22 +95,35 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
     // Mobile Users BUT NOT Installed (Browser Mode) -> New "Install App" Screen
     if (isMobile && !isStandalone) {
         // Automatic Redirect Logic
-        // We try to simply reload the page once, which can trigger the "Open with App" intent on Android
-        if (typeof window !== "undefined" && !sessionStorage.getItem("pwa_redirect_attempted")) {
-            sessionStorage.setItem("pwa_redirect_attempted", "true");
-            window.location.reload();
-            return null; // Return null while reloading to prevent flash
-        }
+        useEffect(() => {
+            if (!sessionStorage.getItem("pwa_redirect_attempted")) {
+                sessionStorage.setItem("pwa_redirect_attempted", "true");
+                // Use a small timeout to allow the component to mount, then try to redirect
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = window.location.href; // Same URL
+                    link.setAttribute('target', '_top');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, 500);
+            }
+        }, []);
 
         const handleOpenApp = () => {
-            // Force a navigation event which triggers the intent picker on many OSs if app is installed
-            window.location.reload();
+            // Programmatic link click is often more effective than window.location for triggering intents
+            const link = document.createElement('a');
+            link.href = window.location.href;
+            link.setAttribute('target', '_top');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
 
         return (
             <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-4 bg-gray-950 text-white">
-                 <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
-                
+                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
+
                 {/* Reverting to simple design but ensuring scrollability for small screens */}
                 <div className="relative z-10 max-w-md w-full flex flex-col items-center text-center space-y-6 p-6 overflow-y-auto max-h-full scrollbar-hide">
                     <div className="bg-gradient-to-br from-blue-600 to-violet-600 p-6 rounded-[2rem] shadow-2xl shadow-blue-500/20 mb-4 animate-bounce-slow">
@@ -124,8 +137,8 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                         </p>
                     </div>
 
-                     {/* Open App Button (For users who already have it) */}
-                     <Button 
+                    {/* Open App Button (For users who already have it) */}
+                    <Button
                         onClick={handleOpenApp}
                         variant="secondary"
                         className="w-full bg-blue-600 hover:bg-blue-500 text-white border-none"
@@ -136,7 +149,7 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
                     {/* Installation Instructions */}
                     <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md mt-4">
                         <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">How to Install</h3>
-                        
+
                         {isIOS ? (
                             <div className="space-y-4 text-left">
                                 <div className="flex items-center gap-4">
