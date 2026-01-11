@@ -40,13 +40,19 @@ export function GreetingHeader() {
 
     return (
         <div className="h-8 overflow-hidden grid place-items-start relative">
-            <div className={`col-start-1 row-start-1 transition-all duration-700 ease-in-out transform ${showGreeting ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
+            <div
+                className={`col-start-1 row-start-1 transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] transform ${showGreeting ? '-translate-y-full opacity-0 blur-sm scale-95' : 'translate-y-0 opacity-100 blur-0 scale-100'
+                    }`}
+            >
                 <h1 className="font-bold text-lg text-gray-900 dark:text-white whitespace-nowrap">
                     Student Portal
                 </h1>
             </div>
 
-            <div className={`col-start-1 row-start-1 transition-all duration-700 ease-in-out transform ${showGreeting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+            <div
+                className={`col-start-1 row-start-1 transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] transform ${showGreeting ? 'translate-y-0 opacity-100 blur-0 scale-100' : 'translate-y-full opacity-0 blur-sm scale-95'
+                    }`}
+            >
                 <h1 className="font-bold text-lg text-gray-900 dark:text-white truncate max-w-[250px] whitespace-nowrap">
                     {greeting}, {firstName}
                 </h1>
