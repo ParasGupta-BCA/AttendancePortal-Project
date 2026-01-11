@@ -95,53 +95,60 @@ export function MobileGuard({ children }: { children: React.ReactNode }) {
     // Mobile Users BUT NOT Installed (Browser Mode) -> New "Install App" Screen
     if (isMobile && !isStandalone) {
         return (
-            <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-4 bg-gray-950 overflow-hidden text-white">
+            <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-4 bg-gray-950 text-white">
                 <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none"></div>
 
-                <div className="relative z-10 max-w-md w-full flex flex-col items-center text-center space-y-6 p-6">
-                    <div className="bg-gradient-to-br from-blue-600 to-violet-600 p-6 rounded-[2rem] shadow-2xl shadow-blue-500/20 mb-4 animate-bounce-slow">
-                        <Download className="w-16 h-16 text-white" />
+                {/* Make container scrollable for small screens */}
+                <div className="relative z-10 w-full h-full overflow-y-auto flex flex-col items-center justify-center scrollbar-hide">
+                    <div className="max-w-md w-full flex flex-col items-center text-center space-y-6 p-6 animate-in slide-in-from-bottom-10 fade-in duration-700">
+                        <div className="bg-gradient-to-br from-blue-600 to-violet-600 p-6 rounded-[2rem] shadow-2xl shadow-blue-500/20 mb-4 animate-bounce-slow ring-4 ring-white/10 backdrop-blur-md">
+                            <Download className="w-16 h-16 text-white drop-shadow-md" />
+                        </div>
+
+                        <div className="space-y-3">
+                            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                                Install App
+                            </h1>
+                            <p className="text-gray-400 text-lg leading-relaxed">
+                                To access the Student Portal, you must install the app on your device for the best experience.
+                            </p>
+                        </div>
+
+                        {/* Installation Instructions */}
+                        <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md mt-4 shadow-xl divide-y divide-white/5 transition-all hover:bg-white/10 duration-500">
+                            <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-400 mb-4 flex items-center justify-center gap-2">
+                                <Smartphone className="w-4 h-4" /> How to Install
+                            </h3>
+
+                            {isIOS ? (
+                                <div className="space-y-4 text-left pt-2">
+                                    <div className="flex items-center gap-4 group">
+                                        <div className="bg-white/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300"><Share className="w-6 h-6 text-blue-400" /></div>
+                                        <span className="text-gray-300">1. Tap the <span className="font-bold text-white">Share</span> button below</span>
+                                    </div>
+                                    <div className="flex items-center gap-4 group">
+                                        <div className="bg-white/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300"><Download className="w-6 h-6 text-blue-400" /></div>
+                                        <span className="text-gray-300">2. Select <span className="font-bold text-white">Add to Home Screen</span></span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4 text-left pt-2">
+                                    <div className="flex items-center gap-4 group">
+                                        <div className="bg-white/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300"><MoreVertical className="w-6 h-6 text-blue-400" /></div>
+                                        <span className="text-gray-300">1. Tap the <span className="font-bold text-white">Menu</span> (3 dots)</span>
+                                    </div>
+                                    <div className="flex items-center gap-4 group">
+                                        <div className="bg-white/10 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300"><Download className="w-6 h-6 text-blue-400" /></div>
+                                        <span className="text-gray-300">2. Select <span className="font-bold text-white">Install App</span> or <span className="font-bold text-white">Add to Home Screen</span></span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <h1 className="text-3xl font-bold tracking-tight">Install App</h1>
-                        <p className="text-gray-400 text-lg leading-relaxed">
-                            To access the Student Portal, you must install the app on your device for the best experience.
-                        </p>
+                    <div className="py-8 text-center shrink-0">
+                        <p className="text-gray-600 text-xs font-medium tracking-wide">AttendancePortal &bull; Secure Mobile Access</p>
                     </div>
-
-                    {/* Installation Instructions */}
-                    <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md mt-4">
-                        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-4">How to Install</h3>
-
-                        {isIOS ? (
-                            <div className="space-y-4 text-left">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-white/10 p-2 rounded-lg"><Share className="w-6 h-6 text-blue-400" /></div>
-                                    <span className="text-gray-300">1. Tap the <span className="font-bold text-white">Share</span> button below</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-white/10 p-2 rounded-lg"><Download className="w-6 h-6 text-blue-400" /></div>
-                                    <span className="text-gray-300">2. Select <span className="font-bold text-white">Add to Home Screen</span></span>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="space-y-4 text-left">
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-white/10 p-2 rounded-lg"><MoreVertical className="w-6 h-6 text-blue-400" /></div>
-                                    <span className="text-gray-300">1. Tap the <span className="font-bold text-white">Menu</span> (3 dots)</span>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-white/10 p-2 rounded-lg"><Download className="w-6 h-6 text-blue-400" /></div>
-                                    <span className="text-gray-300">2. Select <span className="font-bold text-white">Install App</span> or <span className="font-bold text-white">Add to Home Screen</span></span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="absolute bottom-8 left-0 w-full text-center">
-                    <p className="text-gray-600 text-xs">AttendancePortal &bull; PWA Required</p>
                 </div>
             </div>
         );
