@@ -148,7 +148,7 @@ export default function StudentDashboard() {
                                         <div className="space-y-1 min-w-0">
                                             <h4 className="font-bold text-base leading-snug break-words">{cls.subject_name}</h4>
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-700 dark:text-gray-300 font-medium font-mono whitespace-nowrap">
+                                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-700 dark:text-gray-300 font-semibold whitespace-nowrap">
                                                     {cls.start_time} - {cls.end_time}
                                                 </span>
                                             </div>
