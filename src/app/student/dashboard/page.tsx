@@ -144,32 +144,34 @@ export default function StudentDashboard() {
                                                 ? 'border-l-blue-500 shadow-md ring-1 ring-blue-100 dark:ring-blue-900/30'
                                                 : 'border-l-gray-300 dark:border-l-gray-600 dark:bg-gray-800/50'
                                 )}>
-                                    <div className="flex justify-between items-center">
-                                        <div className="space-y-1">
-                                            <h4 className="font-bold text-base">{cls.subject_name}</h4>
+                                    <div className="flex justify-between items-center gap-3">
+                                        <div className="space-y-1 min-w-0">
+                                            <h4 className="font-bold text-base leading-snug break-words">{cls.subject_name}</h4>
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-700 dark:text-gray-300 font-medium font-mono">
+                                                <span className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-700 dark:text-gray-300 font-medium font-mono whitespace-nowrap">
                                                     {cls.start_time} - {cls.end_time}
                                                 </span>
                                             </div>
                                         </div>
-                                        {cls.status === 'Present' ? (
-                                            <span className="text-xs bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-bold">
-                                                <CheckCircle2 className="w-4 h-4" /> Present
-                                            </span>
-                                        ) : cls.status === 'Absent' ? (
-                                            <span className="text-xs bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-bold">
-                                                <XCircle className="w-4 h-4" /> Absent
-                                            </span>
-                                        ) : cls.isActive ? (
-                                            <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-3 py-1.5 rounded-lg font-bold animate-pulse">
-                                                Active Now
-                                            </span>
-                                        ) : (
-                                            <span className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 px-3 py-1.5 rounded-lg font-medium">
-                                                Scheduled
-                                            </span>
-                                        )}
+                                        <div className="shrink-0">
+                                            {cls.status === 'Present' ? (
+                                                <span className="text-xs bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-bold">
+                                                    <CheckCircle2 className="w-4 h-4" /> Present
+                                                </span>
+                                            ) : cls.status === 'Absent' ? (
+                                                <span className="text-xs bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-bold">
+                                                    <XCircle className="w-4 h-4" /> Absent
+                                                </span>
+                                            ) : cls.isActive ? (
+                                                <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-3 py-1.5 rounded-lg font-bold animate-pulse">
+                                                    Active Now
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 px-3 py-1.5 rounded-lg font-medium">
+                                                    Scheduled
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </Card>
                             ))}
