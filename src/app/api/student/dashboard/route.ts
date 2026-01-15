@@ -39,7 +39,33 @@ export async function GET() {
         const { present, absent, total } = statsRes.rows[0];
         const attendanceRate = total > 0 ? Math.round((parseInt(present) / parseInt(total)) * 100) : 0;
 
-        // 3. Fetch Today's Classes
+        // 3. Fetch Subject Performance (Subject-wise breakdown)
+        const subjectStatsRes = await query(`
+            SELECT 
+                s.name as subject_name,
+                COUNT(*) FILTER (WHERE ar.status = 'Present') as present_count,
+                COUNT(*) as total_count
+            FROM attendance_records ar
+            JOIN attendance_sessions sess ON ar.session_id = sess.id
+            JOIN timetable t ON sess.timetable_id = t.id
+            JOIN subjects s ON t.subject_id = s.id
+            WHERE ar.student_id = $1
+            GROUP BY s.name
+            ORDER BY total_count DESC
+        `, [student.id]);
+
+        const subjectPerformance = subjectStatsRes.rows.map(row => {
+            const present = parseInt(row.present_count);
+            const total = parseInt(row.total_count);
+            return {
+                subject: row.subject_name,
+                present,
+                total,
+                percentage: total > 0 ? Math.round((present / total) * 100) : 0
+            };
+        });
+
+        // 4. Fetch Today's Classes
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const todayName = days[new Date().getDay()];
 
@@ -92,6 +118,7 @@ export async function GET() {
                 absent: parseInt(absent),
                 totalClasses: parseInt(total) // Note: This is recorded classes. Total scheduled classes would require more complex calc.
             },
+            subjectPerformance,
             todayClasses: todayClasses,
             studentDetails: {
                 course: student.course_year,

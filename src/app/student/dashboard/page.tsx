@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, CheckCircle2, XCircle, RefreshCcw } from "lucide-react";
+import { CalendarDays, CheckCircle2, XCircle, RefreshCcw, ChevronDown, ChevronUp, AlertCircle, TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 export default function StudentDashboard() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [showAllSubjects, setShowAllSubjects] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
@@ -40,7 +41,7 @@ export default function StudentDashboard() {
         <div className="space-y-6 p-4">
             {/* Welcome Card Skeleton */}
             <Skeleton className="h-48 w-full rounded-2xl" />
-            
+
             {/* Stats Grid Skeleton */}
             <div className="grid grid-cols-2 gap-4">
                 <Skeleton className="h-32 w-full rounded-xl" />
@@ -58,7 +59,31 @@ export default function StudentDashboard() {
 
     if (!data) return <div className="p-4">Failed to load data. <Button onClick={fetchData}>Retry</Button></div>;
 
-    const { stats, todayClasses, studentDetails } = data;
+    if (!data) return <div className="p-4">Failed to load data. <Button onClick={fetchData}>Retry</Button></div>;
+
+    const { stats, todayClasses, studentDetails, subjectPerformance } = data;
+
+    // Sort subjects: Low attendance first (Critical attention needed)
+    const sortedSubjects = [...(subjectPerformance || [])].sort((a, b) => a.percentage - b.percentage);
+    const displayedSubjects = showAllSubjects ? sortedSubjects : sortedSubjects.slice(0, 3);
+
+    const getStatusColor = (percentage: number) => {
+        if (percentage >= 75) return "text-green-600 dark:text-green-400";
+        if (percentage >= 60) return "text-yellow-600 dark:text-yellow-400";
+        return "text-red-600 dark:text-red-400";
+    };
+
+    const getProgressColor = (percentage: number) => {
+        if (percentage >= 75) return "bg-green-500";
+        if (percentage >= 60) return "bg-yellow-500";
+        return "bg-red-500";
+    };
+
+    const getStatusText = (percentage: number) => {
+        if (percentage >= 75) return "Good Standing";
+        if (percentage >= 60) return "At Risk";
+        return "Critical Shortage";
+    };
 
     return (
         <div className="space-y-6">
@@ -106,6 +131,66 @@ export default function StudentDashboard() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Subject Performance Section */}
+            <Card className="overflow-hidden border-none shadow-md bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+                <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg font-bold flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            Subject Performance
+                        </CardTitle>
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            {subjectPerformance?.length || 0} Subjects
+                        </span>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {displayedSubjects.length === 0 ? (
+                        <p className="text-sm text-center text-muted-foreground py-4">No attendance data available yet.</p>
+                    ) : (
+                        displayedSubjects.map((subject: any, index: number) => (
+                            <div key={index} className="space-y-1.5">
+                                <div className="flex justify-between items-end text-sm">
+                                    <span className="font-semibold truncate max-w-[60%]">{subject.subject}</span>
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <span className={cn("font-bold", getStatusColor(subject.percentage))}>
+                                            {subject.percentage}%
+                                        </span>
+                                        <span className="text-muted-foreground">
+                                            ({subject.present}/{subject.total})
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="h-2.5 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                                    <div
+                                        className={cn("h-full rounded-full transition-all duration-500", getProgressColor(subject.percentage))}
+                                        style={{ width: `${subject.percentage}%` }}
+                                    />
+                                </div>
+                                <p className={cn("text-[10px] font-medium text-right", getStatusColor(subject.percentage))}>
+                                    {getStatusText(subject.percentage)}
+                                </p>
+                            </div>
+                        ))
+                    )}
+
+                    {subjectPerformance?.length > 3 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-xs text-muted-foreground hover:text-foreground mt-2"
+                            onClick={() => setShowAllSubjects(!showAllSubjects)}
+                        >
+                            {showAllSubjects ? (
+                                <span className="flex items-center gap-1">Show Less <ChevronUp className="w-3 h-3" /></span>
+                            ) : (
+                                <span className="flex items-center gap-1">Show More ({subjectPerformance.length - 3} others) <ChevronDown className="w-3 h-3" /></span>
+                            )}
+                        </Button>
+                    )}
+                </CardContent>
+            </Card>
 
             <div className="space-y-2">
                 <h3 className="font-semibold text-lg">Today's Classes</h3>
