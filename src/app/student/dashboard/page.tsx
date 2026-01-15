@@ -103,17 +103,17 @@ export default function StudentDashboard() {
     };
 
     return (
-        <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10"
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10">
             {/* LEFT COLUMN: Main Content (Welcome + Today's Classes) */}
             <div className="md:col-span-2 space-y-6">
 
-                {/* 1. Welcome Card */}
-                <motion.div variants={itemVariants} className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                {/* 1. Welcome Card - Immediate Animation */}
+                <motion.div
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="show"
+                    className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
+                >
                     {/* Decorative Background */}
                     <div className="absolute top-0 right-0 p-4 opacity-10">
                         <CalendarDays className="w-32 h-32 transform rotate-12 -translate-y-8 translate-x-8" />
@@ -143,8 +143,14 @@ export default function StudentDashboard() {
                     </div>
                 </motion.div>
 
-                {/* 2. Today's Classes (High Priority) */}
-                <div className="space-y-4">
+                {/* 2. Today's Classes (High Priority) - Scroll Triggered */}
+                <motion.div
+                    className="space-y-4"
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: "-50px" }}
+                >
                     <motion.h3 variants={itemVariants} className="font-bold text-xl flex items-center gap-2">
                         <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         Today's Classes
@@ -202,14 +208,20 @@ export default function StudentDashboard() {
                             ))}
                         </div>
                     )}
-                </div>
+                </motion.div>
             </div>
 
             {/* RIGHT COLUMN: Sidebar (Stats + Performance) */}
             <div className="space-y-6">
 
-                {/* 3. Stats Grid */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* 3. Stats Grid - Scroll Triggered */}
+                <motion.div
+                    className="grid grid-cols-2 gap-4"
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: "-50px" }}
+                >
                     <motion.div variants={itemVariants}>
                         <Card className="hover:shadow-md transition-shadow h-full">
                             <CardContent className="p-4 flex flex-col items-center justify-center text-center">
@@ -228,10 +240,15 @@ export default function StudentDashboard() {
                             </CardContent>
                         </Card>
                     </motion.div>
-                </div>
+                </motion.div>
 
-                {/* 4. Subject Performance */}
-                <motion.div variants={itemVariants}>
+                {/* 4. Subject Performance - Scroll Triggered */}
+                <motion.div
+                    variants={itemVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: "-50px" }}
+                >
                     <Card className="overflow-hidden border-none shadow-md bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm sticky top-4">
                         <CardHeader className="pb-2">
                             <div className="flex justify-between items-center">
@@ -292,6 +309,6 @@ export default function StudentDashboard() {
                     </Card>
                 </motion.div>
             </div>
-        </motion.div>
+        </div>
     );
 }
