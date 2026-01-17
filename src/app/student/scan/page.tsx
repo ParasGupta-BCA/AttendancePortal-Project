@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import { Html5QrcodeScanner } from "html5-qrcode";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, ZoomIn, ZoomOut, RefreshCw } from "lucide-react";
+import { MapPin, ZoomIn, ZoomOut } from "lucide-react";
 
 export default function ScanPage() {
     const router = useRouter();
@@ -16,13 +16,15 @@ export default function ScanPage() {
     // Zoom State
     const [zoom, setZoom] = useState(1);
     const [zoomCaps, setZoomCaps] = useState<{ min: number; max: number; step: number } | null>(null);
-    const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+    const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
     // 1. Initial GPS Check
     useEffect(() => {
         checkLocation();
         return () => {
-            stopScanner();
+            if (scannerRef.current) {
+                scannerRef.current.clear().catch(e => console.error("Scanner clear error", e));
+            }
         };
     }, []);
 
@@ -62,104 +64,81 @@ export default function ScanPage() {
 
     // 2. Initialize Scanner ONLY when status is 'scanning'
     useEffect(() => {
-        if (status === 'scanning' && !html5QrCodeRef.current) {
-            startScanner();
-        } else if (status !== 'scanning') {
-            stopScanner();
+        if (status !== 'scanning') return;
+
+        const scanner = new Html5QrcodeScanner(
+            "reader",
+            { fps: 10, qrbox: 250 },
+            false
+        );
+        scannerRef.current = scanner;
+
+        scanner.render(onScanSuccess, onScanFailure);
+
+        function onScanSuccess(decodedText: string, decodedResult: any) {
+            scanner.clear();
+            markAttendance(decodedText);
         }
+
+        function onScanFailure(error: any) {
+            // handle scan failure, usually better to ignore and keep scanning.
+        }
+
+        // --- ZOOM LOGIC INJECTION ---
+        // Since Html5QrcodeScanner doesn't expose the track directly, we poll the DOM for the video element
+        const checkVideoInterval = setInterval(() => {
+            const videoElement = document.querySelector("#reader video") as HTMLVideoElement;
+            if (videoElement && videoElement.srcObject) {
+                const stream = videoElement.srcObject as MediaStream;
+                const track = stream.getVideoTracks()[0];
+                if (track) {
+                    const capabilities = track.getCapabilities() as any;
+                    if (capabilities && 'zoom' in capabilities) {
+                        setZoomCaps({
+                            min: capabilities.zoom.min,
+                            max: capabilities.zoom.max,
+                            step: capabilities.zoom.step
+                        });
+                        setZoom(capabilities.zoom.min);
+                        clearInterval(checkVideoInterval); // Found capabilities, stop polling
+                    }
+                }
+            }
+        }, 1000); // Check every second until found
+
+        return () => {
+            clearInterval(checkVideoInterval);
+            if (scannerRef.current) {
+                scannerRef.current.clear().catch(e => console.log("Cleanup error", e));
+            }
+        };
+        // -----------------------------
+
     }, [status]);
 
-    const startScanner = async () => {
-        try {
-            const html5QrCode = new Html5Qrcode("reader");
-            html5QrCodeRef.current = html5QrCode;
-
-            const config = {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 1.0
-            };
-
-            await html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                (decodedText) => {
-                    stopScanner();
-                    markAttendance(decodedText);
-                },
-                (errorMessage) => {
-                    // ignore errors during scanning
-                }
-            );
-
-            // Check for zoom capabilities
-            // Access the running track to get capabilities
-            // @ts-ignore - access internal video element or track if exposed, or use getRunningTrackCameraCapabilities if available in newer versions
-            // HTML5-qrcode library might handle this differently, but let's try standard getUserMedia pattern if needed or use internal methods if available.
-            // Actually, html5-qrcode doesn't expose the track directly easily in all versions.
-            // Let's use the `applyVideoConstraints` method if we can simply try applying zoom.
-            // BETTER APPROACH: Get the media stream track from the internal scanner if possible, or blindly try zoom.
-            // Wait a moment for camera to fully start
-            setTimeout(() => {
-                checkZoomCapabilities();
-            }, 500);
-
-        } catch (err) {
-            console.error("Error starting scanner", err);
-            // setStatus('error');
-            // setMessage("Camera permission denied or error.");
-        }
-    };
-
-    const checkZoomCapabilities = () => {
-        // This is a bit of a hack since html5-qrcode encapsulates the video element.
-        // We look for the video element inside the 'reader' div.
-        const videoElement = document.querySelector("#reader video") as HTMLVideoElement;
-        if (videoElement && videoElement.srcObject) {
-            const stream = videoElement.srcObject as MediaStream;
-            const track = stream.getVideoTracks()[0];
-            const capabilities = track.getCapabilities() as any; // Cast to any because 'zoom' might not be in standard TS lib yet
-
-            if (capabilities && 'zoom' in capabilities) {
-                setZoomCaps({
-                    min: capabilities.zoom.min,
-                    max: capabilities.zoom.max,
-                    step: capabilities.zoom.step
-                });
-                setZoom(capabilities.zoom.min); // Start at min zoom usually
-            }
-        }
-    };
-
+    // Handle Zoom Change
     const handleZoomChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newZoom = Number(e.target.value);
         setZoom(newZoom);
 
-        if (html5QrCodeRef.current) {
-            try {
-                await html5QrCodeRef.current.applyVideoConstraints({
-                    advanced: [{ zoom: newZoom } as any]
-                });
-            } catch (err) {
-                console.error("Failed to apply zoom", err);
-            }
-        }
-    };
-
-    const stopScanner = async () => {
-        if (html5QrCodeRef.current) {
-            try {
-                await html5QrCodeRef.current.stop();
-                html5QrCodeRef.current.clear();
-                html5QrCodeRef.current = null;
-            } catch (e) {
-                console.error("Failed to stop scanner", e);
+        // Apply to the active video track directly
+        const videoElement = document.querySelector("#reader video") as HTMLVideoElement;
+        if (videoElement && videoElement.srcObject) {
+            const stream = videoElement.srcObject as MediaStream;
+            const track = stream.getVideoTracks()[0];
+            if (track) {
+                try {
+                    await track.applyConstraints({
+                        advanced: [{ zoom: newZoom } as any]
+                    });
+                } catch (err) {
+                    console.error("Failed to apply zoom", err);
+                }
             }
         }
     };
 
     const markAttendance = async (qr_code: string) => {
-        // We already have coords from the initial check, but let's refresh them for precision if possible
         if (!coords) {
             checkLocation();
             return;
@@ -242,33 +221,26 @@ export default function ScanPage() {
                         <span>GPS Active</span>
                     </div>
 
-                    <Card className="w-full max-w-sm p-0 bg-black overflow-hidden relative shadow-2xl rounded-3xl border-0">
-                        {/* Scanner Viewport */}
-                        <div id="reader" className="w-full h-[350px] bg-black"></div>
-
-                        {/* Zoom Controls Overlay */}
-                        {zoomCaps && (
-                            <div className="absolute bottom-4 left-0 right-0 px-6 pb-2 pt-4 bg-gradient-to-t from-black/80 to-transparent flex items-center space-x-4">
-                                <ZoomOut className="w-5 h-5 text-white/80" />
-                                <input
-                                    type="range"
-                                    min={zoomCaps.min}
-                                    max={zoomCaps.max}
-                                    step={zoomCaps.step}
-                                    value={zoom}
-                                    onChange={handleZoomChange}
-                                    className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
-                                />
-                                <ZoomIn className="w-5 h-5 text-white/80" />
-                            </div>
-                        )}
-                        {/* Overlay Text */}
-                        {!zoomCaps && (
-                            <div className="absolute bottom-4 left-0 right-0 text-center text-white/50 text-xs">
-                                Move camera to fit QR code
-                            </div>
-                        )}
+                    <Card className="w-full max-w-sm p-4 bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden relative">
+                        <div id="reader" className="w-full"></div>
                     </Card>
+
+                    {/* Zoom Slider (Only shown if caps detected) */}
+                    {zoomCaps && (
+                        <div className="w-full max-w-xs flex items-center space-x-4 bg-gray-100 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <ZoomOut className="w-5 h-5 text-gray-500" />
+                            <input
+                                type="range"
+                                min={zoomCaps.min}
+                                max={zoomCaps.max}
+                                step={zoomCaps.step}
+                                value={zoom}
+                                onChange={handleZoomChange}
+                                className="flex-1 h-2 bg-gray-300 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                            />
+                            <ZoomIn className="w-5 h-5 text-gray-500" />
+                        </div>
+                    )}
 
                     <p className="text-sm text-gray-500 text-center max-w-xs">
                         Use the zoom slider for distant codes.
@@ -315,4 +287,3 @@ export default function ScanPage() {
         </div>
     );
 }
-
