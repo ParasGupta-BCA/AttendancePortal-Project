@@ -101,7 +101,7 @@ export default function ScanPage() {
             // BETTER APPROACH: Get the media stream track from the internal scanner if possible, or blindly try zoom.
             // Wait a moment for camera to fully start
             setTimeout(() => {
-               checkZoomCapabilities();
+                checkZoomCapabilities();
             }, 500);
 
         } catch (err) {
@@ -134,16 +134,15 @@ export default function ScanPage() {
     const handleZoomChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const newZoom = Number(e.target.value);
         setZoom(newZoom);
-        
+
         if (html5QrCodeRef.current) {
-             try {
-                // @ts-ignore
+            try {
                 await html5QrCodeRef.current.applyVideoConstraints({
-                    advanced: [{ zoom: newZoom }]
+                    advanced: [{ zoom: newZoom } as any]
                 });
-             } catch (err) {
-                 console.error("Failed to apply zoom", err);
-             }
+            } catch (err) {
+                console.error("Failed to apply zoom", err);
+            }
         }
     };
 
@@ -244,9 +243,9 @@ export default function ScanPage() {
                     </div>
 
                     <Card className="w-full max-w-sm p-0 bg-black overflow-hidden relative shadow-2xl rounded-3xl border-0">
-                         {/* Scanner Viewport */}
+                        {/* Scanner Viewport */}
                         <div id="reader" className="w-full h-[350px] bg-black"></div>
-                        
+
                         {/* Zoom Controls Overlay */}
                         {zoomCaps && (
                             <div className="absolute bottom-4 left-0 right-0 px-6 pb-2 pt-4 bg-gradient-to-t from-black/80 to-transparent flex items-center space-x-4">
@@ -263,14 +262,14 @@ export default function ScanPage() {
                                 <ZoomIn className="w-5 h-5 text-white/80" />
                             </div>
                         )}
-                         {/* Overlay Text */}
-                         {!zoomCaps && (
+                        {/* Overlay Text */}
+                        {!zoomCaps && (
                             <div className="absolute bottom-4 left-0 right-0 text-center text-white/50 text-xs">
-                               Move camera to fit QR code
+                                Move camera to fit QR code
                             </div>
-                         )}
+                        )}
                     </Card>
-                    
+
                     <p className="text-sm text-gray-500 text-center max-w-xs">
                         Use the zoom slider for distant codes.
                     </p>
@@ -290,11 +289,11 @@ export default function ScanPage() {
                     )}
                     {(status === 'error' || status === 'expired') && (
                         <div className="bg-red-100 dark:bg-red-900/30 p-6 rounded-full">
-                             {status === 'expired' ? (
+                            {status === 'expired' ? (
                                 <svg className="w-20 h-20 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                             ) : (
+                            ) : (
                                 <svg className="w-20 h-20 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                             )}
+                            )}
                         </div>
                     )}
 
