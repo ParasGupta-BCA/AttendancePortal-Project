@@ -67,6 +67,7 @@ export const exportDailyReportToExcel = (reportData: any) => {
 
         // Prepare rows
         const rows = attendance.map((st: any) => ({
+            "Date": new Date(session_info.start_time).toLocaleDateString('en-GB'),
             "Enrollment": st.enrollment_no,
             "Name": st.name,
             "Status": st.status,
