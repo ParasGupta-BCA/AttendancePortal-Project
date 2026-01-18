@@ -65,9 +65,12 @@ export const exportDailyReportToPDF = (reportData: any) => {
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100); // Grey
-        doc.text(`${session_info.class_name} (${session_info.section}) | Time: ${new Date(session_info.start_time).toLocaleTimeString()}`, 14, finalY + 6);
+        doc.text(`${session_info.class_name} (${session_info.section}) | ${new Date(session_info.start_time).toLocaleDateString()} ${new Date(session_info.start_time).toLocaleTimeString()}`, 14, finalY + 6);
+
+        const sessionDate = new Date(session_info.start_time).toLocaleDateString();
 
         const tableBody = attendance.map((st: any) => [
+            sessionDate,
             st.enrollment_no,
             st.name,
             st.status,
@@ -76,7 +79,7 @@ export const exportDailyReportToPDF = (reportData: any) => {
 
         autoTable(doc, {
             startY: finalY + 12,
-            head: [['Enrollment', 'Student Name', 'Status', 'Time']],
+            head: [['Date', 'Enrollment', 'Student Name', 'Status', 'Time']],
             body: tableBody,
             theme: 'striped',
             headStyles: { fillColor: [52, 73, 94] }, // Dark header
