@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Users, QrCode } from "lucide-react";
+import { Calendar, Users, QrCode, FileDown, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import QRCode from "qrcode";
+import { exportSubjectReportToExcel, exportDailyReportToExcel } from "@/utils/exportAttendance";
+import { exportSubjectReportToPDF, exportDailyReportToPDF } from "@/utils/exportPdf";
 
 export default function FacultyDashboard() {
     const [data, setData] = useState<any>(null);
@@ -42,12 +45,62 @@ export default function FacultyDashboard() {
         }
     };
 
+    const handleExportDaily = async (type: 'excel' | 'pdf') => {
+        try {
+            const res = await fetch(`/api/faculty/reports/daily`);
+            const json = await res.json();
+            if (json.error) return alert(json.error);
+
+            if (type === 'excel') exportDailyReportToExcel(json);
+            else exportDailyReportToPDF(json);
+        } catch (e) {
+            console.error(e);
+            alert("Failed to export daily report");
+        }
+    };
+
+    const handleExportSubject = async (timetableId: string, type: 'excel' | 'pdf') => {
+        try {
+            const res = await fetch(`/api/faculty/reports/subject?timetable_id=${timetableId}`);
+            const json = await res.json();
+            if (json.error) return alert(json.error);
+
+            if (type === 'excel') exportSubjectReportToExcel(json.data, json.meta);
+            else exportSubjectReportToPDF(json.data, json.meta);
+        } catch (e) {
+            console.error(e);
+            alert("Failed to export subject report");
+        }
+    };
+
     if (loading) return <div className="p-8">Loading...</div>;
     const { stats, todaySchedule } = data || {};
 
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
-            <h2 className="text-3xl font-bold tracking-tight">Faculty Dashboard</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-bold tracking-tight">Faculty Dashboard</h2>
+                <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="gap-2">
+                                <FileDown className="h-4 w-4" />
+                                Export Today's Report
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Choose Format</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleExportDaily('excel')}>
+                                Excel (.xlsx)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleExportDaily('pdf')}>
+                                PDF (.pdf)
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
 
             <h3 className="text-xl font-bold mb-4">Daily Overview</h3>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -106,7 +159,27 @@ export default function FacultyDashboard() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm mb-4">Time: {slot.start_time} - {slot.end_time}</p>
-                            <p className="text-sm mb-4">Room: {slot.room_no || 'N/A'}</p>
+                            <p className="text-sm mb-4">Time: {slot.start_time} - {slot.end_time}</p>
+                            <div className="flex justify-between items-center mb-4">
+                                <p className="text-sm">Room: {slot.room_no || 'N/A'}</p>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                            <Download className="h-4 w-4" />
+                                            <span className="sr-only">Open menu</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>Export Attendance</DropdownMenuLabel>
+                                        <DropdownMenuItem onClick={() => handleExportSubject(slot.id, 'excel')}>
+                                            To Excel
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleExportSubject(slot.id, 'pdf')}>
+                                            To PDF
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
 
                             {slot.activeSession ? (
                                 <Dialog>
