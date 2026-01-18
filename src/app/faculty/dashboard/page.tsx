@@ -3,17 +3,21 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Users, QrCode, FileDown, Download } from "lucide-react";
+import { Calendar as CalendarIcon, Users, QrCode, FileDown, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import QRCode from "qrcode";
 import { exportSubjectReportToExcel, exportDailyReportToExcel } from "@/utils/exportAttendance";
 import { exportSubjectReportToPDF, exportDailyReportToPDF } from "@/utils/exportPdf";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 export default function FacultyDashboard() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [date, setDate] = useState<Date | undefined>(new Date());
+    const [isExportOpen, setIsExportOpen] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -46,13 +50,18 @@ export default function FacultyDashboard() {
     };
 
     const handleExportDaily = async (type: 'excel' | 'pdf') => {
+        if (!date) return alert("Please select a date first.");
+
         try {
-            const res = await fetch(`/api/faculty/reports/daily`);
+            const dateStr = format(date, "yyyy-MM-dd");
+            const res = await fetch(`/api/faculty/reports/daily?date=${dateStr}`);
             const json = await res.json();
             if (json.error) return alert(json.error);
 
             if (type === 'excel') exportDailyReportToExcel(json);
             else exportDailyReportToPDF(json);
+
+            setIsExportOpen(false);
         } catch (e) {
             console.error(e);
             alert("Failed to export daily report");
@@ -81,24 +90,41 @@ export default function FacultyDashboard() {
             <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold tracking-tight">Faculty Dashboard</h2>
                 <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                    <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
+                        <DialogTrigger asChild>
                             <Button variant="outline" className="gap-2">
                                 <FileDown className="h-4 w-4" />
-                                Export Today's Report
+                                Export Daily Report
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Choose Format</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleExportDaily('excel')}>
-                                Excel (.xlsx)
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleExportDaily('pdf')}>
-                                PDF (.pdf)
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Export Daily Attendance</DialogTitle>
+                                <DialogDescription>
+                                    Select a date to download the attendance report for all your classes on that day.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex justify-center py-4">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    className="rounded-md border"
+                                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                                />
+                            </div>
+                            <DialogFooter className="sm:justify-start flex-col gap-2">
+                                <div className="flex gap-2 w-full">
+                                    <Button className="flex-1" onClick={() => handleExportDaily('excel')}>
+                                        Download Excel
+                                    </Button>
+                                    <Button className="flex-1" variant="outline" onClick={() => handleExportDaily('pdf')}>
+                                        Download PDF
+                                    </Button>
+                                </div>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
 
@@ -107,8 +133,8 @@ export default function FacultyDashboard() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Classes Today</CardTitle>
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
+                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats?.classesToday || 0}</div>
                     </CardContent>
