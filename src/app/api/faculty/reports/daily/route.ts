@@ -14,9 +14,14 @@ export async function GET(request: Request) {
 
         const facultyUserId = (session.user as any).id;
 
-        // Get Date from params or default to today
+        // Get Date Range from params
         const { searchParams } = new URL(request.url);
-        const dateParam = searchParams.get('date'); // YYYY-MM-DD
+        const startDate = searchParams.get('startDate');
+        const endDate = searchParams.get('endDate');
+
+        if (!startDate || !endDate) {
+            return NextResponse.json({ error: 'Start and End dates are required' }, { status: 400 });
+        }
 
         // 1. Get Faculty ID
         const facultyRes = await query('SELECT id FROM faculty WHERE user_id = $1', [facultyUserId]);
