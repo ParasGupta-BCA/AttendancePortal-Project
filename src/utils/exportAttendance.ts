@@ -91,9 +91,9 @@ export const exportDailyReportToExcel = (reportData: any) => {
 
     if (reportData.sessions.length === 0) {
         // Empty sheet if no classes
-        const ws = XLSX.utils.aoa_to_sheet([["No classes conducted today."]]);
+        const ws = XLSX.utils.aoa_to_sheet([["No classes conducted in this range."]]);
         XLSX.utils.book_append_sheet(wb, ws, "Info");
     }
 
-    XLSX.writeFile(wb, `Daily_Report_${dateStr}.xlsx`);
+    XLSX.writeFile(wb, `Attendance_Report_${reportData.startDate}_to_${reportData.endDate}.xlsx`);
 };

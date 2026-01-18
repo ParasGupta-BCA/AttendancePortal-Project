@@ -37,17 +37,17 @@ export const exportSubjectReportToPDF = (data: any[], meta: any) => {
 
 export const exportDailyReportToPDF = (reportData: any) => {
     const doc = new jsPDF();
-    const dateStr = reportData.date;
+    const dateRangeStr = `${reportData.startDate} to ${reportData.endDate}`;
     let finalY = 15;
 
     doc.setFontSize(22);
-    doc.text("Daily Attendance Report", 105, finalY, { align: "center" });
+    doc.text("Attendance Report", 105, finalY, { align: "center" });
     doc.setFontSize(12);
-    doc.text(`Date: ${dateStr}`, 105, finalY + 8, { align: "center" });
+    doc.text(`Period: ${dateRangeStr}`, 105, finalY + 8, { align: "center" });
     finalY += 20;
 
     if (reportData.sessions.length === 0) {
-        doc.text("No classes conducted today.", 14, finalY);
+        doc.text("No classes conducted in this period.", 14, finalY);
     }
 
     reportData.sessions.forEach((sessionData: any, index: number) => {
@@ -86,5 +86,5 @@ export const exportDailyReportToPDF = (reportData: any) => {
         finalY = doc.lastAutoTable.finalY + 20;
     });
 
-    doc.save(`Daily_Report_${dateStr}.pdf`);
+    doc.save(`Attendance_Report_${reportData.startDate}_to_${reportData.endDate}.pdf`);
 };

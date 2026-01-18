@@ -23,16 +23,7 @@ export async function GET(request: Request) {
         if (facultyRes.rowCount === 0) return NextResponse.json({ error: 'Faculty profile not found' }, { status: 404 });
         const facultyId = facultyRes.rows[0].id;
 
-        // 2. Fetch Sessions for that Date
-        // We filter by start_time being within the day
-        let dateFilter;
-        if (dateParam) {
-            dateFilter = dateParam;
-        } else {
-            const now = new Date();
-            dateFilter = now.toISOString().split('T')[0];
-        }
-
+        // 2. Fetch Sessions for that Date Range
         const sessionsRes = await query(`
             SELECT 
                 as_sess.id as session_id,
@@ -46,9 +37,10 @@ export async function GET(request: Request) {
             JOIN subjects s ON t.subject_id = s.id
             JOIN classes c ON t.class_id = c.id
             WHERE as_sess.faculty_id = $1
-            AND as_sess.start_time::date = $2
+            AND as_sess.start_time >= $2::timestamp
+            AND as_sess.start_time <= $3::timestamp
             ORDER BY as_sess.start_time ASC
-        `, [facultyId, dateFilter]);
+        `, [facultyId, `${startDate} 00:00:00`, `${endDate} 23:59:59`]);
 
         const sessions = sessionsRes.rows;
         const reportData = [];
@@ -97,7 +89,8 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json({
-            date: dateFilter,
+            startDate,
+            endDate,
             sessions: reportData
         });
 

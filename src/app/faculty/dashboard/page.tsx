@@ -12,11 +12,15 @@ import { exportSubjectReportToExcel, exportDailyReportToExcel } from "@/utils/ex
 import { exportSubjectReportToPDF, exportDailyReportToPDF } from "@/utils/exportPdf";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 export default function FacultyDashboard() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [date, setDate] = useState<Date | undefined>(new Date());
+    const [date, setDate] = useState<DateRange | undefined>({
+        from: new Date(),
+        to: new Date(),
+    });
     const [isExportOpen, setIsExportOpen] = useState(false);
     const router = useRouter();
 
@@ -50,11 +54,12 @@ export default function FacultyDashboard() {
     };
 
     const handleExportDaily = async (type: 'excel' | 'pdf') => {
-        if (!date) return alert("Please select a date first.");
+        if (!date?.from || !date?.to) return alert("Please select a valid date range.");
 
         try {
-            const dateStr = format(date, "yyyy-MM-dd");
-            const res = await fetch(`/api/faculty/reports/daily?date=${dateStr}`);
+            const startDate = format(date.from, "yyyy-MM-dd");
+            const endDate = format(date.to, "yyyy-MM-dd");
+            const res = await fetch(`/api/faculty/reports/daily?startDate=${startDate}&endDate=${endDate}`);
             const json = await res.json();
             if (json.error) return alert(json.error);
 
@@ -99,16 +104,18 @@ export default function FacultyDashboard() {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-md">
                             <DialogHeader>
-                                <DialogTitle>Export Daily Attendance</DialogTitle>
+                                <DialogTitle>Export Attendance Report</DialogTitle>
                                 <DialogDescription>
-                                    Select a date to download the attendance report for all your classes on that day.
+                                    Select a date range to download report for.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="flex justify-center py-4">
                                 <Calendar
-                                    mode="single"
+                                    mode="range"
+                                    defaultMonth={date?.from}
                                     selected={date}
                                     onSelect={setDate}
+                                    numberOfMonths={1}
                                     className="rounded-md border"
                                     disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                                 />
