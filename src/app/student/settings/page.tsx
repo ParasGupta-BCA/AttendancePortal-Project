@@ -232,38 +232,41 @@ export default function StudentSettingsPage() {
                                             const isCurrent = index === 0; // Assume first is current for now
 
                                             return (
-                                                <div key={log.id} className="group flex flex-col sm:flex-row sm:items-center justify-between px-4 py-2 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all gap-2">
-                                                    <div className="flex items-start gap-4">
-                                                        <div className={cn(
-                                                            "p-2.5 rounded-xl shrink-0 transition-colors",
-                                                            isMobile ? "bg-orange-50 dark:bg-orange-900/10 text-orange-600 dark:text-orange-400"
-                                                                : "bg-indigo-50 dark:bg-indigo-900/10 text-indigo-600 dark:text-indigo-400"
-                                                        )}>
-                                                            <Icon className="w-5 h-5" />
-                                                        </div>
-                                                        <div className="space-y-1">
-                                                            <div className="flex items-center gap-2">
-                                                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                                    {cleanDeviceName}
-                                                                </p>
-                                                                {isCurrent && (
-                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800">
-                                                                        Current
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                                                                {log.ip_address}
-                                                            </p>
-                                                        </div>
+                                                <div key={log.id} className="group flex items-start gap-3 p-3 transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-800/40">
+                                                    {/* Icon Box */}
+                                                    <div className={cn(
+                                                        "p-2.5 rounded-xl shrink-0 transition-colors mt-0.5",
+                                                        isMobile ? "bg-orange-50 dark:bg-orange-900/10 text-orange-600 dark:text-orange-400"
+                                                            : "bg-indigo-50 dark:bg-indigo-900/10 text-indigo-600 dark:text-indigo-400"
+                                                    )}>
+                                                        <Icon className="w-5 h-5" />
                                                     </div>
 
-                                                    <div className="pl-14 sm:pl-0 text-left sm:text-right">
-                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                            {new Date(log.login_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                                            <span className="mx-1.5 opacity-30">|</span>
-                                                            {new Date(log.login_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                                                        </p>
+                                                    {/* Content */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center justify-between gap-2 mb-1">
+                                                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                                                {cleanDeviceName}
+                                                            </p>
+                                                            {isCurrent && (
+                                                                <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800">
+                                                                    Current
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                                                            <div className="flex items-center gap-1.5 min-w-0">
+                                                                <Globe className="w-3 h-3 shrink-0 opacity-70" />
+                                                                <span className="font-mono">{log.ip_address}</span>
+                                                            </div>
+                                                            <span className="hidden sm:inline w-0.5 h-0.5 rounded-full bg-gray-300 dark:bg-gray-600" />
+                                                            <span className="font-medium opacity-90">
+                                                                {new Date(log.login_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                                <span className="mx-1 opacity-50">at</span>
+                                                                {new Date(log.login_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             );
