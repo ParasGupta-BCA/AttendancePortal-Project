@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
-import { rpID, origin, getUserAuthenticators } from '@/lib/webauthn';
+import { getOrigin, getRpID, getUserAuthenticators } from '@/lib/webauthn';
 import { cookies } from 'next/headers';
 import { query } from '@/lib/db';
 import crypto from 'crypto';
@@ -34,6 +34,9 @@ export async function POST(req: Request) {
 
     let verification;
     try {
+        const rpID = getRpID(req);
+        const origin = getOrigin(req);
+
         verification = await verifyAuthenticationResponse({
             response: verificationResponse,
             expectedChallenge: challenge,

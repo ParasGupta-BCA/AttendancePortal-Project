@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { verifyRegistrationResponse } from '@simplewebauthn/server';
-import { rpID, origin, saveAuthenticator } from '@/lib/webauthn';
+import { getRpID, getOrigin, saveAuthenticator } from '@/lib/webauthn';
 import { cookies } from 'next/headers';
 
 export async function POST(req: Request) {
@@ -21,6 +21,9 @@ export async function POST(req: Request) {
 
     let verification;
     try {
+        const rpID = getRpID(req);
+        const origin = getOrigin(req);
+
         verification = await verifyRegistrationResponse({
             response: body,
             expectedChallenge: challenge,

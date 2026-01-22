@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
-import { rpID, getUserAuthenticators } from '@/lib/webauthn';
+import { getRpID, getUserAuthenticators } from '@/lib/webauthn';
 import { cookies } from 'next/headers';
 import { query } from '@/lib/db';
 
@@ -21,6 +21,7 @@ export async function GET(req: Request) {
 
     // Get authenticators
     const userAuthenticators = await getUserAuthenticators(user.id);
+    const rpID = getRpID(req);
 
     const options = await generateAuthenticationOptions({
         rpID,

@@ -14,9 +14,19 @@ export interface AuthenticatorDevice {
 }
 
 export const rpName = 'Student Portal';
-// Prioritize environment variable, then hardcoded domain, then localhost
-export const rpID = process.env.RP_ID || 'attendance-portal-liard.vercel.app';
-export const origin = process.env.NODE_ENV === 'development' ? `http://${rpID}:3000` : `https://${rpID}`;
+
+export function getRpID(req: Request | { headers: Headers }) {
+    const host = req.headers.get('host') || 'localhost';
+    // Remove port if present
+    const hostname = host.split(':')[0];
+    return hostname;
+}
+
+export function getOrigin(req: Request | { headers: Headers }) {
+    const host = req.headers.get('host') || 'localhost';
+    const proto = host.includes('localhost') ? 'http' : 'https';
+    return `${proto}://${host}`;
+}
 
 export async function getUserAuthenticators(userId: string): Promise<AuthenticatorDevice[]> {
     const res = await query('SELECT * FROM authenticators WHERE user_id = $1', [userId]);
