@@ -213,16 +213,16 @@ export default function StudentSettingsPage() {
                         </div>
 
                         <Card className="border shadow-md bg-white dark:bg-gray-900 overflow-hidden">
-                            <CardHeader className="border-b bg-gray-50/50 dark:bg-gray-800/50 pb-4">
-                                <CardTitle className="text-lg flex items-center gap-2.5">
-                                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                                        <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+                            <CardHeader className="border-b pb-4">
+                                <CardTitle className="text-lg flex items-center gap-3">
+                                    <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                                        <Shield className="w-5 h-5 text-green-600 dark:text-green-500" />
                                     </div>
-                                    <div>
-                                        <span>Login Activity</span>
-                                        <p className="text-xs font-normal text-muted-foreground mt-0.5">
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-gray-900 dark:text-gray-100 leading-none">Login Activity</span>
+                                        <span className="text-xs font-normal text-muted-foreground mt-1.5">
                                             Recent sign-ins to your account
-                                        </p>
+                                        </span>
                                     </div>
                                 </CardTitle>
                             </CardHeader>
@@ -232,6 +232,7 @@ export default function StudentSettingsPage() {
                                         loginHistory.map((log) => {
                                             const isMobile = log.device_info.toLowerCase().includes('mobile') || log.device_info.toLowerCase().includes('android') || log.device_info.toLowerCase().includes('iphone');
                                             const Icon = isMobile ? Smartphone : Laptop;
+                                            const cleanDeviceName = parseUserAgent(log.device_info);
 
                                             return (
                                                 <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors gap-3">
@@ -240,8 +241,8 @@ export default function StudentSettingsPage() {
                                                             <Icon className="w-5 h-5" />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-1 break-all" title={log.device_info}>
-                                                                {log.device_info || "Unknown Device"}
+                                                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 break-all" title={log.device_info}>
+                                                                {cleanDeviceName}
                                                             </p>
                                                             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                                 <Globe className="w-3 h-3" />
