@@ -5,7 +5,7 @@ import { ChangeEmailForm } from "@/components/change-email-form";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe, ChevronDown, ChevronUp, Fingerprint } from "lucide-react";
+import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe, ChevronDown, ChevronUp, Fingerprint, Plus, Trash2, ShieldCheck, Key } from "lucide-react";
 import { startRegistration } from '@simplewebauthn/browser';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -279,35 +279,73 @@ export default function StudentSettingsPage() {
                                     </div>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4">
-                                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                    <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
-                                        <p>Secure your account by adding a passkey from this device.</p>
-                                        {authenticators.length > 0 && (
-                                            <div className="mt-2 flex flex-wrap gap-2">
-                                                {authenticators.map((auth, idx) => (
-                                                    <span key={idx} className="inline-flex items-center px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium border border-green-200 dark:border-green-800">
-                                                        <Fingerprint className="w-3 h-3 mr-1" />
-                                                        Passkey {idx + 1}
-                                                    </span>
-                                                ))}
+                            <CardContent className="p-0">
+                                <div className="p-4 sm:p-6 space-y-6">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                Go passwordless! Sign in using your face, fingerprint, or security key.
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={handleRegisterPasskey}
+                                            disabled={passkeyLoading}
+                                            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {passkeyLoading ? (
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            ) : (
+                                                <Plus className="w-4 h-4" />
+                                            )}
+                                            Add New Device
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {authenticators.length > 0 ? (
+                                            authenticators.map((auth, idx) => (
+                                                <div key={idx} className="group flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 hover:bg-white dark:hover:bg-gray-800 transition-all">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={cn(
+                                                            "p-2.5 rounded-full shrink-0",
+                                                            auth.device_type.includes('Synced')
+                                                                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                                                                : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
+                                                        )}>
+                                                            {auth.device_type.includes('Synced') ? <ShieldCheck className="w-5 h-5" /> : <Key className="w-5 h-5" />}
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                                                                    Passkey {idx + 1}
+                                                                </h4>
+                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20">
+                                                                    Active
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                                                {auth.device_type}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                        title="Remove (Coming Soon)"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                                                <div className="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+                                                    <Fingerprint className="w-6 h-6" />
+                                                </div>
+                                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No passkeys registered</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Add your device to sign in faster</p>
                                             </div>
                                         )}
                                     </div>
-                                    <button
-                                        onClick={handleRegisterPasskey}
-                                        disabled={passkeyLoading}
-                                        className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                                    >
-                                        {passkeyLoading ? (
-                                            <>Processing...</>
-                                        ) : (
-                                            <>
-                                                <Fingerprint className="w-4 h-4" />
-                                                {authenticators.length > 0 ? 'Add Another Device' : 'Register This Device'}
-                                            </>
-                                        )}
-                                    </button>
                                 </div>
                             </CardContent>
                         </Card>

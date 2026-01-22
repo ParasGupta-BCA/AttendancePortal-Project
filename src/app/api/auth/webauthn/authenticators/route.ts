@@ -9,13 +9,19 @@ export async function GET() {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const authenticators = await getUserAuthenticators((session.user as any).id);
+    const res = await getUserAuthenticators((session.user as any).id);
 
-    return NextResponse.json(authenticators.map(auth => ({
-        id: auth.credentialID.toString('base64url'),
-        // No confidential info returned, just metadata if we had it
-        // We'll just return the ID and count for now
-        last_used: new Date().toISOString(), // Placeholder as we don't fetch last_used yet
-        device_type: 'Unknown Device' // We could store/fetch a friendly name in future
+    // We need to fetch the raw rows to get the device type as getUserAuthenticators simplifies it
+    // Actually, let's just update getUserAuthenticators to return it or fetch directly here for simplicity
+    // Since getUserAuthenticators returns specific type, let's just query db directly here for the metadata
+
+    // Re-query to get metadata not in AuthenticatorDevice interface
+    const { query } = require('@/lib/db');
+    const dbRes = await query('SELECT credential_id, credential_device_type, credential_backed_up FROM authenticators WHERE user_id = $1', [(session.user as any).id]);
+
+    return NextResponse.json(dbRes.rows.map((row: any) => ({
+        id: Buffer.from(row.credential_id, 'base64url').toString('base64url'),
+        device_type: row.credential_backed_up ? 'Synced Passkey (iCloud/Google)' : 'Hardware Key / Local Device',
+        created_at: new Date().toISOString() // Still placeholder as we didn't add created_at column
     })));
 }
