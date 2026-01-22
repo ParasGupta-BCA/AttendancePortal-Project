@@ -5,7 +5,7 @@ import { ChangeEmailForm } from "@/components/change-email-form";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe } from "lucide-react";
+import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe, ChevronDown, ChevronUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -285,9 +285,14 @@ export default function StudentSettingsPage() {
                                     {loginHistory.length > 3 && (
                                         <button
                                             onClick={() => setShowAllHistory(!showAllHistory)}
-                                            className="w-full py-2 text-xs font-semibold text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-xl transition-colors mt-1"
+                                            className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
                                         >
-                                            {showAllHistory ? "Show Less" : `Show ${loginHistory.length - 3} More`}
+                                            <span>{showAllHistory ? "Show Less" : `View ${loginHistory.length - 3} More items`}</span>
+                                            {showAllHistory ? (
+                                                <ChevronUp className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+                                            ) : (
+                                                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:translate-y-0.5" />
+                                            )}
                                         </button>
                                     )}
                                 </div>
