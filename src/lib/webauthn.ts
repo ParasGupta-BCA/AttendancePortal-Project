@@ -14,7 +14,8 @@ export interface AuthenticatorDevice {
 }
 
 export const rpName = 'Student Portal';
-export const rpID = process.env.NODE_ENV === 'development' ? 'localhost' : 'your-production-domain.com'; // Adjust for production
+// Prioritize environment variable, then hardcoded domain, then localhost
+export const rpID = process.env.RP_ID || 'attendance-portal-liard.vercel.app';
 export const origin = process.env.NODE_ENV === 'development' ? `http://${rpID}:3000` : `https://${rpID}`;
 
 export async function getUserAuthenticators(userId: string): Promise<AuthenticatorDevice[]> {
