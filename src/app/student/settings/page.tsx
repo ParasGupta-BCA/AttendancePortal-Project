@@ -5,7 +5,7 @@ import { ChangeEmailForm } from "@/components/change-email-form";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, BookOpen, Shield } from "lucide-react";
+import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -194,36 +194,62 @@ export default function StudentSettingsPage() {
                             <ChangeEmailForm />
                         </div>
 
-                        {/* Login History Section */}
-                        <Card className="border shadow-sm dark:bg-gray-900">
-                            <CardHeader>
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                    <Shield className="w-5 h-5 text-green-600" />
-                                    Login Activity
+                        <Card className="border shadow-md bg-white dark:bg-gray-900 overflow-hidden">
+                            <CardHeader className="border-b bg-gray-50/50 dark:bg-gray-800/50 pb-4">
+                                <CardTitle className="text-lg flex items-center gap-2.5">
+                                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                                        <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                    </div>
+                                    <div>
+                                        <span>Login Activity</span>
+                                        <p className="text-xs font-normal text-muted-foreground mt-0.5">
+                                            Recent sign-ins to your account
+                                        </p>
+                                    </div>
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
+                            <CardContent className="p-0">
+                                <div className="divide-y divide-gray-100 dark:divide-gray-800">
                                     {loginHistory.length > 0 ? (
-                                        loginHistory.map((log) => (
-                                            <div key={log.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-                                                <div className="space-y-1">
-                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {log.device_info || "Unknown Device"}
-                                                    </p>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                        IP: {log.ip_address}
-                                                    </p>
+                                        loginHistory.map((log) => {
+                                            const isMobile = log.device_info.toLowerCase().includes('mobile') || log.device_info.toLowerCase().includes('android') || log.device_info.toLowerCase().includes('iphone');
+                                            const Icon = isMobile ? Smartphone : Laptop;
+
+                                            return (
+                                                <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors gap-3">
+                                                    <div className="flex items-start gap-4">
+                                                        <div className="p-2.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shrink-0">
+                                                            <Icon className="w-5 h-5" />
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-1 break-all" title={log.device_info}>
+                                                                {log.device_info || "Unknown Device"}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                <Globe className="w-3 h-3" />
+                                                                <span>{log.ip_address}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="pl-14 sm:pl-0 text-left sm:text-right">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
+                                                            {new Date(log.login_at).toLocaleString(undefined, {
+                                                                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                                                            })}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                        {new Date(log.login_at).toLocaleString()}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     ) : (
-                                        <p className="text-sm text-gray-500 text-center py-4">No login history found.</p>
+                                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                                            <Shield className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No recent activity</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto mt-1">
+                                                We haven't recorded any login history yet. Log out and back in to see your device here.
+                                            </p>
+                                        </div>
                                     )}
                                 </div>
                             </CardContent>

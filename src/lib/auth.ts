@@ -54,16 +54,16 @@ export const authOptions: NextAuthOptions = {
             // However, headers() might not be available in events depending on the exact Next.js version/env
             // But usually, it works in server actions/route handlers. 
             // Since this runs on the server, we try to capture info.
-            
+
             try {
-               const headersList = await headers();
-               const ip = headersList.get('x-forwarded-for') || 'Unknown IP';
-               const userAgent = headersList.get('user-agent') || 'Unknown Device';
-               
-               await query(
-                   `INSERT INTO login_history (user_id, device_info, ip_address) VALUES ($1, $2, $3)`,
-                   [user.id, userAgent, ip]
-               );
+                const headersList = await headers();
+                const ip = headersList.get('x-forwarded-for') || 'Unknown IP';
+                const userAgent = headersList.get('user-agent') || 'Unknown Device';
+
+                await query(
+                    `INSERT INTO login_history (user_id, device_info, ip_address) VALUES ($1, $2, $3)`,
+                    [user.id, userAgent, ip]
+                );
             } catch (error) {
                 console.error("Failed to log login history:", error);
                 // Don't block login if logging fails
