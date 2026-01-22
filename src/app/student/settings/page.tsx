@@ -16,6 +16,24 @@ export default function StudentSettingsPage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
 
+    // Helper to parse UA string
+    const parseUserAgent = (ua: string) => {
+        if (!ua) return "Unknown Device";
+        if (ua.includes("Windows")) {
+            const match = ua.match(/Windows NT (\d+\.\d+)/);
+            return match ? `Windows PC (v${match[1]})` : "Windows PC";
+        }
+        if (ua.includes("Mac OS")) return "MacBook / iMac";
+        if (ua.includes("Android")) {
+            const match = ua.match(/Android\s([0-9.]+)/);
+            return match ? `Android Phone (v${match[1]})` : "Android Phone";
+        }
+        if (ua.includes("iPhone")) return "iPhone";
+        if (ua.includes("iPad")) return "iPad";
+        if (ua.includes("Linux")) return "Linux System";
+        return "Web Browser";
+    };
+
     const fetchProfile = async () => {
         try {
             const res = await fetch("/api/student/dashboard");
