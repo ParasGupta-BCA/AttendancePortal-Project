@@ -14,6 +14,7 @@ export default function StudentSettingsPage() {
     const { data: session } = useSession();
     const [profile, setProfile] = useState<{ name: string; email: string; course: string; section: string; role?: string } | null>(null);
     const [loginHistory, setLoginHistory] = useState<{ id: string; device_info: string; ip_address: string; login_at: string }[]>([]);
+    const [authenticators, setAuthenticators] = useState<{ id: string; device_type: string }[]>([]);
     const [loading, setLoading] = useState(true);
     const [passkeyLoading, setPasskeyLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
@@ -59,11 +60,27 @@ export default function StudentSettingsPage() {
         }
     };
 
+    const fetchAuthenticators = async () => {
+        try {
+            const res = await fetch("/api/auth/webauthn/authenticators");
+            if (res.ok) {
+                const data = await res.json();
+                setAuthenticators(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch authenticators", error);
+        }
+    };
+
     useEffect(() => {
         fetchProfile();
+        fetchAuthenticators();
 
         // Real-time updates: Poll every 5 seconds
-        const interval = setInterval(fetchProfile, 5000);
+        const interval = setInterval(() => {
+            fetchProfile();
+            fetchAuthenticators();
+        }, 5000);
         return () => clearInterval(interval);
     }, [session]);
 
@@ -90,6 +107,7 @@ export default function StudentSettingsPage() {
 
             if (verifyJson.verified) {
                 alert('Success! Your device is now registered.');
+                fetchAuthenticators(); // Refresh list
             } else {
                 throw new Error('Verification failed');
             }
@@ -265,6 +283,16 @@ export default function StudentSettingsPage() {
                                 <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                                     <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
                                         <p>Secure your account by adding a passkey from this device.</p>
+                                        {authenticators.length > 0 && (
+                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                {authenticators.map((auth, idx) => (
+                                                    <span key={idx} className="inline-flex items-center px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium border border-green-200 dark:border-green-800">
+                                                        <Fingerprint className="w-3 h-3 mr-1" />
+                                                        Passkey {idx + 1}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                     <button
                                         onClick={handleRegisterPasskey}
@@ -276,7 +304,7 @@ export default function StudentSettingsPage() {
                                         ) : (
                                             <>
                                                 <Fingerprint className="w-4 h-4" />
-                                                Register This Device
+                                                {authenticators.length > 0 ? 'Add Another Device' : 'Register This Device'}
                                             </>
                                         )}
                                     </button>

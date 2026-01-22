@@ -26,9 +26,10 @@ export async function POST(req: Request) {
     }
     const user = userRes.rows[0];
     const userAuthenticators = await getUserAuthenticators(user.id);
-    const authenticator = userAuthenticators.find(auth => auth.credentialID === verificationResponse.id);
+    const authenticator = userAuthenticators.find(auth => auth.credentialID.toString('base64url') === verificationResponse.id);
 
     if (!authenticator) {
+        console.error('Authenticator not found', { expected: verificationResponse.id, available: userAuthenticators.map(a => a.credentialID.toString('base64url')) });
         return NextResponse.json({ error: 'Authenticator not registered' }, { status: 400 });
     }
 
