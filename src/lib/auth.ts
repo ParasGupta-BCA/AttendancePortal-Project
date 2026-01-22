@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { query } from './db';
 import { compare } from 'bcryptjs';
 import { headers } from 'next/headers';
+import crypto from 'crypto';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -22,6 +23,35 @@ export const authOptions: NextAuthOptions = {
 
                 if (!user) {
                     return null;
+                }
+
+                // Check for Passkey Token Bypass
+                if (credentials.password.startsWith('PASSKEY-TOKEN:')) {
+                    const token = credentials.password.split('PASSKEY-TOKEN:')[1];
+                    const [payloadB64, signature] = token.split('.');
+
+                    if (!payloadB64 || !signature) return null;
+
+                    const secret = process.env.NEXTAUTH_SECRET || 'secret';
+                    const expectedSignature = crypto.createHmac('sha256', secret).update(payloadB64).digest('hex');
+
+                    if (signature !== expectedSignature) return null;
+
+                    const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
+                    if (Date.now() > payload.exp) return null;
+
+                    // Token is valid, fetch user
+                    const tokenUserRes = await query('SELECT * FROM users WHERE email = $1', [payload.email]);
+                    const tokenUser = tokenUserRes.rows[0];
+                    if (!tokenUser) return null;
+
+                    return {
+                        id: tokenUser.id,
+                        email: tokenUser.email,
+                        name: tokenUser.full_name,
+                        role: tokenUser.role,
+                        must_change_password: tokenUser.must_change_password,
+                    };
                 }
 
                 // Check password (hash or plain text for demo)

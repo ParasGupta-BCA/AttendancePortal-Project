@@ -5,7 +5,8 @@ import { ChangeEmailForm } from "@/components/change-email-form";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe, ChevronDown, ChevronUp } from "lucide-react";
+import { User, Mail, BookOpen, Shield, Laptop, Smartphone, Globe, ChevronDown, ChevronUp, Fingerprint } from "lucide-react";
+import { startRegistration } from '@simplewebauthn/browser';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ export default function StudentSettingsPage() {
     const [profile, setProfile] = useState<{ name: string; email: string; course: string; section: string; role?: string } | null>(null);
     const [loginHistory, setLoginHistory] = useState<{ id: string; device_info: string; ip_address: string; login_at: string }[]>([]);
     const [loading, setLoading] = useState(true);
+    const [passkeyLoading, setPasskeyLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
     const [showAllHistory, setShowAllHistory] = useState(false);
 
@@ -64,6 +66,41 @@ export default function StudentSettingsPage() {
         const interval = setInterval(fetchProfile, 5000);
         return () => clearInterval(interval);
     }, [session]);
+
+    const handleRegisterPasskey = async () => {
+        setPasskeyLoading(true);
+        try {
+            // 1. Get options from server
+            const resp = await fetch('/api/auth/webauthn/register/challenge');
+            const options = await resp.json();
+
+            if (resp.status !== 200) throw new Error(options.error);
+
+            // 2. Browser ceremony
+            const attResp = await startRegistration(options);
+
+            // 3. Send validation to server
+            const verifyResp = await fetch('/api/auth/webauthn/register/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(attResp),
+            });
+
+            const verifyJson = await verifyResp.json();
+
+            if (verifyJson.verified) {
+                alert('Success! Your device is now registered.');
+            } else {
+                throw new Error('Verification failed');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Failed to register device. Please try again.');
+        } finally {
+            setPasskeyLoading(false);
+        }
+    };
+
 
     if (loading) return (
         <div className="space-y-6 p-4 pt-6 pb-20">
@@ -206,6 +243,46 @@ export default function StudentSettingsPage() {
                             <ChangePasswordForm />
                             <ChangeEmailForm />
                         </div>
+
+                        {/* Biometric Security Card */}
+                        <Card className="border-none shadow-xl bg-white dark:bg-gray-900 overflow-hidden ring-1 ring-gray-200 dark:ring-gray-800">
+                            <CardHeader className="pb-0 pt-4 px-4">
+                                <CardTitle className="text-lg flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                                            <Fingerprint className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold text-gray-900 dark:text-gray-100 block">Biometric Security</span>
+                                            <span className="text-xs font-normal text-muted-foreground">
+                                                Login with FaceID or TouchID
+                                            </span>
+                                        </div>
+                                    </div>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4">
+                                <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+                                        <p>Secure your account by adding a passkey from this device.</p>
+                                    </div>
+                                    <button
+                                        onClick={handleRegisterPasskey}
+                                        disabled={passkeyLoading}
+                                        className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    >
+                                        {passkeyLoading ? (
+                                            <>Processing...</>
+                                        ) : (
+                                            <>
+                                                <Fingerprint className="w-4 h-4" />
+                                                Register This Device
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </CardContent>
+                        </Card>
 
                         <Card className="border-none shadow-xl bg-white dark:bg-gray-900 overflow-hidden ring-1 ring-gray-200 dark:ring-gray-800">
                             <CardHeader className="pb-0 pt-4 px-4">
