@@ -232,7 +232,7 @@ export default function StudentSettingsPage() {
                                             const isCurrent = index === 0; // Assume first is current for now
 
                                             return (
-                                                <div key={log.id} className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all gap-4">
+                                                <div key={log.id} className="group flex flex-col sm:flex-row sm:items-center justify-between p-3 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all gap-3">
                                                     <div className="flex items-start gap-4">
                                                         <div className={cn(
                                                             "p-2.5 rounded-xl shrink-0 transition-colors",
