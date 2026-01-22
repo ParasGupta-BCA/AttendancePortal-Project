@@ -30,15 +30,18 @@ export async function getUserAuthenticators(userId: string): Promise<Authenticat
 
 export async function saveAuthenticator(userId: string, verificationFn: any) {
     const { registrationInfo } = verificationFn;
-    const { credentialID, credentialPublicKey, counter, credentialDeviceType, credentialBackedUp } = registrationInfo!;
+    const { credential, credentialDeviceType, credentialBackedUp } = registrationInfo!;
+    const { id, publicKey, counter } = credential;
 
     // Save as Base64URL strings
-    const credentialIDStr = Buffer.from(credentialID).toString('base64url');
-    const credentialPublicKeyStr = Buffer.from(credentialPublicKey).toString('base64url');
+    // id is already a Base64URL string in V13
+    const credentialIDStr = id;
+    // publicKey is Uint8Array, convert to Base64URL
+    const credentialPublicKeyStr = Buffer.from(publicKey).toString('base64url');
 
     await query(
         `INSERT INTO authenticators (credential_id, credential_public_key, counter, credential_device_type, credential_backed_up, user_id)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [credentialIDStr, credentialPublicKeyStr, counter, credentialDeviceType, credentialBackedUp, userId]
+        [credentialIDStr, credentialPublicKeyStr, Number(counter), credentialDeviceType, credentialBackedUp, userId]
     );
 }
