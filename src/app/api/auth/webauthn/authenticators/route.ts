@@ -25,3 +25,26 @@ export async function GET() {
         created_at: new Date().toISOString() // Still placeholder as we didn't add created_at column
     })));
 }
+
+export async function DELETE(req: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const credentialId = searchParams.get('id');
+
+    if (!credentialId) {
+        return NextResponse.json({ error: 'Credential ID required' }, { status: 400 });
+    }
+
+    const { query } = require('@/lib/db');
+    // We expect the credential ID to be sent exactly as it is stored (Base64URL string)
+    await query(
+        'DELETE FROM authenticators WHERE credential_id = $1 AND user_id = $2',
+        [credentialId, (session.user as any).id]
+    );
+
+    return NextResponse.json({ success: true });
+}

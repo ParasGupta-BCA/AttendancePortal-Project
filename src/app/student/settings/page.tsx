@@ -119,6 +119,26 @@ export default function StudentSettingsPage() {
         }
     };
 
+    const handleDeleteAuthenticator = async (id: string) => {
+        if (!confirm("Are you sure you want to remove this passkey?")) return;
+
+        try {
+            const res = await fetch(`/api/auth/webauthn/authenticators?id=${id}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                fetchAuthenticators();
+            } else {
+                const data = await res.json();
+                alert(data.error || "Failed to remove passkey");
+            }
+        } catch (error) {
+            console.error("Failed to delete", error);
+            alert("Error removing passkey");
+        }
+    };
+
 
     if (loading) return (
         <div className="space-y-6 p-4 pt-6 pb-20">
@@ -329,8 +349,9 @@ export default function StudentSettingsPage() {
                                                         </div>
                                                     </div>
                                                     <button
+                                                        onClick={() => handleDeleteAuthenticator(auth.id)}
                                                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                                        title="Remove (Coming Soon)"
+                                                        title="Remove Passkey"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
