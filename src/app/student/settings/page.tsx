@@ -19,6 +19,7 @@ export default function StudentSettingsPage() {
     const [passkeyLoading, setPasskeyLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
     const [showAllHistory, setShowAllHistory] = useState(false);
+    const [showAllPasskeys, setShowAllPasskeys] = useState(false);
 
     // Helper to parse UA string
     const parseUserAgent = (ua: string) => {
@@ -323,7 +324,7 @@ export default function StudentSettingsPage() {
 
                                     <div className="space-y-3">
                                         {authenticators.length > 0 ? (
-                                            authenticators.map((auth, idx) => (
+                                            (showAllPasskeys ? authenticators : authenticators.slice(0, 2)).map((auth, idx) => (
                                                 <div key={idx} className="group flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40 hover:bg-white dark:hover:bg-gray-800 transition-all">
                                                     <div className="flex items-center gap-4">
                                                         <div className={cn(
@@ -365,6 +366,21 @@ export default function StudentSettingsPage() {
                                                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No passkeys registered</p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Add your device to sign in faster</p>
                                             </div>
+                                        )}
+
+                                        {/* Show More Button for Passkeys */}
+                                        {authenticators.length > 2 && (
+                                            <button
+                                                onClick={() => setShowAllPasskeys(!showAllPasskeys)}
+                                                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
+                                            >
+                                                <span>{showAllPasskeys ? "Show Less" : `View ${authenticators.length - 2} More Passkeys`}</span>
+                                                {showAllPasskeys ? (
+                                                    <ChevronUp className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+                                                ) : (
+                                                    <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:translate-y-0.5" />
+                                                )}
+                                            </button>
                                         )}
                                     </div>
                                 </div>
