@@ -39,10 +39,11 @@ export async function POST(req: Request) {
             expectedChallenge: challenge,
             expectedOrigin: origin,
             expectedRPID: rpID,
-            authenticator: {
-                ...authenticator,
-                credentialPublicKey: new Uint8Array(authenticator.credentialPublicKey),
-                credentialID: new Uint8Array(authenticator.credentialID as any),
+            credential: {
+                id: authenticator.credentialID.toString('base64url'),
+                publicKey: new Uint8Array(authenticator.credentialPublicKey),
+                counter: Number(authenticator.counter),
+                transports: authenticator.transports as any,
             },
         });
     } catch (error) {
