@@ -93,9 +93,9 @@ export default function StudentSettingsPage() {
             } else {
                 throw new Error('Verification failed');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Failed to register device. Please try again.');
+            alert(`Failed to register device: ${error.message || error}`);
         } finally {
             setPasskeyLoading(false);
         }

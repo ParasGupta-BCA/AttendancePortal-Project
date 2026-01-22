@@ -27,7 +27,7 @@ export async function GET() {
         authenticatorSelection: {
             residentKey: 'preferred',
             userVerification: 'preferred',
-            authenticatorAttachment: 'platform', // Enforce Platform authenticators (TouchID/FaceID)
+            // authenticatorAttachment: 'platform', // Removed to allow all types (USB, etc.)
         },
     });
 
