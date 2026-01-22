@@ -207,7 +207,7 @@ export default function StudentSettingsPage() {
                         </div>
 
                         <Card className="border-none shadow-xl bg-white dark:bg-gray-900 overflow-hidden ring-1 ring-gray-200 dark:ring-gray-800">
-                            <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-2">
+                            <CardHeader className="pb-0 pt-4 px-4">
                                 <CardTitle className="text-lg flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
@@ -232,7 +232,7 @@ export default function StudentSettingsPage() {
                                             const isCurrent = index === 0; // Assume first is current for now
 
                                             return (
-                                                <div key={log.id} className="group flex items-start gap-3 p-3 transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-800/40">
+                                                <div key={log.id} className="group flex items-start gap-3 px-4 py-2 transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-800/40 first:mt-2">
                                                     {/* Icon Box */}
                                                     <div className={cn(
                                                         "p-2.5 rounded-xl shrink-0 transition-colors mt-0.5",
