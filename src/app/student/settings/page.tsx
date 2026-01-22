@@ -15,6 +15,7 @@ export default function StudentSettingsPage() {
     const [loginHistory, setLoginHistory] = useState<{ id: string; device_info: string; ip_address: string; login_at: string }[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
+    const [showAllHistory, setShowAllHistory] = useState(false);
 
     // Helper to parse UA string
     const parseUserAgent = (ua: string) => {
@@ -225,7 +226,7 @@ export default function StudentSettingsPage() {
                             <CardContent className="p-0">
                                 <div className="flex flex-col gap-2 p-3">
                                     {loginHistory.length > 0 ? (
-                                        loginHistory.map((log, index) => {
+                                        (showAllHistory ? loginHistory : loginHistory.slice(0, 3)).map((log, index) => {
                                             const isMobile = log.device_info.toLowerCase().includes('mobile') || log.device_info.toLowerCase().includes('android') || log.device_info.toLowerCase().includes('iphone');
                                             const Icon = isMobile ? Smartphone : Laptop;
                                             const cleanDeviceName = parseUserAgent(log.device_info);
@@ -278,6 +279,16 @@ export default function StudentSettingsPage() {
                                             </div>
                                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No activity recorded</p>
                                         </div>
+                                    )}
+
+                                    {/* Show More Button */}
+                                    {loginHistory.length > 3 && (
+                                        <button
+                                            onClick={() => setShowAllHistory(!showAllHistory)}
+                                            className="w-full py-2 text-xs font-semibold text-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 rounded-xl transition-colors mt-1"
+                                        >
+                                            {showAllHistory ? "Show Less" : `Show ${loginHistory.length - 3} More`}
+                                        </button>
                                     )}
                                 </div>
                             </CardContent>
