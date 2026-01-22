@@ -223,7 +223,7 @@ export default function StudentSettingsPage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
-                                <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                                <div className="flex flex-col gap-2 p-3">
                                     {loginHistory.length > 0 ? (
                                         loginHistory.map((log, index) => {
                                             const isMobile = log.device_info.toLowerCase().includes('mobile') || log.device_info.toLowerCase().includes('android') || log.device_info.toLowerCase().includes('iphone');
@@ -232,7 +232,7 @@ export default function StudentSettingsPage() {
                                             const isCurrent = index === 0; // Assume first is current for now
 
                                             return (
-                                                <div key={log.id} className="group flex items-start gap-3 px-4 py-2 transition-colors hover:bg-gray-50/80 dark:hover:bg-gray-800/40 first:mt-2">
+                                                <div key={log.id} className="group flex items-start gap-3 p-3 rounded-2xl bg-gray-50/50 dark:bg-gray-800/40 border border-gray-100/50 dark:border-gray-800 transition-all hover:bg-white dark:hover:bg-gray-800 hover:shadow-sm">
                                                     {/* Icon Box */}
                                                     <div className={cn(
                                                         "p-2.5 rounded-xl shrink-0 transition-colors mt-0.5",
