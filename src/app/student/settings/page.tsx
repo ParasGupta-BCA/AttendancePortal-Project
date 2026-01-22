@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 export default function StudentSettingsPage() {
     const { data: session } = useSession();
     const [profile, setProfile] = useState<{ name: string; email: string; course: string; section: string; role?: string } | null>(null);
+    const [loginHistory, setLoginHistory] = useState<{ id: string; device_info: string; ip_address: string; login_at: string }[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
 
@@ -28,6 +29,14 @@ export default function StudentSettingsPage() {
                     role: (session?.user as any)?.role || "Student"
                 });
             }
+
+            // Fetch Login History
+            const historyRes = await fetch("/api/student/security/login-history");
+            const historyData = await historyRes.json();
+            if (historyRes.ok && historyData.history) {
+                setLoginHistory(historyData.history);
+            }
+
         } catch (error) {
             console.error("Failed to fetch profile info", error);
         } finally {
@@ -179,9 +188,46 @@ export default function StudentSettingsPage() {
                 )}
 
                 {activeTab === 'account' && (
-                    <div className="grid gap-6 md:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <ChangePasswordForm />
-                        <ChangeEmailForm />
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <ChangePasswordForm />
+                            <ChangeEmailForm />
+                        </div>
+
+                        {/* Login History Section */}
+                        <Card className="border shadow-sm dark:bg-gray-900">
+                            <CardHeader>
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <Shield className="w-5 h-5 text-green-600" />
+                                    Login Activity
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    {loginHistory.length > 0 ? (
+                                        loginHistory.map((log) => (
+                                            <div key={log.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                                <div className="space-y-1">
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                        {log.device_info || "Unknown Device"}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                        IP: {log.ip_address}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                        {new Date(log.login_at).toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-gray-500 text-center py-4">No login history found.</p>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
                 )}
             </div>
