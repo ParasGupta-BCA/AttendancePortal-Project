@@ -19,15 +19,9 @@ export default function StudentSettingsPage() {
     // Helper to parse UA string
     const parseUserAgent = (ua: string) => {
         if (!ua) return "Unknown Device";
-        if (ua.includes("Windows")) {
-            const match = ua.match(/Windows NT (\d+\.\d+)/);
-            return match ? `Windows PC (v${match[1]})` : "Windows PC";
-        }
+        if (ua.includes("Windows")) return "Windows PC";
         if (ua.includes("Mac OS")) return "MacBook / iMac";
-        if (ua.includes("Android")) {
-            const match = ua.match(/Android\s([0-9.]+)/);
-            return match ? `Android Phone (v${match[1]})` : "Android Phone";
-        }
+        if (ua.includes("Android")) return "Android Phone";
         if (ua.includes("iPhone")) return "iPhone";
         if (ua.includes("iPad")) return "iPad";
         if (ua.includes("Linux")) return "Linux System";
@@ -212,62 +206,74 @@ export default function StudentSettingsPage() {
                             <ChangeEmailForm />
                         </div>
 
-                        <Card className="border shadow-md bg-white dark:bg-gray-900 overflow-hidden">
-                            <CardHeader className="border-b pb-4">
-                                <CardTitle className="text-lg flex items-center gap-3">
-                                    <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                                        <Shield className="w-5 h-5 text-green-600 dark:text-green-500" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold text-gray-900 dark:text-gray-100 leading-none">Login Activity</span>
-                                        <span className="text-xs font-normal text-muted-foreground mt-1.5">
-                                            Recent sign-ins to your account
-                                        </span>
+                        <Card className="border-none shadow-xl bg-white dark:bg-gray-900 overflow-hidden ring-1 ring-gray-200 dark:ring-gray-800">
+                            <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
+                                <CardTitle className="text-lg flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                                            <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold text-gray-900 dark:text-gray-100 block">Login Activity</span>
+                                            <span className="text-xs font-normal text-muted-foreground">
+                                                Where you're logged in
+                                            </span>
+                                        </div>
                                     </div>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 <div className="divide-y divide-gray-100 dark:divide-gray-800">
                                     {loginHistory.length > 0 ? (
-                                        loginHistory.map((log) => {
+                                        loginHistory.map((log, index) => {
                                             const isMobile = log.device_info.toLowerCase().includes('mobile') || log.device_info.toLowerCase().includes('android') || log.device_info.toLowerCase().includes('iphone');
                                             const Icon = isMobile ? Smartphone : Laptop;
                                             const cleanDeviceName = parseUserAgent(log.device_info);
+                                            const isCurrent = index === 0; // Assume first is current for now
 
                                             return (
-                                                <div key={log.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors gap-3">
+                                                <div key={log.id} className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all gap-4">
                                                     <div className="flex items-start gap-4">
-                                                        <div className="p-2.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shrink-0">
+                                                        <div className={cn(
+                                                            "p-2.5 rounded-xl shrink-0 transition-colors",
+                                                            isMobile ? "bg-orange-50 dark:bg-orange-900/10 text-orange-600 dark:text-orange-400"
+                                                                : "bg-indigo-50 dark:bg-indigo-900/10 text-indigo-600 dark:text-indigo-400"
+                                                        )}>
                                                             <Icon className="w-5 h-5" />
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 break-all" title={log.device_info}>
-                                                                {cleanDeviceName}
-                                                            </p>
-                                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                                                <Globe className="w-3 h-3" />
-                                                                <span>{log.ip_address}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                                                    {cleanDeviceName}
+                                                                </p>
+                                                                {isCurrent && (
+                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800">
+                                                                        Current
+                                                                    </span>
+                                                                )}
                                                             </div>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                                                                {log.ip_address}
+                                                            </p>
                                                         </div>
                                                     </div>
 
                                                     <div className="pl-14 sm:pl-0 text-left sm:text-right">
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
-                                                            {new Date(log.login_at).toLocaleString(undefined, {
-                                                                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                                                            })}
-                                                        </span>
+                                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                                            {new Date(log.login_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                                            <span className="mx-1.5 opacity-30">|</span>
+                                                            {new Date(log.login_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             );
                                         })
                                     ) : (
                                         <div className="flex flex-col items-center justify-center py-12 text-center">
-                                            <Shield className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" />
-                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No recent activity</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto mt-1">
-                                                We haven't recorded any login history yet. Log out and back in to see your device here.
-                                            </p>
+                                            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-full mb-3">
+                                                <Shield className="w-8 h-8 text-gray-300 dark:text-gray-600" />
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No activity recorded</p>
                                         </div>
                                     )}
                                 </div>
