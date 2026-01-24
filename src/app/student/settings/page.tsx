@@ -114,7 +114,11 @@ export default function StudentSettingsPage() {
             }
         } catch (error: any) {
             console.error(error);
-            alert(`Failed to register device: ${error.message || error}`);
+            if (error.name === 'InvalidStateError') {
+                alert("This account passkey you have already registered.");
+            } else {
+                alert(`Failed to register device: ${error.message || error}`);
+            }
         } finally {
             setPasskeyLoading(false);
         }

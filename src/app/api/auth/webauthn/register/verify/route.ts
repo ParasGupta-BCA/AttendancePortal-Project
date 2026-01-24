@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { verifyRegistrationResponse } from '@simplewebauthn/server';
 import { getRpID, getOrigin, saveAuthenticator } from '@/lib/webauthn';
 import { cookies } from 'next/headers';
+import { query } from '@/lib/db';
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
@@ -36,6 +37,14 @@ export async function POST(req: Request) {
     }
 
     if (verification.verified && verification.registrationInfo) {
+        const { credential } = verification.registrationInfo;
+
+        // Check if this credential ID already exists
+        const existing = await query('SELECT 1 FROM authenticators WHERE credential_id = $1', [credential.id]);
+        if (existing.rows.length > 0) {
+            return NextResponse.json({ error: 'This account passkey you have already registered.' }, { status: 400 });
+        }
+
         await saveAuthenticator((session.user as any).id, verification);
         cookieStore.delete('reg_challenge');
         return NextResponse.json({ verified: true });
