@@ -78,9 +78,13 @@ export default function LoginPage() {
             } else {
                 throw new Error('Verification failed');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("Biometric login failed. Please register your device in Settings first.");
+            if (error.name === 'NotAllowedError') {
+                alert("Login cancelled. Please try again.");
+            } else {
+                alert("Biometric login failed. Please ensure you are on a supported device and have registered your passkey in Settings.");
+            }
             setLoading(false);
         }
     };

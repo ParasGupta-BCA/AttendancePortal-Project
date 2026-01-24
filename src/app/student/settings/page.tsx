@@ -114,11 +114,25 @@ export default function StudentSettingsPage() {
             }
         } catch (error: any) {
             console.error(error);
-            if (error.name === 'InvalidStateError') {
-                alert("This account passkey you have already registered.");
-            } else {
-                alert(`Failed to register device: ${error.message || error}`);
+
+            // Map common WebAuthn errors to friendly messages
+            let userMessage = "An unexpected error occurred.";
+
+            if (error.name === 'NotAllowedError') {
+                userMessage = "Registration was cancelled or timed out. Please try again.";
+            } else if (error.name === 'InvalidStateError') {
+                userMessage = "This account passkey you have already registered.";
+            } else if (error.name === 'NotSupportedError') {
+                userMessage = "Your browser or device doesn't support biometric security.";
+            } else if (error.name === 'SecurityError') {
+                userMessage = "Security check failed. Please ensure you are on a secure connection.";
+            } else if (error.message?.includes("credential manager")) {
+                userMessage = "The device's security manager refused the request. Make sure you have a screen lock (PIN/Fingerprint) set up.";
+            } else if (error.message) {
+                userMessage = error.message;
             }
+
+            alert(userMessage);
         } finally {
             setPasskeyLoading(false);
         }
