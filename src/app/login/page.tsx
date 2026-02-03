@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { startAuthentication } from '@simplewebauthn/browser';
 import { Fingerprint } from "lucide-react";
 
@@ -14,7 +15,6 @@ export default function LoginPage() {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -129,8 +129,8 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
-            <Card className="w-[350px]">
+        <div className="flex min-h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+            <Card className="w-full max-w-md shadow-lg">
                 <CardHeader>
                     <CardTitle>Attendance Portal</CardTitle>
                     <CardDescription>Login to access the dashboard</CardDescription>
@@ -180,11 +180,11 @@ export default function LoginPage() {
                         </Button>
                     </form>
                 </CardContent>
-                <div className="p-6 pt-0 flex justify-center">
+                <CardFooter className="flex justify-center">
                     <p className="text-sm text-gray-500">
-                        New Student? <a href="/signup" className="text-indigo-600 hover:underline">Register Here</a>
+                        New Student? <Link href="/signup" className="text-indigo-600 hover:underline">Register Here</Link>
                     </p>
-                </div>
+                </CardFooter>
             </Card>
         </div>
     );

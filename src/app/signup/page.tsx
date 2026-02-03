@@ -72,7 +72,7 @@ export default function SignupPage() {
 
     return (
         <div className="flex min-h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-            <Card className="w-full max-w-md">
+            <Card className="w-full max-w-md shadow-lg">
                 <CardHeader>
                     <CardTitle>Student Registration</CardTitle>
                     <CardDescription>Request account access from administration</CardDescription>
