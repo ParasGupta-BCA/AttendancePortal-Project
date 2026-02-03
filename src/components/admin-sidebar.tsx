@@ -19,16 +19,16 @@ const routes = [
         color: "text-violet-500",
     },
     {
-        label: "Students",
-        icon: Users,
-        href: "/admin/students",
-        color: "text-pink-700",
-    },
-    {
         label: "Student Requests",
         icon: UserPlus,
         href: "/admin/requests",
         color: "text-amber-500",
+    },
+    {
+        label: "Students",
+        icon: Users,
+        href: "/admin/students",
+        color: "text-pink-700",
     },
     {
         label: "Faculty",
