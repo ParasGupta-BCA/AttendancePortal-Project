@@ -180,6 +180,11 @@ export default function LoginPage() {
                         </Button>
                     </form>
                 </CardContent>
+                <div className="p-6 pt-0 flex justify-center">
+                    <p className="text-sm text-gray-500">
+                        New Student? <a href="/signup" className="text-indigo-600 hover:underline">Register Here</a>
+                    </p>
+                </div>
             </Card>
         </div>
     );
