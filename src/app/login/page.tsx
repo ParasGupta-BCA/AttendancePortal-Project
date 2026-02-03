@@ -129,11 +129,11 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-            <Card className="w-full max-w-md shadow-lg">
-                <CardHeader>
-                    <CardTitle>Attendance Portal</CardTitle>
-                    <CardDescription>Login to access the dashboard</CardDescription>
+        <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-slate-900 dark:to-slate-800 p-4">
+            <Card className="w-full max-w-sm sm:max-w-md shadow-xl border-t-4 border-t-indigo-500">
+                <CardHeader className="space-y-1">
+                    <CardTitle className="text-2xl font-bold text-center text-indigo-700 dark:text-indigo-400">Attendance Portal</CardTitle>
+                    <CardDescription className="text-center">Login to your account</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
