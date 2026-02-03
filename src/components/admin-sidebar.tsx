@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const routes = [
@@ -40,6 +40,12 @@ const routes = [
         label: "Settings",
         icon: Settings,
         href: "/admin/settings",
+    },
+    {
+        label: "Student Requests",
+        icon: UserPlus,
+        href: "/admin/requests",
+        color: "text-amber-500",
     },
 ];
 
