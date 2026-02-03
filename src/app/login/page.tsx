@@ -129,49 +129,51 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-slate-900 dark:to-slate-800 p-4">
-            <Card className="w-full max-w-sm sm:max-w-md shadow-xl border-t-4 border-t-indigo-500">
+        <div className="flex min-h-screen w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
+            <Card className="w-full max-w-sm sm:max-w-md shadow-2xl border-zinc-200 dark:border-zinc-800">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center text-indigo-700 dark:text-indigo-400">Attendance Portal</CardTitle>
-                    <CardDescription className="text-center">Login to your account</CardDescription>
+                    <CardTitle className="text-2xl font-bold text-center tracking-tight text-zinc-900 dark:text-zinc-50">Attendance Portal</CardTitle>
+                    <CardDescription className="text-center text-zinc-500 dark:text-zinc-400">Login to your account</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Email</label>
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</label>
                             <Input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Password</label>
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Password</label>
                             <Input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
                             />
                         </div>
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button type="submit" className="w-full bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200" disabled={loading}>
                             {loading ? "Signing in..." : "Sign In"}
                         </Button>
 
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-gray-300 dark:border-gray-700" />
+                                <span className="w-full border-t border-zinc-300 dark:border-zinc-700" />
                             </div>
                             <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-gray-100 dark:bg-gray-900 px-2 text-muted-foreground">Or continue with</span>
+                                <span className="bg-zinc-50 dark:bg-zinc-950 px-2 text-zinc-500 dark:text-zinc-400">Or continue with</span>
                             </div>
                         </div>
 
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full gap-2 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400"
+                            className="w-full gap-2 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
                             onClick={handlePasskeyLogin}
                             disabled={loading || !email}
                         >
@@ -180,9 +182,9 @@ export default function LoginPage() {
                         </Button>
                     </form>
                 </CardContent>
-                <CardFooter className="flex justify-center">
-                    <p className="text-sm text-gray-500">
-                        New Student? <Link href="/signup" className="text-indigo-600 hover:underline">Register Here</Link>
+                <CardFooter className="flex justify-center border-t border-zinc-100 dark:border-zinc-800 pt-6">
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        New Student? <Link href="/signup" className="text-zinc-900 dark:text-zinc-50 font-medium hover:underline underline-offset-4">Register Here</Link>
                     </p>
                 </CardFooter>
             </Card>

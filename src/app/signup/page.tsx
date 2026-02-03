@@ -71,46 +71,46 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-slate-900 dark:to-slate-800 p-4">
-            <Card className="w-full max-w-md shadow-xl border-t-4 border-t-indigo-500">
+        <div className="flex min-h-screen w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
+            <Card className="w-full max-w-md shadow-2xl border-zinc-200 dark:border-zinc-800">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center text-indigo-700 dark:text-indigo-400">Student Registration</CardTitle>
-                    <CardDescription className="text-center">Request account access</CardDescription>
+                    <CardTitle className="text-2xl font-bold text-center tracking-tight text-zinc-900 dark:text-zinc-50">Student Registration</CardTitle>
+                    <CardDescription className="text-center text-zinc-500 dark:text-zinc-400">Request account access</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {message && (
-                            <div className={`p-3 rounded text-sm ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            <div className={`p-3 rounded text-sm font-medium ${message.type === 'success' ? 'bg-zinc-100 text-zinc-900 border border-zinc-200' : 'bg-red-50 text-red-900 border border-red-100'}`}>
                                 {message.text}
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Full Name</label>
-                            <Input name="fullName" value={formData.fullName} onChange={handleChange} required placeholder="John Doe" />
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Full Name</label>
+                            <Input name="fullName" value={formData.fullName} onChange={handleChange} required placeholder="John Doe" className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100" />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Email</label>
-                            <Input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@college.edu" />
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</label>
+                            <Input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@college.edu" className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Enrollment No</label>
-                                <Input name="enrollmentNo" value={formData.enrollmentNo} onChange={handleChange} required />
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Enrollment No</label>
+                                <Input name="enrollmentNo" value={formData.enrollmentNo} onChange={handleChange} required className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100" />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">ERP ID</label>
-                                <Input name="erpId" value={formData.erpId} onChange={handleChange} required />
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">ERP ID</label>
+                                <Input name="erpId" value={formData.erpId} onChange={handleChange} required className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Course Year</label>
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Course Year</label>
                                 <Select value={formData.courseYear} onValueChange={(val) => handleSelectChange("courseYear", val)}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="border-zinc-300 dark:border-zinc-700 focus:ring-zinc-900 dark:focus:ring-zinc-100">
                                         <SelectValue placeholder="Select Year" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -124,9 +124,9 @@ export default function SignupPage() {
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Section</label>
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Section</label>
                                 <Select value={formData.section} onValueChange={(val) => handleSelectChange("section", val)}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="border-zinc-300 dark:border-zinc-700 focus:ring-zinc-900 dark:focus:ring-zinc-100">
                                         <SelectValue placeholder="Select Section" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -138,14 +138,14 @@ export default function SignupPage() {
                             </div>
                         </div>
 
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button type="submit" className="w-full bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200" disabled={loading}>
                             {loading ? "Submitting..." : "Submit Request"}
                         </Button>
                     </form>
                 </CardContent>
-                <CardFooter className="flex justify-center">
-                    <p className="text-sm text-gray-500">
-                        Already registered? <Link href="/login" className="text-indigo-600 hover:underline">Log in</Link>
+                <CardFooter className="flex justify-center border-t border-zinc-100 dark:border-zinc-800 pt-6">
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        Already registered? <Link href="/login" className="text-zinc-900 dark:text-zinc-50 font-medium hover:underline underline-offset-4">Log in</Link>
                     </p>
                 </CardFooter>
             </Card>
