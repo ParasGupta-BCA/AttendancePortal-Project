@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 
 interface Request {
     id: string;
@@ -24,7 +23,7 @@ export default function StudentRequestsPage() {
     const [requests, setRequests] = useState<Request[]>([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState<string | null>(null);
-    const { toast } = useToast();
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     const fetchRequests = async () => {
         try {
@@ -46,6 +45,7 @@ export default function StudentRequestsPage() {
 
     const handleAction = async (requestId: string, action: 'approve' | 'reject') => {
         setProcessingId(requestId);
+        setMessage(null);
         try {
             const res = await fetch("/api/admin/requests", {
                 method: "POST",
@@ -56,28 +56,18 @@ export default function StudentRequestsPage() {
             const data = await res.json();
 
             if (res.ok) {
-                toast({
-                    title: action === 'approve' ? "Approved" : "Rejected",
-                    description: data.message,
-                    variant: action === 'approve' ? "default" : "destructive", // default is usually success-like or neutral
-                });
+                setMessage({ type: 'success', text: data.message });
                 // Remove from list
                 setRequests(prev => prev.filter(r => r.id !== requestId));
             } else {
-                toast({
-                    title: "Error",
-                    description: data.message,
-                    variant: "destructive",
-                });
+                setMessage({ type: 'error', text: data.message });
             }
         } catch (error) {
-            toast({
-                title: "Error",
-                description: "Something went wrong",
-                variant: "destructive",
-            });
+            setMessage({ type: 'error', text: "Something went wrong" });
         } finally {
             setProcessingId(null);
+            // Clear message after 3 seconds
+            setTimeout(() => setMessage(null), 3000);
         }
     };
 
@@ -89,6 +79,12 @@ export default function StudentRequestsPage() {
                     Refresh
                 </Button>
             </div>
+
+            {message && (
+                <div className={`p-4 rounded-md mb-4 ${message.type === 'success' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'}`}>
+                    {message.text}
+                </div>
+            )}
 
             <Card>
                 <CardHeader>
