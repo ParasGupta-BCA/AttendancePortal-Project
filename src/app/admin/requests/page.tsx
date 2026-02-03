@@ -26,8 +26,12 @@ export default function StudentRequestsPage() {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     const fetchRequests = async () => {
+        setLoading(true); // Show loading state on refresh
         try {
-            const res = await fetch("/api/admin/requests");
+            const res = await fetch("/api/admin/requests", {
+                cache: "no-store", // Ensure fresh data
+                headers: { "Pragma": "no-cache" }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setRequests(data);
