@@ -47,7 +47,13 @@ export default function SignupPage() {
                 throw new Error(data.message || "Something went wrong.");
             }
 
-            setMessage({ type: 'success', text: "Request submitted! Once approved, use password 'student' to login." });
+            setMessage({ type: 'success', text: "Request submitted! Redirecting to login..." });
+
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                router.push("/login");
+            }, 2000);
+
             // Optional: clear form
             setFormData({
                 fullName: "",
