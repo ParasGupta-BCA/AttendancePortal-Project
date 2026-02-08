@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Download, Share2, AlertCircle, Info, Calendar, Megaphone, Coffee, Search, X, Plus, Minus } from "lucide-react";
+import { Download, Share2, AlertCircle, Info, Calendar, Megaphone, Coffee, Search, X, Plus, Minus, Maximize2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface Announcement {
     id: string;
@@ -22,9 +22,9 @@ interface Announcement {
 export default function AnnouncementsPage() {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedImage, setSelectedImage] = useState<{ src: string, alt: string } | null>(null);
-    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
     const [zoomLevel, setZoomLevel] = useState(1);
+    const [isImageFullscreen, setIsImageFullscreen] = useState(false);
 
     useEffect(() => {
         fetchAnnouncements();
@@ -42,36 +42,6 @@ export default function AnnouncementsPage() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const toggleExpand = (id: string) => {
-        const newExpanded = new Set(expandedIds);
-        if (newExpanded.has(id)) {
-            newExpanded.delete(id);
-        } else {
-            newExpanded.add(id);
-        }
-        setExpandedIds(newExpanded);
-    };
-
-    const openImageModal = (src: string, alt: string) => {
-        setSelectedImage({ src, alt });
-        setZoomLevel(1);
-    };
-
-    const closeImageModal = () => {
-        setSelectedImage(null);
-        setZoomLevel(1);
-    };
-
-    const handleZoomIn = (e?: React.MouseEvent) => {
-        e?.stopPropagation();
-        setZoomLevel(prev => Math.min(prev + 0.5, 3));
-    };
-
-    const handleZoomOut = (e?: React.MouseEvent) => {
-        e?.stopPropagation();
-        setZoomLevel(prev => Math.max(prev - 0.5, 1));
     };
 
     const getCategoryIcon = (category: string) => {
@@ -118,6 +88,14 @@ export default function AnnouncementsPage() {
         document.body.removeChild(link);
     };
 
+    const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.5, 3));
+    const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.5, 1));
+    const handleCloseModal = () => {
+        setSelectedAnnouncement(null);
+        setZoomLevel(1);
+        setIsImageFullscreen(false);
+    };
+
     if (loading) {
         return <div className="p-4 text-center">Loading announcements...</div>;
     }
@@ -132,99 +110,151 @@ export default function AnnouncementsPage() {
                     <p>No announcements yet.</p>
                 </div>
             ) : (
-                announcements.map((item) => (
-                    <Card key={item.id} className="overflow-hidden border-l-4 border-l-blue-500 dark:bg-gray-800">
-                        <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="flex items-center gap-1">
-                                        {getCategoryIcon(item.category)}
-                                        {item.category}
-                                    </Badge>
-                                    <Badge className={getPriorityColor(item.priority)} variant="secondary">
-                                        {item.priority}
-                                    </Badge>
-                                </div>
-                                <span className="text-xs text-gray-500">
-                                    {format(new Date(item.created_at), 'MMM d, h:mm a')}
-                                </span>
-                            </div>
-                            <CardTitle className="text-lg mt-2">{item.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <p className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
-                                {item.content}
-                            </p>
-
-                            {item.image_data && (
-                                <div className="relative rounded-lg overflow-hidden border bg-gray-100 dark:bg-gray-900 mt-2">
-                                    {/* Using standard img for base64 if Image component fails or for simplicity with base64 */}
-                                    <img
-                                        src={item.image_data}
-                                        alt={item.title}
-                                        className="w-full h-auto max-h-[400px] object-contain"
-                                    />
-                                    <div className="absolute top-2 right-2 flex gap-2">
-                                        <button
-                                            onClick={() => handleDownload(item.image_data!, item.title)}
-                                            className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
-                                            title="Download Image"
-                                        >
-                                            <Download className="w-4 h-4" />
-                                        </button>
+                <div className="grid gap-4">
+                    {announcements.map((item) => (
+                        <Card
+                            key={item.id}
+                            onClick={() => setSelectedAnnouncement(item)}
+                            className="cursor-pointer hover:shadow-md transition-shadow dark:bg-gray-800 overflow-hidden border-l-4 border-l-blue-500"
+                        >
+                            <CardHeader className="pb-2">
+                                <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="outline" className="flex items-center gap-1">
+                                            {getCategoryIcon(item.category)}
+                                            {item.category}
+                                        </Badge>
+                                        <Badge className={getPriorityColor(item.priority)} variant="secondary">
+                                            {item.priority}
+                                        </Badge>
                                     </div>
+                                    <span className="text-xs text-gray-500">
+                                        {format(new Date(item.created_at), 'MMM d')}
+                                    </span>
                                 </div>
-                            )}
+                                <CardTitle className="text-lg mt-2 line-clamp-1">{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {item.image_data && (
+                                    <div className="w-full h-48 bg-gray-100 dark:bg-gray-900 rounded-md overflow-hidden mb-3">
+                                        <img
+                                            src={item.image_data}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                )}
+                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                    {item.content}
+                                </p>
+                                <div className="mt-2 text-blue-600 text-xs font-medium">
+                                    Click to view details
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
 
-                            <div className="flex justify-between items-center pt-2 border-t mt-2">
-                                <span className="text-xs text-gray-500">Posted by {item.author_name}</span>
+            {/* Detail Modal */}
+            <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && handleCloseModal()}>
+                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                    {selectedAnnouncement && (
+                        <>
+                            <DialogHeader className="p-6 pb-2 border-b">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Badge variant="outline" className="flex items-center gap-1">
+                                        {getCategoryIcon(selectedAnnouncement.category)}
+                                        {selectedAnnouncement.category}
+                                    </Badge>
+                                    <Badge className={getPriorityColor(selectedAnnouncement.priority)} variant="secondary">
+                                        {selectedAnnouncement.priority}
+                                    </Badge>
+                                    <span className="text-xs text-gray-500 ml-auto">
+                                        {format(new Date(selectedAnnouncement.created_at), 'MMM d, yyyy h:mm a')}
+                                    </span>
+                                </div>
+                                <DialogTitle className="text-2xl">{selectedAnnouncement.title}</DialogTitle>
+                                <DialogDescription>
+                                    Posted by {selectedAnnouncement.author_name}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <ScrollArea className="flex-1 p-6 pt-2">
+                                {selectedAnnouncement.image_data && (
+                                    <div className="relative rounded-lg overflow-hidden border bg-gray-100 dark:bg-gray-900 mb-6 group">
+                                        <img
+                                            src={selectedAnnouncement.image_data}
+                                            alt={selectedAnnouncement.title}
+                                            className="w-full h-auto max-h-[400px] object-contain mx-auto"
+                                        />
+                                        <div className="absolute top-2 right-2 flex gap-2">
+                                            <button
+                                                onClick={() => setIsImageFullscreen(true)}
+                                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+                                            >
+                                                <Maximize2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDownload(selectedAnnouncement.image_data!, selectedAnnouncement.title)}
+                                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
+                                    {selectedAnnouncement.content}
+                                </div>
+                            </ScrollArea>
+
+                            <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end">
                                 <button
-                                    onClick={() => handleShare(item)}
-                                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                                    onClick={() => handleShare(selectedAnnouncement)}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
                                 >
                                     <Share2 className="w-4 h-4" />
-                                    Share
+                                    Share Announcement
                                 </button>
                             </div>
-                        </CardContent>
-                    </Card>
-                ))
-            )}
-            {/* Image Modal */}
-            {selectedImage && (
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Fullscreen Image Modal */}
+            {isImageFullscreen && selectedAnnouncement?.image_data && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
-                    onClick={closeImageModal}
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4"
+                    onClick={() => setIsImageFullscreen(false)}
                 >
-                    <div className="relative max-w-full max-h-full" onClick={e => e.stopPropagation()}>
-                        <div className="absolute top-4 right-4 z-10 flex gap-2">
-                            <button
-                                onClick={handleZoomOut}
-                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full"
-                            >
-                                <Minus className="w-6 h-6" />
-                            </button>
-                            <button
-                                onClick={handleZoomIn}
-                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full"
-                            >
-                                <Plus className="w-6 h-6" />
-                            </button>
-                            <button
-                                onClick={closeImageModal}
-                                className="p-2 bg-red-600/80 hover:bg-red-700 text-white rounded-full"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        <div className="overflow-auto max-h-screen">
-                            <img
-                                src={selectedImage.src}
-                                alt={selectedImage.alt}
-                                className="max-w-screen max-h-screen object-contain transition-transform duration-200 ease-out"
-                                style={{ transform: `scale(${zoomLevel})` }}
-                            />
-                        </div>
+                    <div className="absolute top-4 right-4 z-10 flex gap-2" onClick={e => e.stopPropagation()}>
+                        <button onClick={handleZoomOut} className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full">
+                            <Minus className="w-6 h-6" />
+                        </button>
+                        <button onClick={handleZoomIn} className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full">
+                            <Plus className="w-6 h-6" />
+                        </button>
+                        <button onClick={() => setIsImageFullscreen(false)} className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full">
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+
+                    <div
+                        className="overflow-auto max-w-full max-h-full flex items-center justify-center"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <img
+                            src={selectedAnnouncement.image_data}
+                            alt="Fullscreen"
+                            className="transition-transform duration-200 ease-out max-w-none"
+                            style={{
+                                transform: `scale(${zoomLevel})`,
+                                maxHeight: '90vh'
+                            }}
+                        />
                     </div>
                 </div>
             )}
