@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface Announcement {
     id: string;
@@ -23,7 +24,6 @@ export default function AnnouncementsPage() {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
-    const [zoomLevel, setZoomLevel] = useState(1);
     const [isImageFullscreen, setIsImageFullscreen] = useState(false);
 
     useEffect(() => {
@@ -88,11 +88,8 @@ export default function AnnouncementsPage() {
         document.body.removeChild(link);
     };
 
-    const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.05, 3));
-    const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.05, 1));
     const handleCloseModal = () => {
         setSelectedAnnouncement(null);
-        setZoomLevel(1);
         setIsImageFullscreen(false);
     };
 
@@ -226,41 +223,52 @@ export default function AnnouncementsPage() {
 
             {/* Fullscreen Image Modal */}
             <Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
-                <DialogContent className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center">
+                <DialogContent className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center outline-none">
                     <DialogTitle className="sr-only">Fullscreen Image</DialogTitle>
-                    <div className="absolute top-4 right-4 z-50 flex gap-2">
-                        <button
-                            onClick={handleZoomOut}
-                            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
-                        >
-                            <Minus className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={handleZoomIn}
-                            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
-                        >
-                            <Plus className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={() => setIsImageFullscreen(false)}
-                            className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
-                    </div>
+                    <TransformWrapper
+                        initialScale={1}
+                        minScale={0.5}
+                        maxScale={4}
+                        centerOnInit
+                    >
+                        {({ zoomIn, zoomOut, resetTransform }) => (
+                            <>
+                                <div className="absolute top-4 right-4 z-50 flex gap-2">
+                                    <button
+                                        onClick={() => zoomOut()}
+                                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                                    >
+                                        <Minus className="w-6 h-6" />
+                                    </button>
+                                    <button
+                                        onClick={() => zoomIn()}
+                                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                                    >
+                                        <Plus className="w-6 h-6" />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            resetTransform();
+                                            setIsImageFullscreen(false);
+                                        }}
+                                        className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
+                                    >
+                                        <X className="w-6 h-6" />
+                                    </button>
+                                </div>
 
-                    <div className="w-full h-full overflow-auto flex items-center justify-center p-4">
-                        <img
-                            src={selectedAnnouncement?.image_data}
-                            alt="Fullscreen"
-                            className="transition-transform duration-200 ease-out max-w-none"
-                            style={{
-                                transform: `scale(${zoomLevel})`,
-                                maxHeight: zoomLevel > 1 ? 'none' : '90vh',
-                                maxWidth: zoomLevel > 1 ? 'none' : '90vw'
-                            }}
-                        />
-                    </div>
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full flex items-center justify-center">
+                                        <img
+                                            src={selectedAnnouncement?.image_data}
+                                            alt="Fullscreen"
+                                            className="max-w-full max-h-screen object-contain"
+                                        />
+                                    </TransformComponent>
+                                </div>
+                            </>
+                        )}
+                    </TransformWrapper>
                 </DialogContent>
             </Dialog>
         </div>
