@@ -225,39 +225,44 @@ export default function AnnouncementsPage() {
             </Dialog>
 
             {/* Fullscreen Image Modal */}
-            {isImageFullscreen && selectedAnnouncement?.image_data && (
-                <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4"
-                    onClick={() => setIsImageFullscreen(false)}
-                >
-                    <div className="absolute top-4 right-4 z-10 flex gap-2" onClick={e => e.stopPropagation()}>
-                        <button onClick={handleZoomOut} className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full">
+            <Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
+                <DialogContent className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center">
+                    <DialogTitle className="sr-only">Fullscreen Image</DialogTitle>
+                    <div className="absolute top-4 right-4 z-50 flex gap-2">
+                        <button
+                            onClick={handleZoomOut}
+                            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                        >
                             <Minus className="w-6 h-6" />
                         </button>
-                        <button onClick={handleZoomIn} className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full">
+                        <button
+                            onClick={handleZoomIn}
+                            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                        >
                             <Plus className="w-6 h-6" />
                         </button>
-                        <button onClick={() => setIsImageFullscreen(false)} className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full">
+                        <button
+                            onClick={() => setIsImageFullscreen(false)}
+                            className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
+                        >
                             <X className="w-6 h-6" />
                         </button>
                     </div>
 
-                    <div
-                        className="overflow-auto max-w-full max-h-full flex items-center justify-center"
-                        onClick={e => e.stopPropagation()}
-                    >
+                    <div className="w-full h-full overflow-auto flex items-center justify-center p-4">
                         <img
-                            src={selectedAnnouncement.image_data}
+                            src={selectedAnnouncement?.image_data}
                             alt="Fullscreen"
                             className="transition-transform duration-200 ease-out max-w-none"
                             style={{
                                 transform: `scale(${zoomLevel})`,
-                                maxHeight: '90vh'
+                                maxHeight: zoomLevel > 1 ? 'none' : '90vh',
+                                maxWidth: zoomLevel > 1 ? 'none' : '90vw'
                             }}
                         />
                     </div>
-                </div>
-            )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
