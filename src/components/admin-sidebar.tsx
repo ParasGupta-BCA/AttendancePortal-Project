@@ -19,6 +19,12 @@ const routes = [
         color: "text-violet-500",
     },
     {
+        label: "Announcements",
+        icon: Megaphone,
+        href: "/admin/announcements",
+        color: "text-red-500",
+    },
+    {
         label: "Student Requests",
         icon: UserPlus,
         href: "/admin/requests",
@@ -41,12 +47,6 @@ const routes = [
         icon: BookOpen,
         href: "/admin/subjects",
         color: "text-emerald-500",
-    },
-    {
-        label: "Announcements",
-        icon: Megaphone,
-        href: "/admin/announcements",
-        color: "text-yellow-500",
     },
     {
         label: "Settings",
