@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, QrCode, History, Settings, Moon, Sun } from "lucide-react";
+import { LogOut, LayoutDashboard, QrCode, History, Settings, Moon, Sun, Bell } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { MobileGuard } from "@/components/mobile-guard";
 import { GreetingHeader } from "@/components/student/greeting-header";
@@ -62,13 +62,22 @@ export default function StudentLayout({
             <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 transition-colors duration-300">
                 <header className="bg-white dark:bg-gray-800 shadow px-4 py-3 flex justify-between items-center sticky top-0 z-50 transition-colors duration-300">
                     <GreetingHeader />
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
-                        aria-label="Toggle Theme"
-                    >
-                        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/student/announcements"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                            aria-label="Announcements"
+                        >
+                            <Bell className="w-5 h-5" />
+                        </Link>
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                            aria-label="Toggle Theme"
+                        >
+                            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                        </button>
+                    </div>
                 </header>
                 <main className="flex-1 p-4">
                     {children}

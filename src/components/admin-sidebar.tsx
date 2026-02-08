@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const routes = [
@@ -41,6 +41,12 @@ const routes = [
         icon: BookOpen,
         href: "/admin/subjects",
         color: "text-emerald-500",
+    },
+    {
+        label: "Announcements",
+        icon: Megaphone,
+        href: "/admin/announcements",
+        color: "text-yellow-500",
     },
     {
         label: "Settings",
