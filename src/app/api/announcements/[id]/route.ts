@@ -5,9 +5,10 @@ import { query } from '@/lib/db';
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
         // @ts-ignore
         if (!session || !['admin', 'faculty'].includes(session.user?.role)) {
@@ -19,7 +20,7 @@ export async function DELETE(
 
         await query(
             'UPDATE announcements SET is_active = false WHERE id = $1',
-            [params.id]
+            [id]
         );
 
         return NextResponse.json({ success: true });
