@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Download, Share2, AlertCircle, Info, Calendar, Megaphone, Coffee } from "lucide-react";
+import { Download, Share2, AlertCircle, Info, Calendar, Megaphone, Coffee, Search, X, Plus, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
