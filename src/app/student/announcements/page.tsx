@@ -101,7 +101,7 @@ export default function AnnouncementsPage() {
     }
 
     return (
-        <div className="space-y-4 max-w-2xl mx-auto pb-20">
+        <div className="space-y-4 max-w-2xl mx-auto pb-20 px-4">
             <h1 className="text-2xl font-bold mb-4">Announcements</h1>
 
             {announcements.length === 0 ? (
