@@ -88,8 +88,8 @@ export default function AnnouncementsPage() {
         document.body.removeChild(link);
     };
 
-    const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.1, 3));
-    const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.1, 1));
+    const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.05, 3));
+    const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.05, 1));
     const handleCloseModal = () => {
         setSelectedAnnouncement(null);
         setZoomLevel(1);
