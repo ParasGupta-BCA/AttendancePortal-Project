@@ -22,6 +22,9 @@ interface Announcement {
 export default function AnnouncementsPage() {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState<{ src: string, alt: string } | null>(null);
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [zoomLevel, setZoomLevel] = useState(1);
 
     useEffect(() => {
         fetchAnnouncements();
@@ -39,6 +42,36 @@ export default function AnnouncementsPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const toggleExpand = (id: string) => {
+        const newExpanded = new Set(expandedIds);
+        if (newExpanded.has(id)) {
+            newExpanded.delete(id);
+        } else {
+            newExpanded.add(id);
+        }
+        setExpandedIds(newExpanded);
+    };
+
+    const openImageModal = (src: string, alt: string) => {
+        setSelectedImage({ src, alt });
+        setZoomLevel(1);
+    };
+
+    const closeImageModal = () => {
+        setSelectedImage(null);
+        setZoomLevel(1);
+    };
+
+    const handleZoomIn = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        setZoomLevel(prev => Math.min(prev + 0.5, 3));
+    };
+
+    const handleZoomOut = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        setZoomLevel(prev => Math.max(prev - 0.5, 1));
     };
 
     const getCategoryIcon = (category: string) => {
@@ -71,7 +104,6 @@ export default function AnnouncementsPage() {
                 console.log('Error sharing:', err);
             }
         } else {
-            // Fallback for WhatsApp
             const text = `*${announcement.title}*\n${announcement.content}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
