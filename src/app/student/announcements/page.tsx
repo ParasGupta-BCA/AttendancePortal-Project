@@ -144,142 +144,140 @@ export default function AnnouncementsPage() {
                                 <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                                     {item.content}
                                 </p>
-                                {item.content}
-                            </p>
-                            <button
-                                className="mt-2 text-blue-600 text-sm font-medium hover:underline focus:outline-none"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedAnnouncement(item);
-                                }}
-                            >
-                                Read More
-                            </button>
-                        </CardContent>
-                        </Card>
-            ))}
-        </div>
-    )
-}
-
-{/* Detail Modal */ }
-<Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && handleCloseModal()}>
-    <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        {selectedAnnouncement && (
-            <>
-                <DialogHeader className="p-6 pb-2 border-b">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="flex items-center gap-1">
-                            {getCategoryIcon(selectedAnnouncement.category)}
-                            {selectedAnnouncement.category}
-                        </Badge>
-                        <Badge className={getPriorityColor(selectedAnnouncement.priority)} variant="secondary">
-                            {selectedAnnouncement.priority}
-                        </Badge>
-                        <span className="text-xs text-gray-500 ml-auto">
-                            {format(new Date(selectedAnnouncement.created_at), 'MMM d, yyyy h:mm a')}
-                        </span>
-                    </div>
-                    <DialogTitle className="text-2xl">{selectedAnnouncement.title}</DialogTitle>
-                    <DialogDescription>
-                        Posted by {selectedAnnouncement.author_name}
-                    </DialogDescription>
-                </DialogHeader>
-
-                <ScrollArea className="flex-1 p-6 pt-2">
-                    {selectedAnnouncement.image_data && (
-                        <div className="relative rounded-lg overflow-hidden border bg-gray-100 dark:bg-gray-900 mb-6 group">
-                            <img
-                                src={selectedAnnouncement.image_data}
-                                alt={selectedAnnouncement.title}
-                                className="w-full h-auto max-h-[400px] object-contain mx-auto"
-                            />
-                            <div className="absolute top-2 right-2 flex gap-2">
                                 <button
-                                    onClick={() => setIsImageFullscreen(true)}
-                                    className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+                                    className="mt-2 text-blue-600 text-sm font-medium hover:underline focus:outline-none"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedAnnouncement(item);
+                                    }}
                                 >
-                                    <Maximize2 className="w-4 h-4" />
+                                    Read More
                                 </button>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )
+            }
+
+            {/* Detail Modal */}
+            <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && handleCloseModal()}>
+                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                    {selectedAnnouncement && (
+                        <>
+                            <DialogHeader className="p-6 pb-2 border-b">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Badge variant="outline" className="flex items-center gap-1">
+                                        {getCategoryIcon(selectedAnnouncement.category)}
+                                        {selectedAnnouncement.category}
+                                    </Badge>
+                                    <Badge className={getPriorityColor(selectedAnnouncement.priority)} variant="secondary">
+                                        {selectedAnnouncement.priority}
+                                    </Badge>
+                                    <span className="text-xs text-gray-500 ml-auto">
+                                        {format(new Date(selectedAnnouncement.created_at), 'MMM d, yyyy h:mm a')}
+                                    </span>
+                                </div>
+                                <DialogTitle className="text-2xl">{selectedAnnouncement.title}</DialogTitle>
+                                <DialogDescription>
+                                    Posted by {selectedAnnouncement.author_name}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <ScrollArea className="flex-1 p-6 pt-2">
+                                {selectedAnnouncement.image_data && (
+                                    <div className="relative rounded-lg overflow-hidden border bg-gray-100 dark:bg-gray-900 mb-6 group">
+                                        <img
+                                            src={selectedAnnouncement.image_data}
+                                            alt={selectedAnnouncement.title}
+                                            className="w-full h-auto max-h-[400px] object-contain mx-auto"
+                                        />
+                                        <div className="absolute top-2 right-2 flex gap-2">
+                                            <button
+                                                onClick={() => setIsImageFullscreen(true)}
+                                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+                                            >
+                                                <Maximize2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDownload(selectedAnnouncement.image_data!, selectedAnnouncement.title)}
+                                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
+                                    {selectedAnnouncement.content}
+                                </div>
+                            </ScrollArea>
+
+                            <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end">
                                 <button
-                                    onClick={() => handleDownload(selectedAnnouncement.image_data!, selectedAnnouncement.title)}
-                                    className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+                                    onClick={() => handleShare(selectedAnnouncement)}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
                                 >
-                                    <Download className="w-4 h-4" />
+                                    <Share2 className="w-4 h-4" />
+                                    Share Announcement
                                 </button>
                             </div>
-                        </div>
+                        </>
                     )}
+                </DialogContent>
+            </Dialog>
 
-                    <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
-                        {selectedAnnouncement.content}
-                    </div>
-                </ScrollArea>
-
-                <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end">
-                    <button
-                        onClick={() => handleShare(selectedAnnouncement)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+            {/* Fullscreen Image Modal */}
+            <Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
+                <DialogContent className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center outline-none">
+                    <DialogTitle className="sr-only">Fullscreen Image</DialogTitle>
+                    <TransformWrapper
+                        initialScale={1}
+                        minScale={0.5}
+                        maxScale={4}
+                        centerOnInit
                     >
-                        <Share2 className="w-4 h-4" />
-                        Share Announcement
-                    </button>
-                </div>
-            </>
-        )}
-    </DialogContent>
-</Dialog>
+                        {({ zoomIn, zoomOut, resetTransform }) => (
+                            <>
+                                <div className="absolute top-4 right-4 z-50 flex gap-2">
+                                    <button
+                                        onClick={() => zoomOut()}
+                                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                                    >
+                                        <Minus className="w-6 h-6" />
+                                    </button>
+                                    <button
+                                        onClick={() => zoomIn()}
+                                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                                    >
+                                        <Plus className="w-6 h-6" />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            resetTransform();
+                                            setIsImageFullscreen(false);
+                                        }}
+                                        className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
+                                    >
+                                        <X className="w-6 h-6" />
+                                    </button>
+                                </div>
 
-{/* Fullscreen Image Modal */ }
-<Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
-    <DialogContent className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center outline-none">
-        <DialogTitle className="sr-only">Fullscreen Image</DialogTitle>
-        <TransformWrapper
-            initialScale={1}
-            minScale={0.5}
-            maxScale={4}
-            centerOnInit
-        >
-            {({ zoomIn, zoomOut, resetTransform }) => (
-                <>
-                    <div className="absolute top-4 right-4 z-50 flex gap-2">
-                        <button
-                            onClick={() => zoomOut()}
-                            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
-                        >
-                            <Minus className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={() => zoomIn()}
-                            className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
-                        >
-                            <Plus className="w-6 h-6" />
-                        </button>
-                        <button
-                            onClick={() => {
-                                resetTransform();
-                                setIsImageFullscreen(false);
-                            }}
-                            className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
-                    </div>
-
-                    <div className="w-full h-full flex items-center justify-center">
-                        <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full flex items-center justify-center">
-                            <img
-                                src={selectedAnnouncement?.image_data}
-                                alt="Fullscreen"
-                                className="max-w-full max-h-screen object-contain"
-                            />
-                        </TransformComponent>
-                    </div>
-                </>
-            )}
-        </TransformWrapper>
-    </DialogContent>
-</Dialog>
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full flex items-center justify-center">
+                                        <img
+                                            src={selectedAnnouncement?.image_data}
+                                            alt="Fullscreen"
+                                            className="max-w-full max-h-screen object-contain"
+                                        />
+                                    </TransformComponent>
+                                </div>
+                            </>
+                        )}
+                    </TransformWrapper>
+                </DialogContent>
+            </Dialog>
         </div >
     );
 }
