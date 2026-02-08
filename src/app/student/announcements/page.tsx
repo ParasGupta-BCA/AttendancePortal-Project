@@ -190,6 +190,44 @@ export default function AnnouncementsPage() {
                     </Card>
                 ))
             )}
+            {/* Image Modal */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+                    onClick={closeImageModal}
+                >
+                    <div className="relative max-w-full max-h-full" onClick={e => e.stopPropagation()}>
+                        <div className="absolute top-4 right-4 z-10 flex gap-2">
+                            <button
+                                onClick={handleZoomOut}
+                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full"
+                            >
+                                <Minus className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={handleZoomIn}
+                                className="p-2 bg-black/50 hover:bg-black/70 text-white rounded-full"
+                            >
+                                <Plus className="w-6 h-6" />
+                            </button>
+                            <button
+                                onClick={closeImageModal}
+                                className="p-2 bg-red-600/80 hover:bg-red-700 text-white rounded-full"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="overflow-auto max-h-screen">
+                            <img
+                                src={selectedImage.src}
+                                alt={selectedImage.alt}
+                                className="max-w-screen max-h-screen object-contain transition-transform duration-200 ease-out"
+                                style={{ transform: `scale(${zoomLevel})` }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
