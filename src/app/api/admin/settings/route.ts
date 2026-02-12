@@ -14,7 +14,7 @@ export async function GET() {
 
         const res = await query(`
             SELECT key, value FROM attendance_settings 
-            WHERE key IN ('campus_lat', 'campus_long', 'allowed_radius_meters')
+            WHERE key IN ('campus_lat', 'campus_long', 'allowed_radius_meters', 'qr_refresh_interval')
         `);
 
         // Convert array to object
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { campus_lat, campus_long, allowed_radius_meters } = await request.json();
+        const { campus_lat, campus_long, allowed_radius_meters, qr_refresh_interval } = await request.json();
 
         // Upsert 3 values
         const upsert = `
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
         if (campus_lat) await query(upsert, ['campus_lat', String(campus_lat)]);
         if (campus_long) await query(upsert, ['campus_long', String(campus_long)]);
         if (allowed_radius_meters) await query(upsert, ['allowed_radius_meters', String(allowed_radius_meters)]);
+        if (qr_refresh_interval) await query(upsert, ['qr_refresh_interval', String(qr_refresh_interval)]);
         await query('COMMIT');
 
         return NextResponse.json({ success: true });

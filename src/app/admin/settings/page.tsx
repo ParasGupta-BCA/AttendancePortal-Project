@@ -23,8 +23,16 @@ export default function SettingsPage() {
             });
     };
 
+    const [qrInterval, setQrInterval] = useState("5");
+
     useEffect(() => {
         fetchUsers();
+        fetch("/api/admin/settings")
+            .then(res => res.json())
+            .then(data => {
+                if (data.qr_refresh_interval) setQrInterval(data.qr_refresh_interval);
+            })
+            .catch(err => console.error("Failed to fetch settings", err));
     }, []);
 
     const handleRoleChange = async (userId: string, newRole: string) => {
@@ -43,6 +51,20 @@ export default function SettingsPage() {
         }
     };
 
+    const saveSystemSettings = async () => {
+        try {
+            const res = await fetch("/api/admin/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ qr_refresh_interval: qrInterval })
+            });
+            if (res.ok) alert("Settings saved!");
+            else alert("Failed to save settings");
+        } catch (e) {
+            alert("Error saving settings");
+        }
+    };
+
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
             <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
@@ -50,6 +72,7 @@ export default function SettingsPage() {
             <Tabs defaultValue="users" className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="users">User Management</TabsTrigger>
+                    <TabsTrigger value="system">System</TabsTrigger>
                     <TabsTrigger value="account">My Account</TabsTrigger>
                 </TabsList>
 
@@ -99,6 +122,34 @@ export default function SettingsPage() {
                                     {users.length === 0 && !loading && <TableRow><TableCell colSpan={4} className="text-center">No users found.</TableCell></TableRow>}
                                 </TableBody>
                             </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="system" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Dynamic QR Settings</CardTitle>
+                            <CardDescription>Configure the security parameters for attendance QR codes.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid gap-2">
+                                <label className="text-sm font-medium">QR Refresh Interval (seconds)</label>
+                                <div className="flex gap-4">
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 max-w-[200px]"
+                                        value={qrInterval}
+                                        onChange={(e) => setQrInterval(e.target.value)}
+                                    />
+                                    <Button onClick={saveSystemSettings}>Save Changes</Button>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Lower values are more secure against proxy attendance but require better internet connectivity.
+                                    Recommended: 5-10 seconds.
+                                </p>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>

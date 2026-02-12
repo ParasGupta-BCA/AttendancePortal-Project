@@ -43,7 +43,13 @@ export async function GET(request: Request) {
 
         // Add user name via another join if needed, but for now this is fine.
 
-        return NextResponse.json({ timetable: res.rows });
+        const settingsRes = await query(`SELECT value FROM attendance_settings WHERE key = 'qr_refresh_interval'`);
+        const qrInterval = parseInt(settingsRes.rows[0]?.value || '5', 10);
+
+        return NextResponse.json({
+            timetable: res.rows,
+            qrInterval
+        });
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });

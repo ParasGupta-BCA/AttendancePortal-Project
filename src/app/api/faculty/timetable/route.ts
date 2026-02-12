@@ -56,8 +56,12 @@ export async function GET() {
             };
         }));
 
+        const settingsRes = await query(`SELECT value FROM attendance_settings WHERE key = 'qr_refresh_interval'`);
+        const qrInterval = parseInt(settingsRes.rows[0]?.value || '5', 10);
+
         return NextResponse.json({
-            timetable: timetableWithSessions
+            timetable: timetableWithSessions,
+            qrInterval
         });
 
     } catch (error: any) {

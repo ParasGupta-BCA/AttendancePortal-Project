@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { validateToken } from '@/utils/dynamicQrServer';
 
 export async function POST(request: Request) {
     let body;
@@ -48,16 +49,46 @@ export async function POST(request: Request) {
         }
 
         // 3. QR Validation & Session Retrieval
+        // Fetch Settings first to get interval
+        const settingsRes = await query(`SELECT key, value FROM attendance_settings WHERE key IN ('campus_lat', 'campus_long', 'allowed_radius_meters', 'qr_refresh_interval')`);
+        const settings = settingsRes.rows.reduce((acc: any, row: any) => ({ ...acc, [row.key]: row.value }), {});
+
+        const qrInterval = parseInt(settings.qr_refresh_interval || '5', 10);
+
+        // Parse QR: Format "UUID:TOKEN"
+        const parts = qr_code.split(':');
+        let sessionSecret = qr_code;
+        let token = null;
+
+        if (parts.length === 2) {
+            sessionSecret = parts[0];
+            token = parts[1];
+        } else {
+            // Strict enforcement: Reject static QRs
+            scanStatus = 'INVALID_QR';
+            logMessage = 'Static QR code used (Update required)';
+            await logScan(studentId, null, scanStatus, lat, long, null, logMessage);
+            return NextResponse.json({ error: 'Invalid QR Code Format. Please refresh.' }, { status: 400 });
+        }
+
         const sessionRes = await query(`
             SELECT * FROM attendance_sessions 
             WHERE qr_code = $1 AND is_active = TRUE 
-        `, [qr_code]);
+        `, [sessionSecret]);
 
         if (sessionRes.rowCount === 0) {
             scanStatus = 'INVALID_QR';
-            logMessage = 'Invalid or inactive QR code';
+            logMessage = 'Invalid or inactive session';
             await logScan(studentId, null, scanStatus, lat, long, null, logMessage);
             return NextResponse.json({ error: 'Invalid QR Code' }, { status: 400 });
+        }
+
+        // Validate Dynamic Token
+        if (!validateToken(sessionSecret, token, qrInterval)) {
+            scanStatus = 'INVALID_QR';
+            logMessage = 'Expired or invalid dynamic token';
+            await logScan(studentId, sessionRes.rows[0].id, scanStatus, lat, long, null, logMessage);
+            return NextResponse.json({ error: 'QR Code Expired. Please scan again.' }, { status: 400 });
         }
 
         const attendanceSession = sessionRes.rows[0];
@@ -72,10 +103,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Attendance period is over.' }, { status: 400 });
         }
 
-        // 5. Geolocation Validation
-        // Fetch Settings
-        const settingsRes = await query(`SELECT key, value FROM attendance_settings WHERE key IN ('campus_lat', 'campus_long', 'allowed_radius_meters')`);
-        const settings = settingsRes.rows.reduce((acc: any, row: any) => ({ ...acc, [row.key]: row.value }), {});
+        // Settings already fetched above
 
         const campusLat = parseFloat(settings.campus_lat);
         const campusLong = parseFloat(settings.campus_long);
@@ -83,13 +111,13 @@ export async function POST(request: Request) {
 
         if (!isNaN(campusLat) && !isNaN(campusLong)) {
             distance = calculateDistance(lat, long, campusLat, campusLong);
-            
+
             if (distance > allowedRadius) {
                 scanStatus = 'OUT_OF_RANGE';
                 logMessage = `Out of range (${Math.round(distance)}m). Must be within ${allowedRadius}m.`;
                 await logScan(studentId, sessionId, scanStatus, lat, long, distance, logMessage);
-                return NextResponse.json({ 
-                    error: `You are ${Math.round(distance)}m away from class. You must be inside the campus.` 
+                return NextResponse.json({
+                    error: `You are ${Math.round(distance)}m away from class. You must be inside the campus.`
                 }, { status: 400 });
             }
         } else {
@@ -124,7 +152,7 @@ export async function POST(request: Request) {
         console.error('Mark Attendance Error:', error);
         // Try to log the system error if we have a studentId
         if (studentId) {
-             await logScan(studentId, sessionId, 'ERROR', lat, long, null, error.message);
+            await logScan(studentId, sessionId, 'ERROR', lat, long, null, error.message);
         }
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
@@ -139,8 +167,8 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
     const deltaLambda = (lon2 - lon1) * Math.PI / 180;
 
     const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-              Math.cos(phi1) * Math.cos(phi2) *
-              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+        Math.cos(phi1) * Math.cos(phi2) *
+        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c;

@@ -152,7 +152,7 @@ export default function DashboardPage() {
                                             <p className="font-medium">{session.subject_name}</p>
                                             <p className="text-xs text-muted-foreground">{session.class_name} ({session.section}) • {session.faculty_name || 'Admin'}</p>
                                         </div>
-                                        <ActiveSessionDialog session={session} />
+                                        <ActiveSessionDialog session={session} interval={data?.stats?.qrInterval || 5} />
                                     </div>
                                 ))}
                             </div>
@@ -174,8 +174,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings as SettingsIcon, MapPin } from "lucide-react";
 import QRCode from "qrcode";
+import { generateToken } from "@/utils/dynamicQrClient";
 
-function ActiveSessionDialog({ session }: { session: any }) {
+function ActiveSessionDialog({ session, interval }: { session: any, interval: number }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -185,7 +186,7 @@ function ActiveSessionDialog({ session }: { session: any }) {
                 <h3 className="text-xl font-bold mb-4">{session.subject_name}</h3>
                 <p className="text-sm text-muted-foreground mb-4">Scan to mark attendance</p>
 
-                <QRDisplay code={session.qr_code} />
+                <QRDisplay code={session.qr_code} interval={interval} />
 
                 <div className="w-full mt-6 border-t pt-4">
                     <Button
@@ -220,12 +221,38 @@ function ActiveSessionDialog({ session }: { session: any }) {
     );
 }
 
-function QRDisplay({ code }: { code: string }) {
+function QRDisplay({ code, interval = 5 }: { code: string, interval?: number }) {
     const [src, setSrc] = useState("");
+
     useEffect(() => {
-        QRCode.toDataURL(code).then(setSrc);
-    }, [code]);
-    return src ? <img src={src} alt="Attendance QR" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" /> : <p>Loading QR...</p>;
+        let isMounted = true;
+
+        const updateQR = async () => {
+            try {
+                const token = await generateToken(code, interval);
+                const fullCode = `${code}:${token}`;
+                const url = await QRCode.toDataURL(fullCode);
+                if (isMounted) setSrc(url);
+            } catch (e) {
+                console.error("QR Gen Error", e);
+            }
+        };
+
+        updateQR(); // Initial run
+
+        const timer = setInterval(updateQR, interval * 1000);
+        return () => {
+            isMounted = false;
+            clearInterval(timer);
+        };
+    }, [code, interval]);
+
+    return src ? (
+        <div className="flex flex-col items-center">
+            <img src={src} alt="Attendance QR" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" />
+            <p className="text-xs text-muted-foreground mt-2">Refreshes every {interval}s</p>
+        </div>
+    ) : <p>Loading QR...</p>;
 }
 
 function SettingsDialog() {

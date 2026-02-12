@@ -100,16 +100,20 @@ export async function GET() {
         const totalExpected = parseInt(globalExpectedRes.rows[0].total_expected || '0');
         const totalAbsent = Math.max(0, totalExpected - totalPresent);
 
+        const settingsRes = await query(`SELECT value FROM attendance_settings WHERE key = 'qr_refresh_interval'`);
+        const qrInterval = parseInt(settingsRes.rows[0]?.value || '5', 10);
+
         return NextResponse.json({
             stats: {
                 classesToday: todaySchedule.length,
-                studentsPresent: parseInt(todayStatsRes.rows[0].present_count),
+                studentsPresent: parseInt((todayStatsRes.rows[0] as any)?.present_count || '0'),
             },
             analysis: {
                 totalPresent,
                 totalAbsent
             },
-            todaySchedule
+            todaySchedule,
+            qrInterval
         });
 
     } catch (error: any) {

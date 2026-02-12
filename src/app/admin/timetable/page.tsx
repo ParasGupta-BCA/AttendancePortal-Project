@@ -10,9 +10,42 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import QRCode from "qrcode";
 import { Loader2, Trash2, Plus, Edit } from "lucide-react";
+import { generateToken } from "@/utils/dynamicQrClient";
+
+function DynamicQRDisplay({ code, interval }: { code: string, interval: number }) {
+    const [src, setSrc] = useState("");
+
+    useEffect(() => {
+        let isMounted = true;
+        const update = async () => {
+            try {
+                const token = await generateToken(code, interval);
+                const fullCode = `${code}:${token}`;
+                const url = await QRCode.toDataURL(fullCode);
+                if (isMounted) setSrc(url);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        update();
+        const timer = setInterval(update, interval * 1000);
+        return () => {
+            isMounted = false;
+            clearInterval(timer);
+        };
+    }, [code, interval]);
+
+    return src ? (
+        <div className="flex flex-col items-center">
+            <img src={src} alt="QR Code" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" />
+            <p className="text-xs text-muted-foreground mt-2">Refreshes every {interval}s</p>
+        </div>
+    ) : <p>Generating QR...</p>;
+}
 
 export default function TimetablePage() {
     const [timetable, setTimetable] = useState<any[]>([]);
+    const [qrInterval, setQrInterval] = useState(5);
     const [loading, setLoading] = useState(true);
     const [activeSession, setActiveSession] = useState<any>(null); // Details of session just created
 
@@ -43,6 +76,7 @@ export default function TimetablePage() {
             .then((res) => res.json())
             .then((data) => {
                 setTimetable(data.timetable);
+                if (data.qrInterval) setQrInterval(data.qrInterval);
                 setLoading(false);
             })
             .catch((err) => console.error(err));
@@ -70,17 +104,11 @@ export default function TimetablePage() {
     const handleGenerateQR = async (slot: any) => {
         // If already active, just show it
         if (slot.active_session) {
-            try {
-                const qrImage = await QRCode.toDataURL(slot.active_session.qr_code);
-                setActiveSession({
-                    ...slot,
-                    qrImage,
-                    expiry: new Date(Date.now() + 10 * 60 * 1000) // Visual only
-                });
-            } catch (e) {
-                console.error(e);
-                alert("Error displaying QR");
-            }
+            setActiveSession({
+                ...slot,
+                qr_code: slot.active_session.qr_code,
+                expiry: new Date(Date.now() + 10 * 60 * 1000) // Visual only
+            });
             return;
         }
 
@@ -92,7 +120,6 @@ export default function TimetablePage() {
             });
             const data = await res.json();
             if (!res.ok) { alert(data.error || "Failed"); return; }
-            const qrImage = await QRCode.toDataURL(data.qr_code);
 
             // Optimistically update the list so the button turns green immediately
             const updatedTimetable = timetable.map(t => {
@@ -103,7 +130,7 @@ export default function TimetablePage() {
             });
             setTimetable(updatedTimetable);
 
-            setActiveSession({ ...slot, qrImage });
+            setActiveSession({ ...slot, qr_code: data.qr_code });
         } catch (error) { alert("Error generating QR"); }
     };
 
@@ -250,7 +277,9 @@ export default function TimetablePage() {
                 <DialogContent>
                     <DialogHeader><DialogTitle>Scan Attendance</DialogTitle></DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
-                        <img src={activeSession?.qrImage} alt="QR Code" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" />
+                        {activeSession?.qr_code && (
+                            <DynamicQRDisplay code={activeSession.qr_code} interval={qrInterval} />
+                        )}
                     </div>
                 </DialogContent>
             </Dialog>

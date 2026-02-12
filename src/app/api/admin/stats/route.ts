@@ -114,12 +114,17 @@ export async function GET() {
             };
         });
 
+        // 8. Dynamic QR Settings
+        const settingsRes = await query(`SELECT value FROM attendance_settings WHERE key = 'qr_refresh_interval'`);
+        const qrInterval = parseInt(settingsRes.rows[0]?.value || '5', 10);
+
         return NextResponse.json({
             stats: {
                 totalStudents,
                 presentToday,
                 absentToday,
                 monthlyRate,
+                qrInterval // Include in stats
             },
             recentActivity,
             activeSessions,

@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { QrCode } from "lucide-react";
 import QRCode from "qrcode";
+import { generateToken } from "@/utils/dynamicQrClient";
 
 export default function FacultyTimetablePage() {
     const [timetable, setTimetable] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDay, setSelectedDay] = useState("Monday");
+    const [interval, setIntervalVal] = useState(5);
 
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -22,6 +24,7 @@ export default function FacultyTimetablePage() {
             .then(res => res.json())
             .then(data => {
                 setTimetable(data.timetable || []);
+                if (data.qrInterval) setIntervalVal(data.qrInterval);
                 setLoading(false);
             })
             .catch(err => console.error(err));
@@ -102,7 +105,7 @@ export default function FacultyTimetablePage() {
                                                     </DialogTrigger>
                                                     <DialogContent className="flex flex-col items-center">
                                                         <h3 className="text-lg font-bold mb-4">Scan to Mark Attendance</h3>
-                                                        <QRDisplay code={slot.activeSession.qr_code} />
+                                                        <QRDisplay code={slot.activeSession.qr_code} interval={interval} />
                                                     </DialogContent>
                                                 </Dialog>
                                             ) : (
@@ -122,10 +125,36 @@ export default function FacultyTimetablePage() {
     );
 }
 
-function QRDisplay({ code }: { code: string }) {
+function QRDisplay({ code, interval = 5 }: { code: string, interval?: number }) {
     const [src, setSrc] = useState("");
+
     useEffect(() => {
-        QRCode.toDataURL(code).then(setSrc);
-    }, [code]);
-    return src ? <img src={src} alt="Attendance QR" className="w-64 h-64" /> : <p>Loading QR...</p>;
+        let isMounted = true;
+
+        const updateQR = async () => {
+            try {
+                const token = await generateToken(code, interval);
+                const fullCode = `${code}:${token}`;
+                const url = await QRCode.toDataURL(fullCode);
+                if (isMounted) setSrc(url);
+            } catch (e) {
+                console.error("QR Gen Error", e);
+            }
+        };
+
+        updateQR(); // Initial run
+
+        const timer = setInterval(updateQR, interval * 1000);
+        return () => {
+            isMounted = false;
+            clearInterval(timer);
+        };
+    }, [code, interval]);
+
+    return src ? (
+        <div className="flex flex-col items-center">
+            <img src={src} alt="Attendance QR" className="w-64 h-64" />
+            <p className="text-xs text-muted-foreground mt-1">Refreshes every {interval}s</p>
+        </div>
+    ) : <p>Loading QR...</p>;
 }
