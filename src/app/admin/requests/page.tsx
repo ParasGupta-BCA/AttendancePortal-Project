@@ -146,9 +146,13 @@ export default function StudentRequestsPage() {
                                                     <div className="flex items-center space-x-2">
                                                         <span>{req.full_name}</span>
                                                         {nameValid ? (
-                                                            <Check className="h-4 w-4 text-green-500" title="Valid Name Format" />
+                                                            <span title="Valid Name Format">
+                                                                <Check className="h-4 w-4 text-green-500" />
+                                                            </span>
                                                         ) : (
-                                                            <X className="h-4 w-4 text-red-500" title="Invalid Name Format (Contains numbers or special chars)" />
+                                                            <span title="Invalid Name Format (Contains numbers or special chars)">
+                                                                <X className="h-4 w-4 text-red-500" />
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </TableCell>
@@ -156,13 +160,17 @@ export default function StudentRequestsPage() {
                                                     <div className="flex items-center space-x-2">
                                                         <span>{req.email}</span>
                                                         {!emailFormatValid ? (
-                                                            <X className="h-4 w-4 text-red-500" title="Invalid Email Format" />
+                                                            <span title="Invalid Email Format">
+                                                                <X className="h-4 w-4 text-red-500" />
+                                                            </span>
                                                         ) : emailDuplicate ? (
                                                             <div className="flex items-center text-orange-500" title="Email already registered in system">
                                                                 <span className="text-xs font-bold mr-1">!</span>
                                                             </div>
                                                         ) : (
-                                                            <Check className="h-4 w-4 text-green-500" title="Valid & Unique Email" />
+                                                            <span title="Valid & Unique Email">
+                                                                <Check className="h-4 w-4 text-green-500" />
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </TableCell>
