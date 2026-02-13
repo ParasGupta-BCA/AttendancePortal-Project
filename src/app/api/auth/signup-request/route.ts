@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         { status: 409 }
       );
     }
-    
+
     // Check if a pending request already exists for this email or enrollment
     const existingRequest = await query(
       `SELECT id FROM student_requests 
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Signup request error:', error);
     return NextResponse.json(
-      { message: 'Internal server error.' },
+      { message: `Error: ${error.message}` },
       { status: 500 }
     );
   }
