@@ -13,8 +13,17 @@ export async function GET(req: Request) {
     }
 
     try {
+        // Enriched query to check for existence of email or enrollment_no in the main tables
         const result = await query(
-            `SELECT * FROM student_requests WHERE status = 'pending' ORDER BY created_at ASC`
+            `SELECT 
+                sr.*,
+                CASE WHEN u.email IS NOT NULL THEN true ELSE false END as email_exists,
+                CASE WHEN s.enrollment_no IS NOT NULL THEN true ELSE false END as enrollment_exists
+             FROM student_requests sr
+             LEFT JOIN users u ON sr.email = u.email
+             LEFT JOIN students s ON sr.enrollment_no = s.enrollment_no
+             WHERE sr.status = 'pending' 
+             ORDER BY sr.created_at ASC`
         );
         return NextResponse.json(result.rows);
     } catch (error) {

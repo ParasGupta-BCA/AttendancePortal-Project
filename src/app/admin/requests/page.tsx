@@ -17,6 +17,9 @@ interface Request {
     section: string;
     status: string;
     created_at: string;
+    // Validation fields (from backend)
+    email_exists: boolean;
+    enrollment_exists: boolean;
 }
 
 export default function StudentRequestsPage() {
@@ -75,6 +78,18 @@ export default function StudentRequestsPage() {
         }
     };
 
+    // Verification Logic
+    const isValidEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const isValidName = (name: string) => {
+        // Allow letters, spaces, dots, hyphens, apostrophes. No numbers.
+        const nameRegex = /^[a-zA-Z\s.'-]+$/;
+        return nameRegex.test(name) && name.length >= 2;
+    };
+
     return (
         <div className="p-6 space-y-6">
             <div className="flex justify-between items-center">
@@ -118,51 +133,85 @@ export default function StudentRequestsPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {requests.map((req, index) => (
-                                        <TableRow key={req.id}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell className="font-medium">{req.full_name}</TableCell>
-                                            <TableCell>{req.email}</TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-col text-xs text-muted-foreground">
-                                                    <span>{req.enrollment_no}</span>
-                                                    <span>{req.erp_id}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="secondary" className="mr-1">{req.course_year}</Badge>
-                                                <Badge variant="outline">{req.section}</Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right space-x-2">
-                                                <Button
-                                                    size="sm"
-                                                    variant="default"
-                                                    className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
-                                                    disabled={!!processingId}
-                                                    onClick={() => handleAction(req.id, 'approve')}
-                                                >
-                                                    {processingId === req.id ? (
-                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                    ) : (
-                                                        <Check className="h-4 w-4" />
-                                                    )}
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    className="h-8 w-8 p-0"
-                                                    disabled={!!processingId}
-                                                    onClick={() => handleAction(req.id, 'reject')}
-                                                >
-                                                    {processingId === req.id ? (
-                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                    ) : (
-                                                        <X className="h-4 w-4" />
-                                                    )}
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {requests.map((req, index) => {
+                                        const nameValid = isValidName(req.full_name);
+                                        const emailFormatValid = isValidEmail(req.email);
+                                        const emailDuplicate = req.email_exists;
+                                        const enrollmentDuplicate = req.enrollment_exists;
+
+                                        return (
+                                            <TableRow key={req.id}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center space-x-2">
+                                                        <span>{req.full_name}</span>
+                                                        {nameValid ? (
+                                                            <Check className="h-4 w-4 text-green-500" title="Valid Name Format" />
+                                                        ) : (
+                                                            <X className="h-4 w-4 text-red-500" title="Invalid Name Format (Contains numbers or special chars)" />
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center space-x-2">
+                                                        <span>{req.email}</span>
+                                                        {!emailFormatValid ? (
+                                                            <X className="h-4 w-4 text-red-500" title="Invalid Email Format" />
+                                                        ) : emailDuplicate ? (
+                                                            <div className="flex items-center text-orange-500" title="Email already registered in system">
+                                                                <span className="text-xs font-bold mr-1">!</span>
+                                                            </div>
+                                                        ) : (
+                                                            <Check className="h-4 w-4 text-green-500" title="Valid & Unique Email" />
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col text-xs text-muted-foreground">
+                                                        <div className="flex items-center space-x-1">
+                                                            <span>{req.enrollment_no}</span>
+                                                            {enrollmentDuplicate && (
+                                                                <span className="text-orange-500 font-bold" title="Enrollment No. already exists">(!)</span>
+                                                            )}
+                                                        </div>
+                                                        <span>{req.erp_id}</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="secondary" className="mr-1">{req.course_year}</Badge>
+                                                    <Badge variant="outline">{req.section}</Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right space-x-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="default"
+                                                        className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
+                                                        disabled={!!processingId}
+                                                        onClick={() => handleAction(req.id, 'approve')}
+                                                    >
+                                                        {processingId === req.id ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <Check className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        className="h-8 w-8 p-0"
+                                                        disabled={!!processingId}
+                                                        onClick={() => handleAction(req.id, 'reject')}
+                                                    >
+                                                        {processingId === req.id ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <X className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                                 </TableBody>
                             </Table>
                         </div>
