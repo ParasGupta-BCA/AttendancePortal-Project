@@ -14,6 +14,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Name format validation
+    const nameRegex = /^[a-zA-Z\s.\'-]+$/;
+    if (!nameRegex.test(fullName) || fullName.length < 2) {
+      return NextResponse.json(
+        { message: 'Invalid name format. Names cannot contain numbers or special characters. Please enter your correct details to get approved.' },
+        { status: 400 }
+      );
+    }
+
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -27,7 +36,7 @@ export async function POST(req: Request) {
     const existingUser = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rowCount && existingUser.rowCount > 0) {
       return NextResponse.json(
-        { message: 'Email already registered.' },
+        { message: 'Email already registered. Please enter your correct details to get approved.' },
         { status: 409 }
       );
     }
@@ -36,7 +45,7 @@ export async function POST(req: Request) {
     const existingStudent = await query('SELECT id FROM students WHERE enrollment_no = $1 OR erp_id = $2', [enrollmentNo, erpId]);
     if (existingStudent.rowCount && existingStudent.rowCount > 0) {
       return NextResponse.json(
-        { message: 'Enrollment Number or ERP ID already registered.' },
+        { message: 'Enrollment Number or ERP ID already registered. Please enter your correct details to get approved.' },
         { status: 409 }
       );
     }
@@ -51,7 +60,7 @@ export async function POST(req: Request) {
 
     if (existingRequest.rowCount && existingRequest.rowCount > 0) {
       return NextResponse.json(
-        { message: 'A pending request with these details already exists.' },
+        { message: 'A pending request with these details already exists. Please enter your correct details to get approved.' },
         { status: 409 }
       );
     }
