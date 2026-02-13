@@ -32,6 +32,13 @@ export async function POST(req: Request) {
       );
     }
 
+    if (enrollmentNo !== erpId) {
+      return NextResponse.json(
+        { message: 'Enrollment Number and ERP ID must be the same. Please enter your correct details to get approved.' },
+        { status: 400 }
+      );
+    }
+
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
