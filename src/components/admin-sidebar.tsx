@@ -37,18 +37,6 @@ const routes = [
         color: "text-pink-700",
     },
     {
-        label: "Faculty",
-        icon: Users,
-        href: "/admin/faculty",
-        color: "text-orange-700",
-    },
-    {
-        label: "Subjects",
-        icon: BookOpen,
-        href: "/admin/subjects",
-        color: "text-emerald-500",
-    },
-    {
         label: "Courses",
         icon: GraduationCap,
         href: "/admin/settings/courses",
@@ -59,6 +47,18 @@ const routes = [
         icon: Layers,
         href: "/admin/settings/sections",
         color: "text-lime-500",
+    },
+    {
+        label: "Faculty",
+        icon: Users,
+        href: "/admin/faculty",
+        color: "text-orange-700",
+    },
+    {
+        label: "Subjects",
+        icon: BookOpen,
+        href: "/admin/subjects",
+        color: "text-emerald-500",
     },
     {
         label: "Settings",
