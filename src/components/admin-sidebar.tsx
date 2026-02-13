@@ -2,110 +2,102 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid, LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid, LucideIcon, ChevronRight, ChevronDown } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 
 
-interface LinkRoute {
-    label: string;
-    icon: LucideIcon;
-    href: string;
-    color?: string;
-    header?: false;
-}
 
-interface HeaderRoute {
-    label: string;
-    header: true;
-    icon?: never;
-    href?: never;
-    color?: never;
-}
 
-type Route = LinkRoute | HeaderRoute;
-
-const routes: Route[] = [
+const routes = [
     {
         label: "General",
-        header: true,
-    },
-    {
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        href: "/admin/dashboard",
-        color: "text-sky-500",
-    },
-    {
-        label: "Timetable & Attendance",
-        icon: Calendar,
-        href: "/admin/timetable",
-        color: "text-violet-500",
-    },
-    {
-        label: "Announcements",
-        icon: Megaphone,
-        href: "/admin/announcements",
-        color: "text-red-500",
+        layout: "general",
+        routes: [
+            {
+                label: "Dashboard",
+                icon: LayoutDashboard,
+                href: "/admin/dashboard",
+                color: "text-sky-500",
+            },
+            {
+                label: "Timetable & Attendance",
+                icon: Calendar,
+                href: "/admin/timetable",
+                color: "text-violet-500",
+            },
+            {
+                label: "Announcements",
+                icon: Megaphone,
+                href: "/admin/announcements",
+                color: "text-red-500",
+            },
+        ]
     },
     {
         label: "Student Management",
-        header: true,
-    },
-    {
-        label: "Student Requests",
-        icon: UserPlus,
-        href: "/admin/requests",
-        color: "text-amber-500",
-    },
-    {
-        label: "Students",
-        icon: Users,
-        href: "/admin/students",
-        color: "text-pink-700",
+        layout: "student",
+        routes: [
+            {
+                label: "Student Requests",
+                icon: UserPlus,
+                href: "/admin/requests",
+                color: "text-amber-500",
+            },
+            {
+                label: "Students",
+                icon: Users,
+                href: "/admin/students",
+                color: "text-pink-700",
+            },
+        ]
     },
     {
         label: "Academic Management",
-        header: true,
-    },
-    {
-        label: "Courses",
-        icon: GraduationCap,
-        href: "/admin/settings/courses",
-        color: "text-cyan-500",
-    },
-    {
-        label: "Sections",
-        icon: Layers,
-        href: "/admin/settings/sections",
-        color: "text-lime-500",
-    },
-    {
-        label: "Classes",
-        icon: LayoutGrid,
-        href: "/admin/settings/classes",
-        color: "text-indigo-500",
-    },
-    {
-        label: "Subjects",
-        icon: BookOpen,
-        href: "/admin/subjects",
-        color: "text-emerald-500",
+        layout: "academic",
+        routes: [
+            {
+                label: "Courses",
+                icon: GraduationCap,
+                href: "/admin/settings/courses",
+                color: "text-cyan-500",
+            },
+            {
+                label: "Sections",
+                icon: Layers,
+                href: "/admin/settings/sections",
+                color: "text-lime-500",
+            },
+            {
+                label: "Classes",
+                icon: LayoutGrid,
+                href: "/admin/settings/classes",
+                color: "text-indigo-500",
+            },
+            {
+                label: "Subjects",
+                icon: BookOpen,
+                href: "/admin/subjects",
+                color: "text-emerald-500",
+            },
+        ]
     },
     {
         label: "Institution",
-        header: true,
-    },
-    {
-        label: "Faculty",
-        icon: Users,
-        href: "/admin/faculty",
-        color: "text-orange-700",
-    },
-    {
-        label: "Settings",
-        icon: Settings,
-        href: "/admin/settings",
+        layout: "institution",
+        routes: [
+            {
+                label: "Faculty",
+                icon: Users,
+                href: "/admin/faculty",
+                color: "text-orange-700",
+            },
+            {
+                label: "Settings",
+                icon: Settings,
+                href: "/admin/settings",
+            },
+        ]
     },
 ];
 
@@ -113,44 +105,59 @@ interface SidebarProps {
     onNavigate?: () => void;
 }
 
+import { useState } from "react";
+
 export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
+    const [openSection, setOpenSection] = useState<string | null>("general");
+
+    const toggleSection = (section: string) => {
+        setOpenSection(openSection === section ? null : section);
+    };
 
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
-            <div className="px-3 py-2 flex-1">
-                <Link href="/admin/dashboard" className="flex items-center pl-3 mb-14" onClick={onNavigate}>
-                    <h1 className="text-2xl font-bold">Admin Portal</h1>
+            <div className="px-3 py-2 flex-1 overflow-y-auto">
+                <Link href="/admin/dashboard" className="flex items-center pl-3 mb-10" onClick={onNavigate}>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-sky-400 to-blue-600 text-transparent bg-clip-text">Admin Portal</h1>
                 </Link>
-                <div className="space-y-1">
-                    {routes.map((route) => {
-                        if (route.header) {
-                            return (
-                                <div key={route.label} className="px-3 mb-2 mt-6 text-xs font-semibold uppercase text-gray-400">
-                                    {route.label}
-                                </div>
-                            );
-                        }
-
-                        const Icon = route.icon; // Assign to capitalized variable
-
-                        return (
-                            <Link
-                                key={route.href}
-                                href={route.href}
-                                onClick={onNavigate}
-                                className={cn(
-                                    "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition",
-                                    pathname === route.href ? "bg-white/10 text-white" : "text-zinc-400"
-                                )}
+                <div className="space-y-2">
+                    {routes.map((section) => (
+                        <div key={section.label} className="space-y-1">
+                            <button
+                                onClick={() => toggleSection(section.layout)}
+                                className="flex items-center w-full px-3 py-2 text-xs font-semibold uppercase text-gray-400 hover:text-white transition-colors"
                             >
-                                <div className="flex items-center flex-1">
-                                    <Icon className={cn("h-5 w-5 mr-3", route.color)} />
-                                    {route.label}
+                                <span className="flex-1 text-left">{section.label}</span>
+                                {openSection === section.layout ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                )}
+                            </button>
+
+                            {openSection === section.layout && (
+                                <div className="space-y-1 mt-1">
+                                    {section.routes.map((route) => (
+                                        <Link
+                                            key={route.href}
+                                            href={route.href}
+                                            onClick={onNavigate}
+                                            className={cn(
+                                                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition pl-6",
+                                                pathname === route.href ? "bg-white/10 text-white" : "text-zinc-400"
+                                            )}
+                                        >
+                                            <div className="flex items-center flex-1">
+                                                <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
+                                                {route.label}
+                                            </div>
+                                        </Link>
+                                    ))}
                                 </div>
-                            </Link>
-                        );
-                    })}
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
 
