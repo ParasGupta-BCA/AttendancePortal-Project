@@ -14,6 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { generateToken } from "@/utils/dynamicQrClient";
+import { DynamicQRDisplay } from "@/components/common/DynamicQRDisplay";
 
 export default function FacultyDashboard() {
     const [data, setData] = useState<any>(null);
@@ -222,7 +223,7 @@ export default function FacultyDashboard() {
                                     </DialogTrigger>
                                     <DialogContent className="flex flex-col items-center sm:max-w-md">
                                         <h3 className="text-xl font-bold mb-4">Scan to Mark Attendance</h3>
-                                        <QRDisplay code={slot.activeSession.qr_code} interval={data?.qrInterval || 5} />
+                                        <DynamicQRDisplay code={slot.activeSession.qr_code} interval={data?.qrInterval || 5} />
                                         <p className="text-sm text-muted-foreground mt-4 mb-6 text-center">
                                             Ask students to scan this QR code with their app to mark their attendance.
                                         </p>
@@ -268,36 +269,4 @@ export default function FacultyDashboard() {
     );
 }
 
-function QRDisplay({ code, interval = 5 }: { code: string, interval?: number }) {
-    const [src, setSrc] = useState("");
-
-    useEffect(() => {
-        let isMounted = true;
-
-        const updateQR = async () => {
-            try {
-                const token = await generateToken(code, interval);
-                const fullCode = `${code}:${token}`;
-                const url = await QRCode.toDataURL(fullCode);
-                if (isMounted) setSrc(url);
-            } catch (e) {
-                console.error("QR Gen Error", e);
-            }
-        };
-
-        updateQR(); // Initial run
-
-        const timer = setInterval(updateQR, interval * 1000);
-        return () => {
-            isMounted = false;
-            clearInterval(timer);
-        };
-    }, [code, interval]);
-
-    return src ? (
-        <div className="flex flex-col items-center">
-            <img src={src} alt="Attendance QR" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" />
-            <p className="text-xs text-muted-foreground mt-2">Auto-refreshing every {interval}s</p>
-        </div>
-    ) : <p>Loading QR...</p>;
-}
+// ... (removed local QRDisplay)

@@ -11,37 +11,7 @@ import { Label } from "@/components/ui/label";
 import QRCode from "qrcode";
 import { Loader2, Trash2, Plus, Edit } from "lucide-react";
 import { generateToken } from "@/utils/dynamicQrClient";
-
-function DynamicQRDisplay({ code, interval }: { code: string, interval: number }) {
-    const [src, setSrc] = useState("");
-
-    useEffect(() => {
-        let isMounted = true;
-        const update = async () => {
-            try {
-                const token = await generateToken(code, interval);
-                const fullCode = `${code}:${token}`;
-                const url = await QRCode.toDataURL(fullCode);
-                if (isMounted) setSrc(url);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        update();
-        const timer = setInterval(update, interval * 1000);
-        return () => {
-            isMounted = false;
-            clearInterval(timer);
-        };
-    }, [code, interval]);
-
-    return src ? (
-        <div className="flex flex-col items-center">
-            <img src={src} alt="QR Code" className="w-64 h-64 border-4 border-white shadow-lg rounded-lg" />
-            <p className="text-xs text-muted-foreground mt-2">Refreshes every {interval}s</p>
-        </div>
-    ) : <p>Generating QR...</p>;
-}
+import { DynamicQRDisplay } from "@/components/common/DynamicQRDisplay";
 
 export default function TimetablePage() {
     const [timetable, setTimetable] = useState<any[]>([]);
