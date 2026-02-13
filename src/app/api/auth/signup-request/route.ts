@@ -14,6 +14,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { message: 'Invalid email format. Please enter your correct details to get approved.' },
+        { status: 400 }
+      );
+    }
+
     // Check if email already exists in users
     const existingUser = await query('SELECT id FROM users WHERE email = $1', [email]);
     if (existingUser.rowCount && existingUser.rowCount > 0) {
@@ -58,10 +67,24 @@ export async function POST(req: Request) {
       { message: 'Signup request submitted successfully.' },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Signup request error:', error);
+
+    // Handle Unique Constraint Violations (Postgres Error 23505)
+    if (error.code === '23505') {
+      let field = 'Field';
+      if (error.constraint?.includes('email')) field = 'Email';
+      if (error.constraint?.includes('enrollment_no')) field = 'Enrollment Number';
+      if (error.constraint?.includes('erp_id')) field = 'ERP ID';
+
+      return NextResponse.json(
+        { message: `${field} is already registered. Please enter your correct details to get approved.` },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
-      { message: `Error: ${(error as any).message}` },
+      { message: `Error: ${error.message}` },
       { status: 500 }
     );
   }
