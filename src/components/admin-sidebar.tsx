@@ -142,7 +142,9 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
             <div className="px-3 py-2 flex-1 overflow-y-auto">
                 <Link href="/admin/dashboard" className="flex items-center pl-3 mb-10" onClick={onNavigate}>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-sky-400 to-blue-600 text-transparent bg-clip-text">Admin Portal</h1>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text tracking-wide">
+                        Admin <span className="text-white">Portal</span>
+                    </h1>
                 </Link>
                 <div className="space-y-2">
                     {routes.map((section) => (
