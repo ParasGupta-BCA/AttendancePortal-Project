@@ -2,10 +2,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid, LucideIcon } from "lucide-react";
 import { signOut } from "next-auth/react";
 
-const routes = [
+
+
+interface LinkRoute {
+    label: string;
+    icon: LucideIcon;
+    href: string;
+    color?: string;
+    header?: false;
+}
+
+interface HeaderRoute {
+    label: string;
+    header: true;
+    icon?: never;
+    href?: never;
+    color?: never;
+}
+
+type Route = LinkRoute | HeaderRoute;
+
+const routes: Route[] = [
     {
         label: "Dashboard",
         icon: LayoutDashboard,
@@ -91,15 +111,21 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                     <h1 className="text-2xl font-bold">Admin Portal</h1>
                 </Link>
                 <div className="space-y-1">
-                    {routes.map((route) => (
-                        route.header ? (
-                            <div key={route.label} className="px-3 mb-2 mt-6 text-xs font-semibold uppercase text-gray-400">
-                                {route.label}
-                            </div>
-                        ) : (
+                    {routes.map((route) => {
+                        if (route.header) {
+                            return (
+                                <div key={route.label} className="px-3 mb-2 mt-6 text-xs font-semibold uppercase text-gray-400">
+                                    {route.label}
+                                </div>
+                            );
+                        }
+
+                        const Icon = route.icon; // Assign to capitalized variable
+
+                        return (
                             <Link
                                 key={route.href}
-                                href={route.href!}
+                                href={route.href}
                                 onClick={onNavigate}
                                 className={cn(
                                     "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition",
@@ -107,12 +133,12 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                                 )}
                             >
                                 <div className="flex items-center flex-1">
-                                    <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
+                                    <Icon className={cn("h-5 w-5 mr-3", route.color)} />
                                     {route.label}
                                 </div>
                             </Link>
-                        )
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
 
