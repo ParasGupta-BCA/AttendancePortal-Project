@@ -49,6 +49,18 @@ const routes = [
         color: "text-emerald-500",
     },
     {
+        label: "Courses",
+        icon: BookOpen,
+        href: "/admin/settings/courses",
+        color: "text-cyan-500",
+    },
+    {
+        label: "Sections",
+        icon: BookOpen,
+        href: "/admin/settings/sections",
+        color: "text-lime-500",
+    },
+    {
         label: "Settings",
         icon: Settings,
         href: "/admin/settings",
