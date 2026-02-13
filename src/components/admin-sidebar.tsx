@@ -1,8 +1,8 @@
 "use client";
-import Link from "next/link";
+import { Link } from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const routes = [
@@ -50,13 +50,13 @@ const routes = [
     },
     {
         label: "Courses",
-        icon: BookOpen,
+        icon: GraduationCap,
         href: "/admin/settings/courses",
         color: "text-cyan-500",
     },
     {
         label: "Sections",
-        icon: BookOpen,
+        icon: Layers,
         href: "/admin/settings/sections",
         color: "text-lime-500",
     },
