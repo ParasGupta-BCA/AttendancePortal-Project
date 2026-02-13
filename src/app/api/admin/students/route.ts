@@ -6,14 +6,37 @@ import bcrypt from 'bcryptjs';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const res = await query(`
+        const { searchParams } = new URL(request.url);
+        const course = searchParams.get('course');
+        const section = searchParams.get('section');
+
+        let queryText = `
       SELECT s.id, s.enrollment_no, s.erp_id, s.course_year, s.section, u.full_name, u.email 
       FROM students s
       JOIN users u ON s.user_id = u.id
-      ORDER BY s.enrollment_no
-    `);
+    `;
+
+        const params: any[] = [];
+        const conditions: string[] = [];
+
+        if (course) {
+            conditions.push(`s.course_year = $${params.length + 1}`);
+            params.push(course);
+        }
+        if (section) {
+            conditions.push(`s.section = $${params.length + 1}`);
+            params.push(section);
+        }
+
+        if (conditions.length > 0) {
+            queryText += ` WHERE ${conditions.join(' AND ')}`;
+        }
+
+        queryText += ` ORDER BY s.enrollment_no`;
+
+        const res = await query(queryText, params);
         return NextResponse.json({ students: res.rows });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -23,11 +46,17 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
+        // Cast session to any to check role safely
         if (!session || (session.user as any)?.role !== 'admin') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { full_name, email, enrollment_no, erp_id } = await request.json();
+        // Destructure course_year and section from body
+        const { full_name, email, enrollment_no, erp_id, course_year, section } = await request.json();
+
+        if (!course_year || !section) {
+            return NextResponse.json({ error: 'Course Year and Section are required' }, { status: 400 });
+        }
 
         const defaultPassword = "student";
         const hashedPassword = await bcrypt.hash(defaultPassword, 10); // Hashing the password
@@ -60,8 +89,8 @@ export async function POST(request: Request) {
         // 2. Create Student Profile
         await query(`
       INSERT INTO students (user_id, enrollment_no, erp_id, course_year, section)
-      VALUES ($1, $2, $3, 'BCA VI', 'Morning')
-    `, [userId, enrollment_no, erp_id]);
+      VALUES ($1, $2, $3, $4, $5)
+    `, [userId, enrollment_no, erp_id, course_year, section]);
 
         return NextResponse.json({ success: true });
     } catch (error: any) {

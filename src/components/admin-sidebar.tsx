@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const routes = [
@@ -47,6 +47,12 @@ const routes = [
         icon: Layers,
         href: "/admin/settings/sections",
         color: "text-lime-500",
+    },
+    {
+        label: "Classes",
+        icon: LayoutGrid,
+        href: "/admin/settings/classes",
+        color: "text-indigo-500",
     },
     {
         label: "Faculty",
