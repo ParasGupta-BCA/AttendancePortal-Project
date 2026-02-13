@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,11 +15,29 @@ export default function SignupPage() {
         email: "",
         enrollmentNo: "",
         erpId: "",
-        courseYear: "BCA VI", // Default
-        section: "Morning"   // Default
+        courseYear: "", // Removed default to force selection
+        section: ""   // Removed default to force selection
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [courses, setCourses] = useState<{ id: string, name: string }[]>([]);
+    const [sections, setSections] = useState<{ id: string, name: string }[]>([]);
+
+    useEffect(() => {
+        const fetchMeta = async () => {
+            try {
+                const res = await fetch('/api/meta');
+                if (res.ok) {
+                    const data = await res.json();
+                    setCourses(data.courses || []);
+                    setSections(data.sections || []);
+                }
+            } catch (error) {
+                console.error("Failed to fetch metadata", error);
+            }
+        };
+        fetchMeta();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -66,8 +84,8 @@ export default function SignupPage() {
                 email: "",
                 enrollmentNo: "",
                 erpId: "",
-                courseYear: "BCA VI",
-                section: "Morning"
+                courseYear: "",
+                section: ""
             });
         } catch (error: any) {
             setMessage({ type: 'error', text: error.message });
@@ -152,12 +170,9 @@ export default function SignupPage() {
                                         <SelectValue placeholder="Select Year" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="BCA I">BCA I</SelectItem>
-                                        <SelectItem value="BCA II">BCA II</SelectItem>
-                                        <SelectItem value="BCA III">BCA III</SelectItem>
-                                        <SelectItem value="BCA IV">BCA IV</SelectItem>
-                                        <SelectItem value="BCA V">BCA V</SelectItem>
-                                        <SelectItem value="BCA VI">BCA VI</SelectItem>
+                                        {courses.map((course) => (
+                                            <SelectItem key={course.id} value={course.name}>{course.name}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -168,9 +183,9 @@ export default function SignupPage() {
                                         <SelectValue placeholder="Select Section" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Morning">Morning</SelectItem>
-                                        <SelectItem value="Afternoon">Afternoon</SelectItem>
-                                        <SelectItem value="Evening">Evening</SelectItem>
+                                        {sections.map((section) => (
+                                            <SelectItem key={section.id} value={section.name}>{section.name}</SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
