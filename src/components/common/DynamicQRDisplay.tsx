@@ -121,6 +121,7 @@ export function DynamicQRDisplay({ code, interval = 5, className }: DynamicQRDis
             </p>
         </div>
     );
+}
 
 // Simple internal Progress component wrapper if needed, but assuming shadcn/ui progress exists?
 // Based on file list, user has consistent usage of @/components/ui/progress.
