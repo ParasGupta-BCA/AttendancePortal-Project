@@ -105,11 +105,30 @@ interface SidebarProps {
     onNavigate?: () => void;
 }
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const [openSections, setOpenSections] = useState<string[]>(["general", "student"]);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        const saved = localStorage.getItem("sidebarOpenSections");
+        if (saved) {
+            try {
+                setOpenSections(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse sidebar state", e);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (isMounted) {
+            localStorage.setItem("sidebarOpenSections", JSON.stringify(openSections));
+        }
+    }, [openSections, isMounted]);
 
     const toggleSection = (section: string) => {
         setOpenSections(prev =>
