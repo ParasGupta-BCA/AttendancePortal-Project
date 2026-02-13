@@ -113,7 +113,7 @@ export default function SignupPage() {
                                         value={formData.enrollmentNo}
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '').slice(0, 3);
-                                            setFormData({ ...formData, enrollmentNo: val });
+                                            setFormData({ ...formData, enrollmentNo: val, erpId: val });
                                         }}
                                         required
                                         placeholder="000"
@@ -133,7 +133,7 @@ export default function SignupPage() {
                                         value={formData.erpId}
                                         onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '').slice(0, 3);
-                                            setFormData({ ...formData, erpId: val });
+                                            setFormData({ ...formData, erpId: val, enrollmentNo: val });
                                         }}
                                         required
                                         placeholder="000"
