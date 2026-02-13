@@ -23,6 +23,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Enrollment and ERP format validation
+    const idRegex = /^0231BCA\d{3}$/;
+    if (!idRegex.test(enrollmentNo) || !idRegex.test(erpId)) {
+      return NextResponse.json(
+        { message: 'Invalid Enrollment No or ERP ID. Must start with "0231BCA" followed by 3 numbers (e.g., 0231BCA123). Please enter your correct details to get approved.' },
+        { status: 400 }
+      );
+    }
+
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {

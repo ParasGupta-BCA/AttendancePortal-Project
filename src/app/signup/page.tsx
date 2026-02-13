@@ -35,10 +35,16 @@ export default function SignupPage() {
         setMessage(null);
 
         try {
+            const payload = {
+                ...formData,
+                enrollmentNo: `0231BCA${formData.enrollmentNo}`,
+                erpId: `0231BCA${formData.erpId}`
+            };
+
             const res = await fetch("/api/auth/signup-request", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
 
             const data = await res.json();
@@ -98,11 +104,43 @@ export default function SignupPage() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Enrollment No</label>
-                                <Input name="enrollmentNo" value={formData.enrollmentNo} onChange={handleChange} required className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100" />
+                                <div className="flex items-center">
+                                    <span className="flex items-center justify-center px-3 py-2 text-sm border border-r-0 rounded-l-md bg-muted text-muted-foreground border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800">
+                                        0231BCA
+                                    </span>
+                                    <Input
+                                        name="enrollmentNo"
+                                        value={formData.enrollmentNo}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/\D/g, '').slice(0, 3);
+                                            setFormData({ ...formData, enrollmentNo: val });
+                                        }}
+                                        required
+                                        placeholder="000"
+                                        maxLength={3}
+                                        className="rounded-l-none border-l-0 border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
+                                    />
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">ERP ID</label>
-                                <Input name="erpId" value={formData.erpId} onChange={handleChange} required className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100" />
+                                <div className="flex items-center">
+                                    <span className="flex items-center justify-center px-3 py-2 text-sm border border-r-0 rounded-l-md bg-muted text-muted-foreground border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800">
+                                        0231BCA
+                                    </span>
+                                    <Input
+                                        name="erpId"
+                                        value={formData.erpId}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/\D/g, '').slice(0, 3);
+                                            setFormData({ ...formData, erpId: val });
+                                        }}
+                                        required
+                                        placeholder="000"
+                                        maxLength={3}
+                                        className="rounded-l-none border-l-0 border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
+                                    />
+                                </div>
                             </div>
                         </div>
 
