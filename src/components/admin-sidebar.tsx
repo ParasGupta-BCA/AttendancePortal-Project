@@ -109,10 +109,14 @@ import { useState } from "react";
 
 export function Sidebar({ onNavigate }: SidebarProps) {
     const pathname = usePathname();
-    const [openSection, setOpenSection] = useState<string | null>("general");
+    const [openSections, setOpenSections] = useState<string[]>(["general", "student"]);
 
     const toggleSection = (section: string) => {
-        setOpenSection(openSection === section ? null : section);
+        setOpenSections(prev =>
+            prev.includes(section)
+                ? prev.filter(s => s !== section)
+                : [...prev, section]
+        );
     };
 
     return (
@@ -129,14 +133,14 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                                 className="flex items-center w-full px-3 py-2 text-xs font-semibold uppercase text-gray-400 hover:text-white transition-colors"
                             >
                                 <span className="flex-1 text-left">{section.label}</span>
-                                {openSection === section.layout ? (
+                                {openSections.includes(section.layout) ? (
                                     <ChevronDown className="h-4 w-4" />
                                 ) : (
                                     <ChevronRight className="h-4 w-4" />
                                 )}
                             </button>
 
-                            {openSection === section.layout && (
+                            {openSections.includes(section.layout) && (
                                 <div className="space-y-1 mt-1">
                                     {section.routes.map((route) => (
                                         <Link
