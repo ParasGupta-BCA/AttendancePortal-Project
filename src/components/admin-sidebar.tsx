@@ -27,6 +27,10 @@ type Route = LinkRoute | HeaderRoute;
 
 const routes: Route[] = [
     {
+        label: "General",
+        header: true,
+    },
+    {
         label: "Dashboard",
         icon: LayoutDashboard,
         href: "/admin/dashboard",
@@ -43,6 +47,10 @@ const routes: Route[] = [
         icon: Megaphone,
         href: "/admin/announcements",
         color: "text-red-500",
+    },
+    {
+        label: "Student Management",
+        header: true,
     },
     {
         label: "Student Requests",
@@ -79,16 +87,20 @@ const routes: Route[] = [
         color: "text-indigo-500",
     },
     {
-        label: "Faculty",
-        icon: Users,
-        href: "/admin/faculty",
-        color: "text-orange-700",
-    },
-    {
         label: "Subjects",
         icon: BookOpen,
         href: "/admin/subjects",
         color: "text-emerald-500",
+    },
+    {
+        label: "Institution",
+        header: true,
+    },
+    {
+        label: "Faculty",
+        icon: Users,
+        href: "/admin/faculty",
+        color: "text-orange-700",
     },
     {
         label: "Settings",
