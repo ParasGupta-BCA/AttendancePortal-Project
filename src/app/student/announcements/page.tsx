@@ -228,7 +228,7 @@ export default function AnnouncementsPage() {
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <ScrollArea className="flex-1 p-6 pt-2">
+                            <ScrollArea className="flex-1 p-6 pt-2 [&>[data-orientation=vertical]]:hidden">
                                 {selectedAnnouncement.image_data && (
                                     <div className="relative rounded-lg overflow-hidden border bg-gray-100 dark:bg-gray-900 mb-6 group">
                                         <img
