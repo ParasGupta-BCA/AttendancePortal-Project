@@ -6,7 +6,7 @@ import { query } from '@/lib/db';
 export async function GET(request: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session) {
+        if (!session || !session.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
         // @ts-ignore
-        if (!session || !['admin', 'faculty'].includes(session.user?.role)) {
+        if (!session || !session.user || !['admin', 'faculty'].includes(session.user.role as string)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
