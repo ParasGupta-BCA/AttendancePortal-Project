@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import { Download, Share2, AlertCircle, Info, Calendar, Megaphone, Coffee, Search, X, Plus, Minus, Maximize2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { useNotification } from "@/contexts/notification-context";
@@ -237,7 +236,7 @@ export default function AnnouncementsPage() {
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <ScrollArea className="flex-1 p-6 pt-2 [&>[data-orientation=vertical]]:hidden">
+                            <div className="flex-1 overflow-y-auto p-6 pt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                 {selectedAnnouncement.image_data && (
                                     <div className="relative rounded-lg overflow-hidden border bg-gray-100 dark:bg-gray-900 mb-6 group">
                                         <img
@@ -263,7 +262,7 @@ export default function AnnouncementsPage() {
                                 )}
 
                                 <ExpandableText text={selectedAnnouncement.content} />
-                            </ScrollArea>
+                            </div>
 
                             <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end">
                                 <button
