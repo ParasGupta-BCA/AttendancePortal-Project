@@ -18,7 +18,7 @@ export async function GET(request: Request) {
              LEFT JOIN announcement_views av ON a.id = av.announcement_id AND av.user_id = $1
              WHERE a.is_active = true 
              ORDER BY a.created_at DESC`,
-            [session.user.id]
+            [(session.user as any).id]
         );
 
         return NextResponse.json(result.rows);
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
         // @ts-ignore
-        if (!session || !session.user || !['admin', 'faculty'].includes(session.user.role as string)) {
+        if (!session || !session.user || !['admin', 'faculty'].includes((session.user as any).role)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
              VALUES ($1, $2, $3, $4, $5, $6) 
              RETURNING *`,
             // @ts-ignore
-            [title, content, category, priority || 'Normal', image_data, session.user.id]
+            [title, content, category, priority || 'Normal', image_data, (session.user as any).id]
         );
 
         return NextResponse.json(result.rows[0], { status: 201 });

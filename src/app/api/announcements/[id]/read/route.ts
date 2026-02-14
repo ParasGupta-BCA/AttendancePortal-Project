@@ -26,7 +26,7 @@ export async function POST(
             `INSERT INTO announcement_views (announcement_id, user_id) 
              VALUES ($1, $2) 
              ON CONFLICT (announcement_id, user_id) DO NOTHING`,
-            [id, session.user.id]
+            [id, (session.user as any).id]
         );
 
         return NextResponse.json({ success: true });

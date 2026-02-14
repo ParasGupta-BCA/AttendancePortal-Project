@@ -15,7 +15,7 @@ export async function GET(request: Request) {
              FROM announcements a
              LEFT JOIN announcement_views av ON a.id = av.announcement_id AND av.user_id = $1
              WHERE a.is_active = true AND av.viewed_at IS NULL`,
-            [session.user.id]
+            [(session.user as any).id]
         );
 
         return NextResponse.json({ unread_count: parseInt(result.rows[0].unread_count) });
