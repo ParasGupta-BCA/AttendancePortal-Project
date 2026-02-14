@@ -251,7 +251,8 @@ export default function AnnouncementsPage() {
                                         <img
                                             src={selectedAnnouncement.image_data}
                                             alt={selectedAnnouncement.title}
-                                            className="w-full h-auto max-h-[400px] object-contain mx-auto"
+                                            onClick={() => setIsImageFullscreen(true)}
+                                            className="w-full h-auto max-h-[400px] object-contain mx-auto cursor-pointer"
                                         />
                                         <div className="absolute top-2 right-2 flex gap-2">
                                             <button
