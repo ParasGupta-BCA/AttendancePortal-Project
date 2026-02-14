@@ -223,7 +223,7 @@ export default function AnnouncementsPage() {
 
             {/* Detail Modal */}
             <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && handleCloseModal()}>
-                <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+                <DialogContent showCloseButton={false} className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
                     {selectedAnnouncement && (
                         <>
                             <DialogHeader className="p-6 pb-2 border-b">
@@ -273,13 +273,19 @@ export default function AnnouncementsPage() {
                                 <ExpandableText text={selectedAnnouncement.content} />
                             </div>
 
-                            <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end">
+                            <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end gap-3">
                                 <button
                                     onClick={() => handleShare(selectedAnnouncement)}
-                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 rounded-md transition-colors"
                                 >
                                     <Share2 className="w-4 h-4" />
-                                    Share Announcement
+                                    Share
+                                </button>
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                                >
+                                    Close
                                 </button>
                             </div>
                         </>
