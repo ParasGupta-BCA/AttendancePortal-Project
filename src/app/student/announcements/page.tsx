@@ -22,6 +22,30 @@ interface Announcement {
     is_read?: boolean;
 }
 
+// Expandable text component for long content
+const ExpandableText = ({ text }: { text: string }) => {
+    const [expanded, setExpanded] = useState(false);
+    const isLong = text.length > 150; // Show button if text is longer than 150 chars
+
+    if (!isLong) {
+        return <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">{text}</div>;
+    }
+
+    return (
+        <div className="flex flex-col items-start">
+            <div className={`prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap ${expanded ? '' : 'line-clamp-4'}`}>
+                {text}
+            </div>
+            <button
+                onClick={() => setExpanded(!expanded)}
+                className="mt-2 text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline focus:outline-none"
+            >
+                {expanded ? 'Show Less' : 'Read More'}
+            </button>
+        </div>
+    );
+};
+
 export default function AnnouncementsPage() {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
@@ -229,9 +253,7 @@ export default function AnnouncementsPage() {
                                     </div>
                                 )}
 
-                                <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">
-                                    {selectedAnnouncement.content}
-                                </div>
+                                <ExpandableText text={selectedAnnouncement.content} />
                             </ScrollArea>
 
                             <div className="p-4 border-t bg-gray-50 dark:bg-gray-900/50 flex justify-end">
