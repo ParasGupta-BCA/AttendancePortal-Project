@@ -121,7 +121,7 @@ export default function AnnouncementsPage() {
                                     setAnnouncements(prev => prev.map(a => a.id === item.id ? { ...a, is_read: true } : a));
                                 }
                             }}
-                            className={`cursor-pointer hover:shadow-md transition-shadow dark:bg-gray-800 overflow-hidden border-l-4 ${!item.is_read ? 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-l-gray-300 dark:border-l-gray-600'}`}
+                            className="cursor-pointer hover:shadow-md transition-shadow dark:bg-gray-800 overflow-hidden border-l-4 border-l-blue-500"
                         >
                             <CardHeader className="pb-2">
                                 <div className="flex justify-between items-start">
@@ -138,15 +138,15 @@ export default function AnnouncementsPage() {
                                         {format(new Date(item.created_at), 'MMM d')}
                                     </span>
                                 </div>
+                                <div className="flex justify-between items-start mt-2 gap-2">
+                                    <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
+                                    {!item.is_read && (
+                                        <Badge className="bg-blue-600 hover:bg-blue-700 text-white shrink-0">
+                                            New
+                                        </Badge>
+                                    )}
+                                </div>
                             </CardHeader>
-                            <CardTitle className="text-lg mt-2 line-clamp-1 flex items-center gap-2">
-                                {item.title}
-                                {!item.is_read && (
-                                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                        New
-                                    </span>
-                                )}
-                            </CardTitle>
                             <CardContent>
                                 {item.image_data && (
                                     <div className="w-full h-48 bg-gray-100 dark:bg-gray-900 rounded-md overflow-hidden mb-3">
