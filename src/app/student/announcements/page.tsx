@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import { useNotification } from "@/contexts/notification-context";
 
 interface Announcement {
     id: string;
@@ -18,6 +19,7 @@ interface Announcement {
     image_data?: string;
     created_at: string;
     author_name: string;
+    is_read?: boolean;
 }
 
 export default function AnnouncementsPage() {
@@ -25,6 +27,7 @@ export default function AnnouncementsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
     const [isImageFullscreen, setIsImageFullscreen] = useState(false);
+    const { markAsRead } = useNotification();
 
     useEffect(() => {
         fetchAnnouncements();
@@ -111,8 +114,14 @@ export default function AnnouncementsPage() {
                     {announcements.map((item) => (
                         <Card
                             key={item.id}
-                            onClick={() => setSelectedAnnouncement(item)}
-                            className="cursor-pointer hover:shadow-md transition-shadow dark:bg-gray-800 overflow-hidden border-l-4 border-l-blue-500"
+                            onClick={() => {
+                                setSelectedAnnouncement(item);
+                                if (!item.is_read) {
+                                    markAsRead(item.id);
+                                    setAnnouncements(prev => prev.map(a => a.id === item.id ? { ...a, is_read: true } : a));
+                                }
+                            }}
+                            className={`cursor-pointer hover:shadow-md transition-shadow dark:bg-gray-800 overflow-hidden border-l-4 ${!item.is_read ? 'border-l-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-l-gray-300 dark:border-l-gray-600'}`}
                         >
                             <CardHeader className="pb-2">
                                 <div className="flex justify-between items-start">
@@ -129,8 +138,15 @@ export default function AnnouncementsPage() {
                                         {format(new Date(item.created_at), 'MMM d')}
                                     </span>
                                 </div>
-                                <CardTitle className="text-lg mt-2 line-clamp-1">{item.title}</CardTitle>
                             </CardHeader>
+                            <CardTitle className="text-lg mt-2 line-clamp-1 flex items-center gap-2">
+                                {item.title}
+                                {!item.is_read && (
+                                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                        New
+                                    </span>
+                                )}
+                            </CardTitle>
                             <CardContent>
                                 {item.image_data && (
                                     <div className="w-full h-48 bg-gray-100 dark:bg-gray-900 rounded-md overflow-hidden mb-3">
@@ -149,6 +165,10 @@ export default function AnnouncementsPage() {
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setSelectedAnnouncement(item);
+                                        if (!item.is_read) {
+                                            markAsRead(item.id);
+                                            setAnnouncements(prev => prev.map(a => a.id === item.id ? { ...a, is_read: true } : a));
+                                        }
                                     }}
                                 >
                                     Read More

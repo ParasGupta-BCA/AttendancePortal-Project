@@ -11,11 +11,14 @@ export async function GET(request: Request) {
         }
 
         const result = await query(
-            `SELECT a.*, u.full_name as author_name 
+            `SELECT a.*, u.full_name as author_name,
+             CASE WHEN av.viewed_at IS NOT NULL THEN true ELSE false END as is_read
              FROM announcements a 
              LEFT JOIN users u ON a.created_by = u.id 
+             LEFT JOIN announcement_views av ON a.id = av.announcement_id AND av.user_id = $1
              WHERE a.is_active = true 
-             ORDER BY a.created_at DESC`
+             ORDER BY a.created_at DESC`,
+            [session.user.id]
         );
 
         return NextResponse.json(result.rows);
@@ -42,7 +45,7 @@ export async function POST(request: Request) {
 
         // Validate image size (approximate from base64 length)
         if (image_data && image_data.length > 700000) { // ~500KB limit
-             return NextResponse.json({ error: 'Image too large. Max 500KB.' }, { status: 400 });
+            return NextResponse.json({ error: 'Image too large. Max 500KB.' }, { status: 400 });
         }
 
         const result = await query(

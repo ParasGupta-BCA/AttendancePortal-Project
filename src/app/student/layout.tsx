@@ -6,13 +6,11 @@ import { LogOut, LayoutDashboard, QrCode, History, Settings, Moon, Sun, Bell } f
 import { signOut } from "next-auth/react";
 import { MobileGuard } from "@/components/mobile-guard";
 import { GreetingHeader } from "@/components/student/greeting-header";
+import { NotificationProvider, useNotification } from "@/contexts/notification-context";
 
-export default function StudentLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+function StudentLayoutContent({ children }: { children: React.ReactNode }) {
     const [isDark, setIsDark] = useState(false);
+    const { unreadCount } = useNotification();
 
     useEffect(() => {
         // Function to apply theme
@@ -65,10 +63,15 @@ export default function StudentLayout({
                     <div className="flex items-center gap-2">
                         <Link
                             href="/student/announcements"
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 relative"
                             aria-label="Announcements"
                         >
                             <Bell className="w-5 h-5" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
                         </Link>
                         <button
                             onClick={toggleTheme}
@@ -117,5 +120,13 @@ export default function StudentLayout({
                 </nav>
             </div>
         </MobileGuard>
+    );
+}
+
+export default function StudentLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <NotificationProvider>
+            <StudentLayoutContent>{children}</StudentLayoutContent>
+        </NotificationProvider>
     );
 }
