@@ -289,7 +289,7 @@ export default function AnnouncementsPage() {
 
             {/* Fullscreen Image Modal */}
             <Dialog open={isImageFullscreen} onOpenChange={setIsImageFullscreen}>
-                <DialogContent className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center outline-none">
+                <DialogContent showCloseButton={false} className="max-w-[100vw] max-h-[100vh] h-screen w-screen bg-black/95 border-none p-0 flex flex-col items-center justify-center outline-none">
                     <DialogTitle className="sr-only">Fullscreen Image</DialogTitle>
                     <TransformWrapper
                         initialScale={1}
@@ -299,25 +299,30 @@ export default function AnnouncementsPage() {
                     >
                         {({ zoomIn, zoomOut, resetTransform }) => (
                             <>
-                                <div className="absolute top-4 right-4 z-50 flex gap-2">
+                                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-2xl">
                                     <button
                                         onClick={() => zoomOut()}
-                                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                                        className="text-white/80 hover:text-white transition-colors focus:outline-none"
+                                        aria-label="Zoom Out"
                                     >
                                         <Minus className="w-6 h-6" />
                                     </button>
+                                    <div className="w-px h-6 bg-white/20" />
                                     <button
                                         onClick={() => zoomIn()}
-                                        className="p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
+                                        className="text-white/80 hover:text-white transition-colors focus:outline-none"
+                                        aria-label="Zoom In"
                                     >
                                         <Plus className="w-6 h-6" />
                                     </button>
+                                    <div className="w-px h-6 bg-white/20" />
                                     <button
                                         onClick={() => {
                                             resetTransform();
                                             setIsImageFullscreen(false);
                                         }}
-                                        className="p-3 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors"
+                                        className="text-white/80 hover:text-red-400 transition-colors focus:outline-none"
+                                        aria-label="Close"
                                     >
                                         <X className="w-6 h-6" />
                                     </button>
