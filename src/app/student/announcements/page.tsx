@@ -23,25 +23,34 @@ interface Announcement {
 }
 
 // Expandable text component for long content
+// Expandable text component for long content
 const ExpandableText = ({ text }: { text: string }) => {
     const [expanded, setExpanded] = useState(false);
-    const isLong = text.length > 150; // Show button if text is longer than 150 chars
+    const limit = 150;
+    const isLong = text.length > limit;
 
-    if (!isLong) {
-        return <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap">{text}</div>;
-    }
+    const displayText = expanded || !isLong ? text : text.slice(0, limit) + '...';
 
     return (
-        <div className="flex flex-col items-start">
-            <div className={`prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap ${expanded ? '' : 'line-clamp-4'}`}>
-                {text}
+        <div className="flex flex-col items-start w-full">
+            <div className="prose dark:prose-invert max-w-none text-sm whitespace-pre-wrap transition-all duration-200">
+                {displayText}
             </div>
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="mt-2 text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline focus:outline-none"
-            >
-                {expanded ? 'Show Less' : 'Read More'}
-            </button>
+            {isLong && (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setExpanded(!expanded);
+                    }}
+                    className="mt-2 text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline focus:outline-none flex items-center gap-1"
+                >
+                    {expanded ? (
+                        <>Show Less <Minus className="w-3 h-3" /></>
+                    ) : (
+                        <>Read More <Plus className="w-3 h-3" /></>
+                    )}
+                </button>
+            )}
         </div>
     );
 };
