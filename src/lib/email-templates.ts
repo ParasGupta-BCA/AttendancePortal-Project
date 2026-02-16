@@ -107,18 +107,18 @@ export const getAttendanceEmailHtml = (studentName: string, subjectName: string,
 
 export const getAnnouncementEmailHtml = (title: string, content: string, category: string) => {
     const bodyContent = `
-        <div style="margin-bottom: 25px;">
-            <span style="background: #0071e3; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">${category}</span>
+        <div style="margin-bottom: 25px; text-align: left;">
+            <span style="background: rgba(0, 113, 227, 0.1); color: #0071e3; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">${category}</span>
         </div>
         
-        <h2 style="font-size: 32px; font-weight: 700; margin: 0 0 20px 0; letter-spacing: -0.5px;">${title}</h2>
+        <h2 style="font-size: 34px; font-weight: 700; margin: 0 0 24px 0; letter-spacing: -0.8px; line-height: 1.1; color: #1d1d1f; text-align: left;">${title}</h2>
         
-        <div style="font-size: 17px; line-height: 1.5; color: #1d1d1f; margin-bottom: 30px;">
+        <div style="font-size: 17px; line-height: 1.6; color: #424245; margin-bottom: 35px; text-align: left; font-weight: 400;">
             ${content.replace(/\n/g, '<br>')}
         </div>
 
-        <div style="text-align: center;">
-            <a href="${process.env.NEXTAUTH_URL || '#'}" style="${buttonStyle}">Read More</a>
+        <div style="text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 30px;">
+            <a href="${process.env.NEXTAUTH_URL || '#'}" style="${buttonStyle}">View in Portal</a>
         </div>
     `;
 
