@@ -157,6 +157,11 @@ export default function LoginPage() {
                                 className="border-zinc-300 dark:border-zinc-700 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
                             />
                         </div>
+                        <div className="flex items-center justify-end">
+                            <Link href="/forgot-password" class="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors">
+                                Forgot password?
+                            </Link>
+                        </div>
                         <Button type="submit" className="w-full bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200" disabled={loading}>
                             {loading ? "Signing in..." : "Sign In"}
                         </Button>
