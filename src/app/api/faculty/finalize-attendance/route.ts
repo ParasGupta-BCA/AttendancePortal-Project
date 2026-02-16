@@ -16,10 +16,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
         }
 
-        // 1. Get Session Details & Timetable Info
+        // 1. Get Session Details & Timetable Info with Subject Name
         const sessionRes = await query(`
-            SELECT s.timetable_id, s.start_time
+            SELECT s.timetable_id, s.start_time, sub.name as subject_name
             FROM attendance_sessions s
+            JOIN timetable t ON s.timetable_id = t.id
+            JOIN subjects sub ON t.subject_id = sub.id
             WHERE s.id = $1
         `, [sessionId]);
 
@@ -27,19 +29,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Session not found' }, { status: 404 });
         }
 
-        const { timetable_id, start_time } = sessionRes.rows[0];
+        const { timetable_id, start_time, subject_name } = sessionRes.rows[0];
 
         // 2. Identify Missing Students
         // Find students who belong to this class/section but have NO 'Present' record for this Timetable Slot on this Date.
-        // We check across ALL sessions for this timetable_id on this specific date to avoid duplicates if multiple sessions were created.
         const missingStudentsRes = await query(`
-            SELECT s.id 
+            SELECT s.id, u.email, u.full_name
             FROM students s
+            JOIN users u ON s.user_id = u.id
             JOIN classes c ON s.course_year = c.name AND s.section = c.section
             JOIN timetable t ON t.class_id = c.id
             WHERE t.id = $1
             AND s.id NOT IN (
-                -- Exclude if they are Present in ANY session for this timetable ID on this date
                 SELECT ar.student_id 
                 FROM attendance_records ar
                 JOIN attendance_sessions as_sess ON ar.session_id = as_sess.id
@@ -48,29 +49,22 @@ export async function POST(req: Request) {
                 AND ar.status = 'Present'
             )
             AND s.id NOT IN (
-                 -- Also exclude if they already have a record (Present OR Absent) in THIS specific session
                  SELECT student_id FROM attendance_records WHERE session_id = $3
             )
         `, [timetable_id, start_time, sessionId]);
 
-        const missingStudentIds = missingStudentsRes.rows.map(r => r.id);
+        const missingStudents = missingStudentsRes.rows; // Array of { id, email, full_name }
 
         // 3. Insert 'Absent' Records
-        if (missingStudentIds.length > 0) {
-            // We need a loop or unnest. For simplicity and driver support, let's use a loop or a giant INSERT.
-            // Using a loop for safety with UUIDs, though batch insert is better.
-            // Construction of batch insert:
-
+        if (missingStudents.length > 0) {
             const values: any[] = [];
             const placeholders: string[] = [];
-
-            // We use the Session Start Time as the marked_at time for consistency
             const markedAt = start_time;
 
-            missingStudentIds.forEach((sid, index) => {
-                const pIndex = index * 4; // 4 params per row
+            missingStudents.forEach((student, index) => {
+                const pIndex = index * 4;
                 placeholders.push(`($${pIndex + 1}, $${pIndex + 2}, $${pIndex + 3}, $${pIndex + 4})`);
-                values.push(sessionId, sid, 'Absent', markedAt);
+                values.push(sessionId, student.id, 'Absent', markedAt);
             });
 
             const queryText = `
@@ -79,6 +73,21 @@ export async function POST(req: Request) {
             `;
 
             await query(queryText, values);
+
+            // --- Email Automation ---
+            const { sendEmail } = await import('@/lib/email');
+            const { getAttendanceEmailHtml } = await import('@/lib/email-templates');
+            const { format } = await import('date-fns');
+            const formattedDate = format(new Date(start_time), 'PPP');
+
+            // Send emails in parallel
+            // We use Promise.allSettled to ensure one failure doesn't stop the request
+            await Promise.allSettled(missingStudents.map(student => {
+                if (!student.email) return Promise.resolve();
+                const html = getAttendanceEmailHtml(student.full_name, subject_name, formattedDate, 'Absent');
+                return sendEmail(student.email, `Attendance Alert: Absent for ${subject_name}`, html);
+            }));
+            // ------------------------
         }
 
         // 4. Close the Session (Input: is_active = false)
@@ -86,7 +95,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({
             success: true,
-            message: `Session finalized. ${missingStudentIds.length} students marked Absent.`
+            message: `Session finalized. ${missingStudents.length} students marked Absent and notified via email.`
         });
 
     } catch (error: any) {

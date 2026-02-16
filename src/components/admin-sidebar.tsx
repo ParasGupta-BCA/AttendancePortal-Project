@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid, LucideIcon, ChevronRight, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid, LucideIcon, ChevronRight, ChevronDown, Mail } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 
@@ -31,6 +31,12 @@ const routes = [
                 icon: Megaphone,
                 href: "/admin/announcements",
                 color: "text-red-500",
+            },
+            {
+                label: "Emails",
+                icon: Mail,
+                href: "/admin/emails",
+                color: "text-blue-500",
             },
         ]
     },

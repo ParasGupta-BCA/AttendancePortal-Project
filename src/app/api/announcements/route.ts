@@ -56,6 +56,18 @@ export async function POST(request: Request) {
             [title, content, category, priority || 'Normal', image_data, (session.user as any).id]
         );
 
+        // --- Email Automation ---
+        // Fetch all student emails to send notification
+        const studentEmailsRes = await query(`SELECT email FROM users WHERE role = 'student'`);
+        const studentEmails = studentEmailsRes.rows.map(r => r.email);
+
+        if (studentEmails.length > 0) {
+            // Send in background
+            const { sendAnnouncementEmail } = await import('@/lib/email');
+            await sendAnnouncementEmail(studentEmails, title, content, category);
+        }
+        // ------------------------
+
         return NextResponse.json(result.rows[0], { status: 201 });
     } catch (error) {
         console.error('Failed to create announcement:', error);
