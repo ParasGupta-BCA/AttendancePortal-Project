@@ -78,7 +78,7 @@ export const getBaseLayout = (content: string, title: string) => `
                                                 <td style="padding-right: 16px;">
                                                     <img src="${process.env.NEXTAUTH_URL}/logo.png" alt="Logo" width="56" height="56" style="display: block; border-radius: 12px;" />
                                                 </td>
-                                                <td class="header-text" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 22px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.5px; vertical-align: middle;">
+                                                <td class="header-text" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 700; color: #1d1d1f; letter-spacing: -1px; vertical-align: middle; line-height: 1.1;">
                                                     Attendance Portal
                                                 </td>
                                             </tr>
