@@ -67,7 +67,7 @@ const getBaseLayout = (content: string, title: string) => `
                     
                     <!-- Header with Logo -->
                     <div style="${headerStyle}">
-                        <img src="${process.env.NEXTAUTH_URL}/logo.svg" alt="Attendance Portal" width="60" height="60" style="display: block; margin: 0 auto; border-radius: 14px;" />
+                        <img src="${process.env.NEXTAUTH_URL}/logo.png" alt="Attendance Portal" width="64" style="display: block; margin: 0 auto; border-radius: 14px;" />
                     </div>
 
                     <!-- Content -->
