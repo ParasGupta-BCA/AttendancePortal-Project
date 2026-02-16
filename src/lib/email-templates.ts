@@ -33,6 +33,7 @@ export const getBaseLayout = (content: string, title: string) => `
         .header-text { color: #1d1d1f; }
         .secondary-text { color: #86868b; }
         .divider { border-color: rgba(0,0,0,0.05); }
+        .header-border { border-right: 1px solid rgba(0,0,0,0.1); }
         .status-box { background-color: rgba(0,0,0,0.03); }
 
         /* Dark Mode Overrides */
@@ -47,6 +48,7 @@ export const getBaseLayout = (content: string, title: string) => `
             .header-text { color: #f5f5f7 !important; }
             .secondary-text { color: #a1a1a6 !important; }
             .divider { border-color: rgba(255,255,255,0.1) !important; }
+            .header-border { border-right: 1px solid rgba(255,255,255,0.15) !important; }
             .status-box { background-color: rgba(255,255,255,0.1) !important; }
             h1, h2, h3, p { color: #f5f5f7 !important; }
             .badge-text { color: #ffffff !important; } /* Ensure text inside badges is readable */
@@ -75,10 +77,10 @@ export const getBaseLayout = (content: string, title: string) => `
                                     <td align="center">
                                         <table border="0" cellspacing="0" cellpadding="0">
                                             <tr>
-                                                <td style="padding-right: 16px;">
+                                                <td class="header-border" style="padding-right: 20px;">
                                                     <img src="${process.env.NEXTAUTH_URL}/logo.png" alt="Logo" width="56" height="56" style="display: block; border-radius: 12px;" />
                                                 </td>
-                                                <td class="header-text" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 700; color: #1d1d1f; letter-spacing: -1px; vertical-align: middle; line-height: 1.1;">
+                                                <td class="header-text" style="padding-left: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 700; color: #1d1d1f; letter-spacing: -1px; vertical-align: middle; line-height: 1.1;">
                                                     Attendance Portal
                                                 </td>
                                             </tr>
