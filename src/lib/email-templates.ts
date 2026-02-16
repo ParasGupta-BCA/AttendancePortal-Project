@@ -1,87 +1,106 @@
-const baseStyles = `
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    color: #1d1d1f;
-    margin: 0;
-    padding: 0;
-    -webkit-font-smoothing: antialiased;
-`;
-
-// "Glass" container style - refined for better client support
-// We use a fallback background for clients that don't support rgba properly
-const glassCard = `
-    background-color: #ffffff;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-    border-radius: 24px;
-    padding: 48px 40px;
-    max-width: 580px;
-    margin: 40px auto;
-    text-align: left;
-`;
-
-const buttonStyle = `
-    display: inline-block;
-    background-color: #0071e3;
-    color: #ffffff;
-    text-decoration: none;
-    padding: 14px 28px;
-    border-radius: 980px;
-    font-weight: 500;
-    font-size: 15px;
-    margin-top: 24px;
-`;
-
-const headerStyle = `
-    text-align: center;
-    margin-bottom: 36px;
-`;
-
-const footerStyle = `
-    text-align: center;
-    margin-top: 48px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    font-size: 11px;
-    color: #86868b;
-    letter-spacing: 0.2px;
-`;
-
-const getBaseLayout = (content: string, title: string) => `
+export const getBaseLayout = (content: string, title: string) => `
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
     <title>${title}</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            supported-color-schemes: light dark;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            background-color: #f2f2f7;
+            color: #1d1d1f;
+        }
+
+        /* Light Mode (Default) Variables */
+        .wrapper { background-color: #f2f2f7; }
+        .card { 
+            background-color: #ffffff; 
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            color: #1d1d1f;
+        }
+        .header-text { color: #1d1d1f; }
+        .secondary-text { color: #86868b; }
+        .divider { border-color: rgba(0,0,0,0.05); }
+        .status-box { background-color: rgba(0,0,0,0.03); }
+
+        /* Dark Mode Overrides */
+        @media (prefers-color-scheme: dark) {
+            body, .wrapper { background-color: #000000 !important; }
+            .card { 
+                background-color: #1c1c1e !important; 
+                border: 1px solid rgba(255,255,255,0.1) !important;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
+                color: #f5f5f7 !important;
+            }
+            .header-text { color: #f5f5f7 !important; }
+            .secondary-text { color: #a1a1a6 !important; }
+            .divider { border-color: rgba(255,255,255,0.1) !important; }
+            .status-box { background-color: rgba(255,255,255,0.1) !important; }
+            h1, h2, h3, p { color: #f5f5f7 !important; }
+            .badge-text { color: #ffffff !important; } /* Ensure text inside badges is readable */
+        }
+
+        /* Mobile Optimization */
+        @media only screen and (max-width: 600px) {
+            .card { padding: 32px 24px !important; margin: 20px auto !important; width: 90% !important; }
+            .header-logo { width: 48px !important; height: 48px !important; }
+            .header-title { font-size: 18px !important; }
+        }
+    </style>
 </head>
-<body style="${baseStyles} background-color: #f2f2f7; padding: 20px;">
-    <!-- Outer wrapper to limit width and center -->
-    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f2f2f7;">
+<body class="wrapper" style="margin: 0; padding: 20px; background-color: #f2f2f7;">
+    <table class="wrapper" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f2f2f7; width: 100%;">
         <tr>
             <td align="center">
                 
                 <!-- Main Card -->
-                <div style="${glassCard}">
-                    
-                    <!-- Header with Logo -->
-                    <div style="${headerStyle}">
-                        <img src="${process.env.NEXTAUTH_URL}/logo.png" alt="Attendance Portal" width="64" style="display: block; margin: 0 auto; border-radius: 14px;" />
-                    </div>
+                <table class="card" width="580" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 24px; margin: 40px auto; max-width: 580px; padding: 48px 40px; text-align: left; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.08);">
+                    <tr>
+                        <td>
+                            <!-- Header with Logo and Text -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 36px;">
+                                <tr>
+                                    <td align="center">
+                                        <table border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding-right: 16px;">
+                                                    <img src="${process.env.NEXTAUTH_URL}/logo.png" alt="Logo" width="56" height="56" style="display: block; border-radius: 12px;" />
+                                                </td>
+                                                <td class="header-text" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 22px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.5px; vertical-align: middle;">
+                                                    Attendance Portal
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
 
-                    <!-- Content -->
-                    <div style="font-size: 16px; color: #1d1d1f;">
-                        ${content}
-                    </div>
+                            <!-- Content -->
+                            <div class="content-text" style="font-size: 16px; line-height: 1.5; color: #1d1d1f;">
+                                ${content}
+                            </div>
 
-                    <!-- Footer -->
-                    <div style="${footerStyle}">
-                        <p style="margin: 0;">&copy; ${new Date().getFullYear()} Attendance Portal. All rights reserved.</p>
-                        <p style="margin: 5px 0 0 0;">Automated Notification System</p>
-                    </div>
+                            <!-- Footer -->
+                            <div class="secondary-text divider" style="margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 11px; color: #86868b; text-align: center; letter-spacing: 0.2px;">
+                                <p style="margin: 0;">&copy; ${new Date().getFullYear()} Attendance Portal. All rights reserved.</p>
+                                <p style="margin: 5px 0 0 0;">Automated Notification System</p>
+                            </div>
 
-                </div>
+                        </td>
+                    </tr>
+                </table>
 
             </td>
         </tr>
@@ -93,16 +112,15 @@ const getBaseLayout = (content: string, title: string) => `
 export const getAttendanceEmailHtml = (studentName: string, subjectName: string, date: string, status: string) => {
     const isAbsent = status === 'Absent';
     const statusColor = isAbsent ? '#ff3b30' : '#34c759';
-    // Using images or simple reliable emojis/characters
     const title = isAbsent ? 'Action Required' : 'Attendance Recorded';
 
     const content = `
         <div style="text-align: center; margin-bottom: 32px;">
-            <div style="width: 50px; height: 50px; background: ${isAbsent ? 'rgba(255, 59, 48, 0.1)' : 'rgba(52, 199, 89, 0.1)'}; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; line-height: 50px; font-size: 24px;">
+            <div style="width: 54px; height: 54px; background: ${isAbsent ? 'rgba(255, 59, 48, 0.1)' : 'rgba(52, 199, 89, 0.1)'}; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 24px;">
                 ${isAbsent ? '⚠️' : '✅'}
             </div>
-            <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px; color: #1d1d1f;">${status}</h1>
-            <p style="font-size: 16px; color: #86868b; margin: 0;">${title}</p>
+            <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px;">${status}</h1>
+            <p class="secondary-text" style="font-size: 16px; color: #86868b; margin: 0;">${title}</p>
         </div>
 
         <div style="margin-bottom: 24px;">
@@ -110,25 +128,25 @@ export const getAttendanceEmailHtml = (studentName: string, subjectName: string,
             <p style="margin: 0;">Your attendance status has been updated. Please review the details below:</p>
         </div>
 
-        <div style="background: rgba(0,0,0,0.03); border-radius: 16px; padding: 20px; margin-bottom: 32px;">
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="status-box" style="background-color: rgba(0,0,0,0.03); border-radius: 16px; padding: 20px; margin-bottom: 32px;">
+            <table width="100%" style="border-collapse: collapse;">
                 <tr>
-                    <td style="padding: 8px 0; color: #86868b; font-size: 14px;">Subject</td>
+                    <td class="secondary-text" style="padding: 8px 0; color: #86868b; font-size: 14px;">Subject</td>
                     <td style="padding: 8px 0; text-align: right; font-weight: 600; font-size: 14px;">${subjectName}</td>
                 </tr>
                 <tr>
-                    <td style="padding: 8px 0; color: #86868b; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.05);">Date</td>
-                    <td style="padding: 8px 0; text-align: right; font-weight: 600; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.05);">${date}</td>
+                    <td class="secondary-text divider" style="padding: 8px 0; color: #86868b; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.05);">Date</td>
+                    <td class="divider" style="padding: 8px 0; text-align: right; font-weight: 600; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.05);">${date}</td>
                 </tr>
                 <tr>
-                    <td style="padding: 8px 0; color: #86868b; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.05);">Status</td>
-                    <td style="padding: 8px 0; text-align: right; font-weight: 600; font-size: 14px; color: ${statusColor}; border-top: 1px solid rgba(0,0,0,0.05);">${status}</td>
+                    <td class="secondary-text divider" style="padding: 8px 0; color: #86868b; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.05);">Status</td>
+                    <td class="divider" style="padding: 8px 0; text-align: right; font-weight: 600; font-size: 14px; color: ${statusColor}; border-top: 1px solid rgba(0,0,0,0.05);">${status}</td>
                 </tr>
             </table>
         </div>
 
         <div style="text-align: center;">
-            <a href="${process.env.NEXTAUTH_URL || '#'}" style="${buttonStyle}">Open Student Portal</a>
+            <a href="${process.env.NEXTAUTH_URL || '#'}" style="display: inline-block; background-color: #0071e3; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 980px; font-weight: 500; font-size: 15px;">Open Student Portal</a>
         </div>
     `;
 
@@ -136,64 +154,25 @@ export const getAttendanceEmailHtml = (studentName: string, subjectName: string,
 };
 
 export const getAnnouncementEmailHtml = (title: string, content: string, category: string) => {
-    // If Admin Notification, we treat differently
     const isGeneric = category === 'Admin Notification';
     const displayCategory = isGeneric ? 'Update' : category;
 
-    const bodyContent = `
-        <div style="margin-bottom: 24px;">
-            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #86868b;">
-                ${displayCategory}
-            </span>
-            <h2 style="font-size: 30px; font-weight: 700; margin: 12px 0 24px 0; letter-spacing: -0.6px; line-height: 1.1; color: #1d1d1f;">
-                ${title}
-            </h2>
-        </div>
-        
-        <div style="font-size: 16px; line-height: 1.6; color: #424245; margin-bottom: 40px; white-space: pre-wrap;">
-${content.replace(/<br>/g, '\n')}
-        </div>
-
-        <div style="text-align: center; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 32px;">
-            <a href="${process.env.NEXTAUTH_URL || '#'}" style="${buttonStyle}">View Dashboard</a>
-        </div>
-    `;
-
-    // Note: We use pre-wrap style above or replace newlines with BRs. 
-    // In strict HTML, white-space: pre-wrap works well for preserving formatting.
-    // But for email safety, let's revert to the replace method in the usage site or logic.
-    // Actually, in the template function called from API, we already replaced \n with <br>.
-    // Let's ensure consistency. 
-    // If content comes in with <br>, we just render it. 
-    // The previous API call replaced \n with <br> inside the function call, but here we moved logic inside?
-    // Let's check api route. It calls `getAnnouncementEmailHtml(subject, content, ...)`
-    // The previous implementation of `getAnnouncementEmailHtml` did the replacement.
-    // So we should do it here too.
-
-    const finalContent = bodyContent.replace(
-        /\${content.replace\(\/\\n\/g, '<br>'\)}/,
-        content.replace(/\n/g, '<br>')
-    );
-
-    // Correction: The string literal above with white-space: pre-wrap is good for modern clients, 
-    // but <br> is safer. Let's use the replacement in the template string directly.
-
     const safeBodyContent = `
         <div style="margin-bottom: 24px;">
-            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #86868b;">
+            <span class="badge-text" style="background-color: rgba(0, 113, 227, 0.1); color: #0071e3; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: inline-block;">
                 ${displayCategory}
             </span>
-            <h2 style="font-size: 30px; font-weight: 700; margin: 12px 0 24px 0; letter-spacing: -0.6px; line-height: 1.1; color: #1d1d1f;">
+            <h2 style="font-size: 30px; font-weight: 700; margin: 16px 0 24px 0; letter-spacing: -0.6px; line-height: 1.1;">
                 ${title}
             </h2>
         </div>
         
-        <div style="font-size: 16px; line-height: 1.6; color: #424245; margin-bottom: 40px;">
+        <div class="secondary-text" style="font-size: 16px; line-height: 1.6; color: #424245; margin-bottom: 40px;">
             ${content.replace(/\n/g, '<br>')}
         </div>
 
-        <div style="text-align: center; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 32px;">
-            <a href="${process.env.NEXTAUTH_URL || '#'}" style="${buttonStyle}">View Dashboard</a>
+        <div class="divider" style="text-align: center; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 32px;">
+            <a href="${process.env.NEXTAUTH_URL || '#'}" style="display: inline-block; background-color: #0071e3; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 980px; font-weight: 500; font-size: 15px;">View Dashboard</a>
         </div>
     `;
 
