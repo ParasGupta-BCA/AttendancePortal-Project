@@ -111,6 +111,17 @@ export const getBaseLayout = (content: string, title: string) => `
 </html>
 `;
 
+const buttonStyle = `
+    display: inline-block;
+    background-color: #0071e3;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 980px;
+    font-weight: 500;
+    font-size: 15px;
+`;
+
 export const getAttendanceEmailHtml = (studentName: string, subjectName: string, date: string, status: string) => {
     const isAbsent = status === 'Absent';
     const statusColor = isAbsent ? '#ff3b30' : '#34c759';
