@@ -180,3 +180,58 @@ export const getAnnouncementEmailHtml = (title: string, content: string, categor
 
     return getBaseLayout(safeBodyContent, title);
 };
+
+export const getAttendanceReportEmailHtml = (studentName: string, totalClasses: number, presentClasses: number, percentage: number) => {
+    let message = "Keep up the consistent work!";
+    let color = "#34c759"; // Green
+
+    if (percentage < 75) {
+        message = "Your attendance is below the 75% requirement. Please prioritize attending upcoming classes.";
+        color = "#ff3b30"; // Red
+    } else if (percentage < 85) {
+        message = "Good attendance. Try to maintain this to stay safe.";
+        color = "#ff9500"; // Orange
+    }
+
+    const content = `
+        <div style="text-align: center; margin-bottom: 32px;">
+            <p class="secondary-text" style="font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; color: #86868b;">Attendance Overview</p>
+            
+            <div style="position: relative; display: inline-block;">
+                <span style="font-size: 80px; font-weight: 800; letter-spacing: -2px; color: ${color}; line-height: 1;">${percentage}%</span>
+            </div>
+
+            <p style="font-size: 18px; font-weight: 500; margin-top: 16px; color: #1d1d1f;">${message}</p>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+            <p style="margin: 0; font-size: 16px;">Hello <strong>${studentName}</strong>,</p>
+            <p style="margin: 8px 0 0 0; color: #424245;">Here is your complete attendance summary as of today:</p>
+        </div>
+
+        <div class="status-box" style="background-color: rgba(0,0,0,0.03); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
+            <table width="100%" style="border-collapse: separate; border-spacing: 0;">
+                <tr>
+                    <td align="center" style="width: 33%; border-right: 1px solid rgba(0,0,0,0.1);">
+                        <div class="secondary-text" style="font-size: 12px; margin-bottom: 4px; color: #86868b;">Total Classes</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #1d1d1f;">${totalClasses}</div>
+                    </td>
+                    <td align="center" style="width: 33%; border-right: 1px solid rgba(0,0,0,0.1);">
+                        <div class="secondary-text" style="font-size: 12px; margin-bottom: 4px; color: #86868b;">Present</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #34c759;">${presentClasses}</div>
+                    </td>
+                    <td align="center" style="width: 33%;">
+                        <div class="secondary-text" style="font-size: 12px; margin-bottom: 4px; color: #86868b;">Absent</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #ff3b30;">${totalClasses - presentClasses}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="${process.env.NEXTAUTH_URL || '#'}" style="${buttonStyle}">View Full Report</a>
+        </div>
+    `;
+
+    return getBaseLayout(content, 'Attendance Report');
+};
