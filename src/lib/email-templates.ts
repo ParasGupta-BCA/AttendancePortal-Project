@@ -74,7 +74,7 @@ export const getBaseLayout = (content: string, title: string) => `
                             <!-- Header with Logo and Text -->
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 36px;">
                                 <tr>
-                                    <td align="center">
+                                    <td align="left">
                                         <table border="0" cellspacing="0" cellpadding="0">
                                             <tr>
                                                 <td class="header-border" style="padding-right: 20px;">
@@ -249,26 +249,22 @@ export const getAttendanceReportEmailHtml = (studentName: string, totalClasses: 
 
 export const getResetPasswordEmailHtml = (resetLink: string) => {
     const content = `
-        <div style="text-align: center; margin-bottom: 32px;">
+        <div style="text-align: left; margin-bottom: 32px;">
             <div style="width: 54px; height: 54px; background: rgba(0, 113, 227, 0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 24px;">
                 🔐
             </div>
             <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px;">Reset Your Password</h1>
-            <p class="secondary-text" style="font-size: 16px; color: #86868b; margin: 0;">Attendance Portal</p>
+            <p class="secondary-text" style="font-size: 16px; color: #86868b; margin: 0;">We received a request to reset your password.</p>
         </div>
 
-        <div style="margin-bottom: 32px; text-align: center;">
-            <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #1d1d1f;">
-                We received a request to reset your password. <br>
+        <div style="margin-bottom: 32px; text-align: left;">
+            <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.5; color: #1d1d1f;">
                 Click the button below to proceed.
             </p>
-        </div>
-
-        <div style="text-align: center; margin-bottom: 40px;">
             <a href="${resetLink}" style="${buttonStyle}">Reset Password</a>
         </div>
         
-        <div style="margin-bottom: 24px; text-align: center;">
+        <div style="margin-bottom: 24px; text-align: left;">
             <p class="secondary-text" style="margin: 0; font-size: 14px; color: #86868b;">
                 If you didn't request this, you can safely ignore this email. <br>
                 This link will expire in 1 hour.
