@@ -50,9 +50,25 @@ export const getBaseLayout = (content: string, title: string) => `
             .divider { border-color: rgba(255,255,255,0.1) !important; }
             .header-border { border-right: 1px solid rgba(255,255,255,0.15) !important; }
             .status-box { background-color: rgba(255,255,255,0.1) !important; }
-            h1, h2, h3, p { color: #f5f5f7 !important; }
-            .badge-text { color: #ffffff !important; } /* Ensure text inside badges is readable */
+            h1, h2, h3, p, td { color: #f5f5f7 !important; }
+            .badge-text { color: #ffffff !important; }
         }
+
+        /* Gmail-specific Dark Mode Overrides */
+        [data-ogsc] body, [data-ogsc] .wrapper { background-color: #000000 !important; }
+        [data-ogsc] .card { 
+            background-color: #1c1c1e !important; 
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
+            color: #f5f5f7 !important;
+        }
+        [data-ogsc] .header-text { color: #f5f5f7 !important; }
+        [data-ogsc] .secondary-text { color: #a1a1a6 !important; }
+        [data-ogsc] .divider { border-color: rgba(255,255,255,0.1) !important; }
+        [data-ogsc] .header-border { border-right: 1px solid rgba(255,255,255,0.15) !important; }
+        [data-ogsc] .status-box { background-color: rgba(255,255,255,0.1) !important; }
+        [data-ogsc] h1, [data-ogsc] h2, [data-ogsc] h3, [data-ogsc] p, [data-ogsc] td { color: #f5f5f7 !important; }
+        [data-ogsc] .badge-text { color: #ffffff !important; }
 
         /* Mobile Optimization */
         @media only screen and (max-width: 600px) {
