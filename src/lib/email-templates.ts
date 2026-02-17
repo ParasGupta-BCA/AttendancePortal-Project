@@ -79,9 +79,8 @@ export const getBaseLayout = (content: string, title: string) => `
             h1 { font-size: 24px !important; }
             h2 { font-size: 22px !important; }
             
-            /* Table responsiveness for the report */
-            td { display: block !important; width: 100% !important; text-align: center !important; border-right: none !important; border-bottom: 1px solid rgba(0,0,0,0.05) !important; padding: 12px 0 !important; }
-            td:last-child { border-bottom: none !important; }
+            /* Table responsiveness - Keep side-by-side for consistent design */
+            /* td rules removed to preserve row layout */
             
             .divider { border-color: rgba(0,0,0,0.05) !important; }
         }
