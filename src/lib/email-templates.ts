@@ -49,7 +49,10 @@ export const getBaseLayout = (content: string, title: string) => `
             .secondary-text { color: #a1a1a6 !important; }
             .divider { border-color: rgba(255,255,255,0.1) !important; }
             .header-border { border-right: 1px solid rgba(255,255,255,0.15) !important; }
-            .status-box { background-color: rgba(255,255,255,0.1) !important; }
+            .status-box { 
+                background-color: #2c2c2e !important; 
+                border: 1px solid rgba(255,255,255,0.1) !important; 
+            }
             h1, h2, h3, p, td { color: #f5f5f7 !important; }
             .badge-text { color: #ffffff !important; }
         }
@@ -66,7 +69,10 @@ export const getBaseLayout = (content: string, title: string) => `
         [data-ogsc] .secondary-text { color: #a1a1a6 !important; }
         [data-ogsc] .divider { border-color: rgba(255,255,255,0.1) !important; }
         [data-ogsc] .header-border { border-right: 1px solid rgba(255,255,255,0.15) !important; }
-        [data-ogsc] .status-box { background-color: rgba(255,255,255,0.1) !important; }
+        [data-ogsc] .status-box { 
+            background-color: #2c2c2e !important; 
+            border: 1px solid rgba(255,255,255,0.1) !important; 
+        }
         [data-ogsc] h1, [data-ogsc] h2, [data-ogsc] h3, [data-ogsc] p, [data-ogsc] td { color: #f5f5f7 !important; }
         [data-ogsc] .badge-text { color: #ffffff !important; }
 
