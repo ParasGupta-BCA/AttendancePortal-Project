@@ -126,6 +126,40 @@ export async function GET(req: Request) {
     }
 }
 
+const DAILY_GLOBAL_LIMIT = 500;
+const DAILY_STUDENT_LIMIT = 10;
+
+// Helper to check rate limits
+async function checkGlobalRateLimit() {
+    const res = await query(`
+        SELECT COUNT(*) as count FROM email_logs 
+        WHERE sent_at::date = CURRENT_DATE
+    `);
+    const count = parseInt(res.rows[0].count, 10);
+    return count < DAILY_GLOBAL_LIMIT;
+}
+
+// Helper to check student rate limit
+async function checkStudentRateLimit(email: string) {
+    const res = await query(`
+        SELECT COUNT(*) as count FROM email_logs 
+        WHERE recipient_email = $1 AND sent_at::date = CURRENT_DATE
+    `, [email]);
+    const count = parseInt(res.rows[0].count, 10);
+    return count < DAILY_STUDENT_LIMIT;
+}
+
+// Helper to log email status
+async function logEmailStatus(email: string, subject: string, status: 'Sent' | 'Failed' | 'Skipped', error?: string) {
+    await query(`
+        INSERT INTO email_logs (recipient_email, subject, status, error_message, context)
+        VALUES ($1, $2, $3, $4, 'Attendance Notification')
+    `, [email, subject, status, error]);
+}
+
+import { sendEmail } from '@/lib/email';
+import { getAttendanceEmailHtml } from '@/lib/email-templates';
+
 export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -181,30 +215,80 @@ export async function POST(req: Request) {
             sessionId = newSessionRes.rows[0].id;
         }
 
-        // 3. Upsert Attendance Records
-        // 3. Upsert Attendance Records
+        // 3. Upsert Attendance Records and Prepare for Emails
+        const studentIds = Object.keys(attendance);
         const queries = Object.entries(attendance).map(([studentId, status]) => {
             const timestamp = date + ' 12:00:00';
-            if (status === 'Present') {
-                return query(`
-                    INSERT INTO attendance_records (session_id, student_id, status, marked_at)
-                    VALUES ($1, $2, 'Present', $3::timestamp)
-                    ON CONFLICT (session_id, student_id) 
-                    DO UPDATE SET status = 'Present', marked_at = $3::timestamp
-                `, [sessionId, studentId, timestamp]);
-            } else {
-                // If marked Absent, remove record or update to Absent?
-                // Usually we just delete the 'Present' record or set to 'Absent'
-                return query(`
-                    INSERT INTO attendance_records (session_id, student_id, status, marked_at)
-                    VALUES ($1, $2, 'Absent', $3::timestamp)
-                    ON CONFLICT (session_id, student_id) 
-                    DO UPDATE SET status = 'Absent', marked_at = $3::timestamp
-                `, [sessionId, studentId, timestamp]);
-            }
+            // Always upsert
+            return query(`
+                INSERT INTO attendance_records (session_id, student_id, status, marked_at)
+                VALUES ($1, $2, $3, $4::timestamp)
+                ON CONFLICT (session_id, student_id) 
+                DO UPDATE SET status = $3, marked_at = $4::timestamp
+            `, [sessionId, studentId, status, timestamp]);
         });
 
         await Promise.all(queries);
+
+        // 4. Send Emails with Rate Limiting
+        // Fetch Subject Name
+        const subjectRes = await query('SELECT name FROM subjects WHERE id = $1', [subjectId]);
+        const subjectName = subjectRes.rows[0]?.name || 'Unknown Subject';
+
+        // Check Global Limit first
+        const canSendGlobal = await checkGlobalRateLimit();
+
+        if (!canSendGlobal) {
+            console.warn("Global email limit reached. Skipping email notifications.");
+            // We don't error out, just skip emails
+        } else {
+            // Fetch Student Emails
+            if (studentIds.length > 0) {
+                // $1, $2, ...
+                const placeholders = studentIds.map((_, i) => `$${i + 1}`).join(',');
+                const studentsInfoRes = await query(`
+                    SELECT s.id, u.email, u.full_name 
+                    FROM students s
+                    JOIN users u ON s.user_id = u.id
+                    WHERE s.id IN (${placeholders})
+                `, studentIds);
+
+                const studentMap = studentsInfoRes.rows.reduce((acc: any, row: any) => {
+                    acc[row.id] = row;
+                    return acc;
+                }, {});
+
+                // Process emails asynchronously
+                (async () => {
+                    for (const studentId of studentIds) {
+                        const student = studentMap[studentId];
+                        const status = attendance[studentId] as string;
+
+                        if (student && student.email) {
+                            // Check Student Limit
+                            const canSendStudent = await checkStudentRateLimit(student.email);
+                            const emailSubject = `Attendance Update: ${status} for ${subjectName}`;
+
+                            if (!canSendStudent) {
+                                console.warn(`Student limit reached for ${student.email}`);
+                                await logEmailStatus(student.email, emailSubject, 'Skipped', 'Daily student limit reached');
+                                continue;
+                            }
+
+                            // Generate and Send
+                            const html = getAttendanceEmailHtml(student.full_name, subjectName, date, status);
+                            const result = await sendEmail(student.email, emailSubject, html);
+
+                            if (result.success) {
+                                await logEmailStatus(student.email, emailSubject, 'Sent');
+                            } else {
+                                await logEmailStatus(student.email, emailSubject, 'Failed', JSON.stringify(result.error));
+                            }
+                        }
+                    }
+                })();
+            }
+        }
 
         return NextResponse.json({ success: true, message: 'Attendance saved successfully' });
 

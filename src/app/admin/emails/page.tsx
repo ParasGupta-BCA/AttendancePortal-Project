@@ -32,6 +32,10 @@ export default function EmailPage() {
     // Form 2: Report
     const [selectedStudentForReport, setSelectedStudentForReport] = useState<string>("");
 
+    // Email Logs
+    const [emailLogs, setEmailLogs] = useState<any[]>([]);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+
     useEffect(() => {
         // Fetch students for the dropdown
         const fetchStudents = async () => {
@@ -44,7 +48,21 @@ export default function EmailPage() {
             }
         };
         fetchStudents();
+        fetchLogs();
     }, []);
+
+    const fetchLogs = async () => {
+        setIsLoadingLogs(true);
+        try {
+            const res = await fetch("/api/admin/email-logs?limit=50");
+            const data = await res.json();
+            if (data.logs) setEmailLogs(data.logs);
+        } catch (error) {
+            console.error("Failed to fetch logs", error);
+        } finally {
+            setIsLoadingLogs(false);
+        }
+    };
 
     const onSendGeneralEmail = async (data: any) => {
         setIsLoading(true);
@@ -59,6 +77,7 @@ export default function EmailPage() {
             if (!res.ok) throw new Error(result.error || "Failed to send email");
             setStatus({ type: 'success', message: `Successfully sent ${result.count} emails.` });
             reset();
+            fetchLogs(); // Refresh logs
         } catch (error: any) {
             setStatus({ type: 'error', message: error.message });
         } finally {
@@ -91,6 +110,7 @@ export default function EmailPage() {
                 type: 'success',
                 message: `Report sent to ${result.data.student}. Usage: ${result.data.percentage}% (${result.data.present}/${result.data.total})`
             });
+            fetchLogs(); // Refresh logs
         } catch (error: any) {
             setStatus({ type: 'error', message: error.message });
         } finally {
@@ -106,7 +126,7 @@ export default function EmailPage() {
             </div>
 
             <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-8 h-auto p-1 bg-gray-100 rounded-lg">
+                <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-gray-100 rounded-lg">
                     <TabsTrigger value="general" className="py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm font-medium transition-all">
                         <Send className="w-4 h-4 mr-2" />
                         General Notification
@@ -114,6 +134,10 @@ export default function EmailPage() {
                     <TabsTrigger value="report" className="py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm font-medium transition-all">
                         <FileBarChart className="w-4 h-4 mr-2" />
                         Attendance Report
+                    </TabsTrigger>
+                    <TabsTrigger value="logs" onClick={fetchLogs} className="py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm font-medium transition-all">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Email Logs
                     </TabsTrigger>
                 </TabsList>
 
@@ -230,6 +254,56 @@ export default function EmailPage() {
                                 </Button>
                             </div>
 
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="logs">
+                    <Card className="bg-white border-gray-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-4">
+                            <CardTitle className="text-xl flex items-center gap-2 text-gray-900">
+                                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                                Email Logs
+                            </CardTitle>
+                            <CardDescription className="text-gray-500">
+                                View the history of all system-sent emails.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
+                                        <tr>
+                                            <th className="px-6 py-3">Status</th>
+                                            <th className="px-6 py-3">Recipient</th>
+                                            <th className="px-6 py-3">Subject</th>
+                                            <th className="px-6 py-3">Date</th>
+                                            <th className="px-6 py-3">Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {isLoadingLogs ? (
+                                            <tr><td colSpan={5} className="p-6 text-center text-gray-500">Loading logs...</td></tr>
+                                        ) : emailLogs.length === 0 ? (
+                                            <tr><td colSpan={5} className="p-6 text-center text-gray-500">No emails sent yet.</td></tr>
+                                        ) : (
+                                            emailLogs.map((log: any) => (
+                                                <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
+                                                    <td className="px-6 py-4">
+                                                        {log.status === 'Sent' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Sent</span>}
+                                                        {log.status === 'Failed' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>}
+                                                        {log.status === 'Skipped' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Skipped</span>}
+                                                    </td>
+                                                    <td className="px-6 py-4 font-medium text-gray-900">{log.recipient_email}</td>
+                                                    <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]">{log.subject}</td>
+                                                    <td className="px-6 py-4 text-gray-500">{new Date(log.sent_at).toLocaleString()}</td>
+                                                    <td className="px-6 py-4 text-gray-500 text-xs max-w-[200px] truncate" title={log.error_message}>{log.error_message || '-'}</td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
