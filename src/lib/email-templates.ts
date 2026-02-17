@@ -56,9 +56,34 @@ export const getBaseLayout = (content: string, title: string) => `
 
         /* Mobile Optimization */
         @media only screen and (max-width: 600px) {
-            .card { padding: 32px 24px !important; margin: 20px auto !important; width: 90% !important; }
-            .header-logo { width: 48px !important; height: 48px !important; }
-            .header-title { font-size: 18px !important; }
+            .card { 
+                padding: 24px 20px !important; 
+                margin: 12px auto !important; 
+                width: 94% !important; 
+                border-radius: 16px !important;
+            }
+            .header-text { 
+                font-size: 20px !important; 
+                padding-left: 12px !important;
+            }
+            .header-logo { 
+                width: 44px !important; 
+                height: 44px !important; 
+            }
+            .content-text { 
+                font-size: 15px !important; 
+            }
+            .status-box {
+                padding: 16px !important;
+            }
+            h1 { font-size: 24px !important; }
+            h2 { font-size: 22px !important; }
+            
+            /* Table responsiveness for the report */
+            td { display: block !important; width: 100% !important; text-align: center !important; border-right: none !important; border-bottom: 1px solid rgba(0,0,0,0.05) !important; padding: 12px 0 !important; }
+            td:last-child { border-bottom: none !important; }
+            
+            .divider { border-color: rgba(0,0,0,0.05) !important; }
         }
     </style>
 </head>
