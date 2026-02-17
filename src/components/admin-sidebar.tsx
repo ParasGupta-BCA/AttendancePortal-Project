@@ -33,7 +33,7 @@ const routes = [
                 color: "text-red-500",
             },
             {
-                label: "Emails",
+                label: "Email Center",
                 icon: Mail,
                 href: "/admin/emails",
                 color: "text-blue-500",
