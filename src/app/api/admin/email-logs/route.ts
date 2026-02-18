@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 
         // Fetch logs
         const logsRes = await query(`
-            SELECT id, recipient_email, subject, status, error_message, sent_at 
+            SELECT id, recipient_email, subject, status, error_message, sent_at, body, context, retry_count
             FROM email_logs 
             ORDER BY sent_at DESC 
             LIMIT $1 OFFSET $2
