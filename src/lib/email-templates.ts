@@ -175,7 +175,7 @@ export const getAttendanceEmailHtml = (studentName: string, subjectName: string,
 
     const content = `
         <div style="text-align: center; margin-bottom: 32px;">
-            <div style="width: 54px; height: 54px; background: ${isAbsent ? 'rgba(255, 59, 48, 0.1)' : 'rgba(52, 199, 89, 0.1)'}; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 24px;">
+            <div style="width: 54px; height: 54px; line-height: 54px; background: ${isAbsent ? 'rgba(255, 59, 48, 0.1)' : 'rgba(52, 199, 89, 0.1)'}; border-radius: 50%; display: inline-block; text-align: center; margin-bottom: 16px; font-size: 24px;">
                 ${isAbsent ? '⚠️' : '✅'}
             </div>
             <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px;">${status}</h1>
