@@ -238,7 +238,7 @@ export async function POST(req: Request) {
                         // It sent for everyone in the list.
 
                         const emailSubject = `Attendance Update: ${status} for ${subjectName}`;
-                        const html = getAttendanceEmailHtml(student.full_name, status, date, subjectName, (session.user as any).name || 'Faculty');
+                        const html = getAttendanceEmailHtml(student.full_name, subjectName, date, status);
 
                         // sendEmail handles logging, retries, and rate limits
                         await sendEmail(student.email, emailSubject, html, 'Attendance Notification');
