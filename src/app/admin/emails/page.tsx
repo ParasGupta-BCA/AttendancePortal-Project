@@ -118,6 +118,27 @@ export default function EmailPage() {
         }
     };
 
+    const onResend = async (logId: string) => {
+        setIsLoading(true);
+        setStatus(null);
+        try {
+            const res = await fetch("/api/admin/resend-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ logId }),
+            });
+            const result = await res.json();
+            if (!res.ok) throw new Error(result.error || "Failed to resend");
+
+            setStatus({ type: 'success', message: 'Email resent successfully. Check logs for new status.' });
+            fetchLogs(); // Refresh logs to see new entry
+        } catch (error: any) {
+            setStatus({ type: 'error', message: error.message });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="p-6 max-w-4xl mx-auto space-y-6">
             <div className="flex flex-col gap-2">
@@ -279,13 +300,14 @@ export default function EmailPage() {
                                             <th className="px-6 py-3">Subject</th>
                                             <th className="px-6 py-3">Date</th>
                                             <th className="px-6 py-3">Details</th>
+                                            <th className="px-6 py-3">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {isLoadingLogs ? (
-                                            <tr><td colSpan={5} className="p-6 text-center text-gray-500">Loading logs...</td></tr>
+                                            <tr><td colSpan={6} className="p-6 text-center text-gray-500">Loading logs...</td></tr>
                                         ) : emailLogs.length === 0 ? (
-                                            <tr><td colSpan={5} className="p-6 text-center text-gray-500">No emails sent yet.</td></tr>
+                                            <tr><td colSpan={6} className="p-6 text-center text-gray-500">No emails sent yet.</td></tr>
                                         ) : (
                                             emailLogs.map((log: any) => (
                                                 <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
@@ -298,6 +320,19 @@ export default function EmailPage() {
                                                     <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]">{log.subject}</td>
                                                     <td className="px-6 py-4 text-gray-500">{new Date(log.sent_at).toLocaleString()}</td>
                                                     <td className="px-6 py-4 text-gray-500 text-xs max-w-[200px] truncate" title={log.error_message}>{log.error_message || '-'}</td>
+                                                    <td className="px-6 py-4">
+                                                        {log.status === 'Failed' && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => onResend(log.id)}
+                                                                disabled={isLoading}
+                                                                className="h-7 text-xs"
+                                                            >
+                                                                Resend
+                                                            </Button>
+                                                        )}
+                                                    </td>
                                                 </tr>
                                             ))
                                         )}
