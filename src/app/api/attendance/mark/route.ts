@@ -3,6 +3,9 @@ import { query } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { validateToken } from '@/utils/dynamicQrServer';
+import { sendEmail } from '@/lib/email';
+import { getAttendanceEmailHtml } from '@/lib/email-templates';
+import { format } from 'date-fns';
 
 export async function POST(request: Request) {
     let body;
@@ -22,18 +25,29 @@ export async function POST(request: Request) {
 
     const userId = (session.user as any).id;
     let studentId: string | null = null;
+    let studentEmail: string | null = null;
+    let studentName: string | null = null;
+
     let sessionId: string | null = null;
     let scanStatus = 'ERROR';
     let logMessage = '';
     let distance = 0;
 
     try {
-        // Fetch Student ID
-        const studentRes = await query('SELECT id FROM students WHERE user_id = $1', [userId]);
+        // Fetch Student ID, Email, Name
+        const studentRes = await query(`
+            SELECT s.id, u.email, u.full_name 
+            FROM students s
+            JOIN users u ON s.user_id = u.id
+            WHERE u.id = $1
+        `, [userId]);
+
         if (studentRes.rowCount === 0) {
             throw new Error('Student profile not found');
         }
         studentId = studentRes.rows[0].id;
+        studentEmail = studentRes.rows[0].email;
+        studentName = studentRes.rows[0].full_name;
 
         // 2. Validate Inputs
         if (!qr_code) {
@@ -71,9 +85,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid QR Code Format. Please refresh.' }, { status: 400 });
         }
 
+        // Fetch Session AND Subject Name
         const sessionRes = await query(`
-            SELECT * FROM attendance_sessions 
-            WHERE qr_code = $1 AND is_active = TRUE 
+            SELECT s.*, sub.name as subject_name
+            FROM attendance_sessions s
+            JOIN timetable t ON s.timetable_id = t.id
+            JOIN subjects sub ON t.subject_id = sub.id
+            WHERE s.qr_code = $1 AND s.is_active = TRUE 
         `, [sessionSecret]);
 
         if (sessionRes.rowCount === 0) {
@@ -93,6 +111,7 @@ export async function POST(request: Request) {
 
         const attendanceSession = sessionRes.rows[0];
         sessionId = attendanceSession.id;
+        const subjectName = attendanceSession.subject_name;
 
         // 4. Time Validation
         const timeCheck = await query(`SELECT NOW() > $1 as is_expired`, [attendanceSession.end_time]);
@@ -145,6 +164,21 @@ export async function POST(request: Request) {
         `, [sessionId, studentId, lat, long]);
 
         await logScan(studentId, sessionId, 'SUCCESS', lat, long, distance, 'Attendance Marked');
+
+        // 8. Send "Present" Email Notification
+        if (studentEmail && studentName) {
+            // Non-blocking email send
+            (async () => {
+                try {
+                    const dateStr = format(new Date(), 'PPP'); // e.g. "April 29th, 2026"
+                    const html = getAttendanceEmailHtml(studentName!, subjectName, dateStr, 'Present');
+                    const subject = `Attendance Recorded: Present for ${subjectName}`;
+                    await sendEmail(studentEmail!, subject, html, 'Attendance Notification');
+                } catch (emailErr) {
+                    console.error("Failed to send Present email:", emailErr);
+                }
+            })();
+        }
 
         return NextResponse.json({ success: true, message: 'Attendance Marked Successfully' });
 
