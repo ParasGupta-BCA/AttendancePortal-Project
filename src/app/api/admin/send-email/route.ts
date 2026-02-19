@@ -21,9 +21,15 @@ export async function POST(req: Request) {
 
         let recipients: string[] = [];
 
-        // 1. Fetch Recipients
         if (recipientType === 'all') {
-            const res = await query(`SELECT email FROM users WHERE role = 'student'`);
+            const res = await query(`SELECT email FROM users WHERE LOWER(role) = 'student'`);
+            console.log("All Students Query Result:", res.rows.length);
+
+            if (res.rows.length === 0) {
+                const debugRes = await query('SELECT role, COUNT(*) FROM users GROUP BY role');
+                console.log("Debug Roles in DB:", debugRes.rows);
+            }
+
             recipients = res.rows.map(r => r.email).filter(Boolean);
         } else if (recipientType === 'single') {
             if (!studentEmail) return NextResponse.json({ error: 'Student email is required.' }, { status: 400 });
