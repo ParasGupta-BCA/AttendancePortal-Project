@@ -227,7 +227,7 @@ export async function POST(req: Request) {
                     const student = studentMap[studentId];
                     const status = attendance[studentId] as string;
 
-                    if (student && student.email && (status === 'Absent' || status === 'Late')) {
+                    if (student && student.email && (status === 'Absent' || status === 'Late' || status === 'Present')) {
                         // Only send for Absent/Late if desired, or all? 
                         // Previous logic implied filtering for output but code sent for all in list? 
                         // Actually previously it didn't filter status in the loop, it just sent. 
