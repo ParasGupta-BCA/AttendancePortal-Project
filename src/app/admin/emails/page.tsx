@@ -35,7 +35,7 @@ export default function EmailPage() {
     // Email Logs
     const [emailLogs, setEmailLogs] = useState<any[]>([]);
     const [isLoadingLogs, setIsLoadingLogs] = useState(false);
-    const [visibleCount, setVisibleCount] = useState(50);
+    const [visibleCount, setVisibleCount] = useState(10);
     const [totalLogs, setTotalLogs] = useState(0);
 
     useEffect(() => {
@@ -362,7 +362,8 @@ export default function EmailPage() {
                                     <Button
                                         variant="outline"
                                         onClick={() => {
-                                            const newCount = visibleCount + 50;
+                                            const newCount = visibleCount + 10;
+                                            setVisibleCount(newCount);
                                             setVisibleCount(newCount);
                                             // Trigger immediate fetch with new count
                                             // We can't rely on interval immediately, so call it manually.
