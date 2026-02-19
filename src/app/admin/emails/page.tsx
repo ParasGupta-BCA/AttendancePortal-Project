@@ -64,6 +64,14 @@ export default function EmailPage() {
         }
     };
 
+    // Auto-refresh every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchLogs();
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     const onSendGeneralEmail = async (data: any) => {
         setIsLoading(true);
         setStatus(null);
@@ -315,7 +323,9 @@ export default function EmailPage() {
                                                         {log.status === 'Sent' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Sent</span>}
                                                         {log.status === 'Failed' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Failed</span>}
                                                         {log.status === 'Skipped' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Skipped</span>}
+                                                        {log.status === 'Sending' && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 animate-pulse">Sending...</span>}
                                                     </td>
+
                                                     <td className="px-6 py-4 font-medium text-gray-900">{log.recipient_email}</td>
                                                     <td className="px-6 py-4 text-gray-600 truncate max-w-[200px]">{log.subject}</td>
                                                     <td className="px-6 py-4 text-gray-500">{new Date(log.sent_at).toLocaleString()}</td>

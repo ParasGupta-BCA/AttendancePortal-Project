@@ -47,24 +47,37 @@ async function checkStudentRateLimit(email: string) {
     }
 }
 
-// Helper: Log Email
+// Helper: Log Email (Returns ID)
 async function logEmail(recipient: string, subject: string, body: string, status: string, error: string | null = null, context: string = 'Notification') {
     try {
-        await query(`
+        const res = await query(`
             INSERT INTO email_logs (recipient_email, subject, body, status, error_message, context, retry_count)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `, [recipient, subject, body, status, error, context, 0]); // Init retry_count 0 for log, though we might have retried internally
+            RETURNING id
+        `, [recipient, subject, body, status, error, context, 0]);
+        return res.rows[0]?.id;
     } catch (logError) {
         console.error("Failed to log email:", logError);
+        return null;
+    }
+}
+
+// Helper: Update Email Status
+async function updateEmailStatus(id: string, status: string, error: string | null = null, retryCount: number = 0) {
+    try {
+        await query(`
+            UPDATE email_logs 
+            SET status = $1, error_message = $2, retry_count = $3
+            WHERE id = $4
+        `, [status, error, retryCount, id]);
+    } catch (logError) {
+        console.error("Failed to update email log:", logError);
     }
 }
 
 export const sendEmail = async (to: string | string[], subject: string, html: string, context: string = 'Notification') => {
     // Normalize 'to' to array for processing, but we mostly expect single emails for transactional
     const recipients = Array.isArray(to) ? to : [to];
-
-    // If multiple recipients, we process them individually to ensure logging and limits
-    // Note: detailed per-recipient logging is best.
 
     // Check Global Limit
     if (!(await checkGlobalRateLimit())) {
@@ -83,6 +96,9 @@ export const sendEmail = async (to: string | string[], subject: string, html: st
             continue;
         }
 
+        // 1. Log as Sending
+        const logId = await logEmail(recipient, subject, html, 'Sending', null, context);
+
         let attempts = 0;
         let sent = false;
         let lastError: any = null;
@@ -100,8 +116,8 @@ export const sendEmail = async (to: string | string[], subject: string, html: st
                 const info = await transporter.sendMail(mailOptions);
                 console.log(`Message sent to ${recipient}: %s`, info.messageId);
 
-                // Log Success
-                await logEmail(recipient, subject, html, 'Sent', null, context);
+                // 2. Update to Sent
+                if (logId) await updateEmailStatus(logId, 'Sent', null, attempts - 1); // retry_count is attempts-1 if 1st try works
                 results.push({ recipient, success: true, messageId: info.messageId });
                 sent = true;
 
@@ -113,9 +129,11 @@ export const sendEmail = async (to: string | string[], subject: string, html: st
         }
 
         if (!sent) {
-            // Log Failure after retries
+            // 3. Update to Failed
             const errorMsg = lastError?.message || "Unknown error";
-            await logEmail(recipient, subject, html, 'Failed', errorMsg, context);
+            if (logId) await updateEmailStatus(logId, 'Failed', errorMsg, attempts);
+            else await logEmail(recipient, subject, html, 'Failed', errorMsg, context); // Fallback if initial log failed
+
             results.push({ recipient, success: false, error: errorMsg });
         }
     }
