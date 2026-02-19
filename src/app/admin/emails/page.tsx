@@ -51,8 +51,8 @@ export default function EmailPage() {
         fetchLogs();
     }, []);
 
-    const fetchLogs = async () => {
-        setIsLoadingLogs(true);
+    const fetchLogs = async (background: boolean = false) => {
+        if (!background) setIsLoadingLogs(true);
         try {
             const res = await fetch("/api/admin/email-logs?limit=50");
             const data = await res.json();
@@ -60,14 +60,14 @@ export default function EmailPage() {
         } catch (error) {
             console.error("Failed to fetch logs", error);
         } finally {
-            setIsLoadingLogs(false);
+            if (!background) setIsLoadingLogs(false);
         }
     };
 
-    // Auto-refresh every 5 seconds
+    // Auto-refresh every 5 seconds (Silent background refresh)
     useEffect(() => {
         const interval = setInterval(() => {
-            fetchLogs();
+            fetchLogs(true);
         }, 5000);
         return () => clearInterval(interval);
     }, []);
@@ -164,7 +164,7 @@ export default function EmailPage() {
                         <FileBarChart className="w-4 h-4 mr-2" />
                         Attendance Report
                     </TabsTrigger>
-                    <TabsTrigger value="logs" onClick={fetchLogs} className="py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm font-medium transition-all">
+                    <TabsTrigger value="logs" onClick={() => fetchLogs()} className="py-2.5 rounded-md data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-sm font-medium transition-all">
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Email Logs
                     </TabsTrigger>
