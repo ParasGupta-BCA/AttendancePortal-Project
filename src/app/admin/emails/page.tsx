@@ -35,6 +35,8 @@ export default function EmailPage() {
     // Email Logs
     const [emailLogs, setEmailLogs] = useState<any[]>([]);
     const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(50);
+    const [totalLogs, setTotalLogs] = useState(0);
 
     useEffect(() => {
         // Fetch students for the dropdown
@@ -54,9 +56,12 @@ export default function EmailPage() {
     const fetchLogs = async (background: boolean = false) => {
         if (!background) setIsLoadingLogs(true);
         try {
-            const res = await fetch("/api/admin/email-logs?limit=50");
+            const res = await fetch(`/api/admin/email-logs?limit=${visibleCount}`);
             const data = await res.json();
-            if (data.logs) setEmailLogs(data.logs);
+            if (data.logs) {
+                setEmailLogs(data.logs);
+                setTotalLogs(data.total || 0);
+            }
         } catch (error) {
             console.error("Failed to fetch logs", error);
         } finally {
@@ -65,12 +70,15 @@ export default function EmailPage() {
     };
 
     // Auto-refresh every 5 seconds (Silent background refresh)
+    // Also triggers initial fetch and re-fetch when visibleCount changes
     useEffect(() => {
+        fetchLogs(false); // Show loading state on mount and when count changes (Show More)
+
         const interval = setInterval(() => {
-            fetchLogs(true);
+            fetchLogs(true); // Silent update for polling
         }, 5000);
         return () => clearInterval(interval);
-    }, []);
+    }, [visibleCount]);
 
     const onSendGeneralEmail = async (data: any) => {
         setIsLoading(true);
@@ -349,6 +357,31 @@ export default function EmailPage() {
                                     </tbody>
                                 </table>
                             </div>
+                            {emailLogs.length < totalLogs && (
+                                <div className="p-4 border-t border-gray-100 flex justify-center bg-gray-50/50">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            const newCount = visibleCount + 50;
+                                            setVisibleCount(newCount);
+                                            // Trigger immediate fetch with new count
+                                            // We can't rely on interval immediately, so call it manually.
+                                            // But since visibleCount is state, we must wait or use a ref? 
+                                            // Ideally useEffect([visibleCount]) handling fetch would be better, 
+                                            // but we already split auto-refresh. 
+                                            // Simplest: just set state, and let a separate effect or manual call handle it.
+                                            // Actually, simplest is to just call fetchLogs() but it uses closure variable 'visibleCount'.
+                                            // We need to wait for re-render. 
+                                            // Better approach: Add useEffect for visibleCount change?
+                                            // Or simpler: pass the new count to fetchLogs if we refactor it?
+                                            // Given constraint, let's add a useEffect for visibleCount change to trigger fetchLogs.
+                                        }}
+                                        className="text-gray-600"
+                                    >
+                                        Show More ({totalLogs - emailLogs.length} remaining)
+                                    </Button>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
