@@ -175,8 +175,14 @@ export const getAttendanceEmailHtml = (studentName: string, subjectName: string,
 
     const content = `
         <div style="text-align: center; margin-bottom: 32px;">
-            <div style="width: 54px; height: 54px; line-height: 54px; background: ${isAbsent ? 'rgba(255, 59, 48, 0.1)' : 'rgba(52, 199, 89, 0.1)'}; border-radius: 50%; display: inline-block; text-align: center; margin-bottom: 16px; font-size: 24px;">
-                ${isAbsent ? '⚠️' : '✅'}
+            <div style="width: 54px; height: 54px; background: ${isAbsent ? 'rgba(255, 59, 48, 0.1)' : 'rgba(52, 199, 89, 0.1)'}; border-radius: 50%; display: inline-block; margin-bottom: 16px;">
+                <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center" valign="middle" style="font-size: 24px; line-height: 1;">
+                            ${isAbsent ? '⚠️' : '✅'}
+                        </td>
+                    </tr>
+                </table>
             </div>
             <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px;">${status}</h1>
             <p class="secondary-text" style="font-size: 16px; color: #86868b; margin: 0;">${title}</p>
@@ -296,8 +302,14 @@ export const getAttendanceReportEmailHtml = (studentName: string, totalClasses: 
 export const getResetPasswordEmailHtml = (resetLink: string) => {
     const content = `
         <div style="text-align: center; margin-bottom: 32px;">
-            <div style="width: 54px; height: 54px; line-height: 54px; background: rgba(0, 113, 227, 0.1); border-radius: 50%; display: inline-block; text-align: center; margin-bottom: 16px; font-size: 24px;">
-                🔐
+            <div style="width: 54px; height: 54px; background: rgba(0, 113, 227, 0.1); border-radius: 50%; display: inline-block; margin-bottom: 16px;">
+                <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="center" valign="middle" style="font-size: 24px; line-height: 1;">
+                            🔐
+                        </td>
+                    </tr>
+                </table>
             </div>
             <h1 style="font-size: 26px; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px;">Reset Your Password</h1>
             <p class="secondary-text" style="font-size: 16px; color: #86868b; margin: 0;">Attendance Portal</p>
