@@ -30,6 +30,7 @@ export function AnnouncementManagement() {
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
 
     // Form State
     const [title, setTitle] = useState("");
@@ -74,13 +75,37 @@ export function AnnouncementManagement() {
         reader.readAsDataURL(file);
     };
 
+    const resetForm = () => {
+        setTitle("");
+        setContent("");
+        setCategory("General");
+        setPriority("Normal");
+        setImageData(null);
+        setCesDate("");
+        setEditingId(null);
+    };
+
+    const handleEdit = (item: Announcement) => {
+        setEditingId(item.id);
+        setTitle(item.title);
+        setContent(item.content);
+        setCategory(item.category);
+        setPriority(item.priority);
+        setImageData(item.image_data || null);
+        setCesDate(item.ces_date ? new Date(item.ces_date).toISOString().split('T')[0] : "");
+        setIsDialogOpen(true);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
 
         try {
-            const res = await fetch('/api/announcements', {
-                method: 'POST',
+            const url = editingId ? `/api/announcements/${editingId}` : '/api/announcements';
+            const method = editingId ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title,
@@ -94,21 +119,15 @@ export function AnnouncementManagement() {
 
             if (!res.ok) {
                 const err = await res.json();
-                throw new Error(err.error || 'Failed to create');
+                throw new Error(err.error || `Failed to ${editingId ? 'update' : 'create'}`);
             }
 
-            // Reset form
-            setTitle("");
-            setContent("");
-            setCategory("General");
-            setPriority("Normal");
-            setImageData(null);
-            setCesDate("");
+            resetForm();
             setIsDialogOpen(false);
             fetchAnnouncements();
         } catch (error) {
             console.error(error);
-            alert("Failed to post announcement");
+            alert(`Failed to ${editingId ? 'update' : 'post'} announcement`);
         } finally {
             setSubmitting(false);
         }
@@ -132,7 +151,10 @@ export function AnnouncementManagement() {
                     <h2 className="text-2xl font-bold tracking-tight">Announcements</h2>
                     <p className="text-muted-foreground">Manage announcements for students and faculty.</p>
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                    setIsDialogOpen(open);
+                    if (!open) resetForm();
+                }}>
                     <DialogTrigger asChild>
                         <Button>
                             <Plus className="mr-2 w-4 h-4" /> New Announcement
@@ -140,9 +162,9 @@ export function AnnouncementManagement() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[600px]">
                         <DialogHeader>
-                            <DialogTitle>Create Announcement</DialogTitle>
+                            <DialogTitle>{editingId ? 'Edit Announcement' : 'Create Announcement'}</DialogTitle>
                             <DialogDescription>
-                                Post a new announcement visible to everyone.
+                                {editingId ? 'Update the announcement details below.' : 'Post a new announcement visible to everyone.'}
                             </DialogDescription>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="space-y-4 py-2">
@@ -258,7 +280,9 @@ export function AnnouncementManagement() {
 
                             <DialogFooter>
                                 <Button type="submit" disabled={submitting}>
-                                    {submitting ? 'Posting...' : 'Post Announcement'}
+                                    {submitting
+                                        ? (editingId ? 'Saving...' : 'Posting...')
+                                        : (editingId ? 'Save Changes' : 'Post Announcement')}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -279,14 +303,24 @@ export function AnnouncementManagement() {
                                 <Badge variant={item.priority === 'Urgent' ? 'destructive' : 'secondary'}>
                                     {item.category}
                                 </Badge>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={() => handleDelete(item.id)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-blue-500"
+                                        onClick={() => handleEdit(item)}
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-red-500"
+                                        onClick={() => handleDelete(item.id)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             </div>
                             <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
                             <CardDescription className="text-xs">
