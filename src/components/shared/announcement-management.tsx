@@ -92,7 +92,7 @@ export function AnnouncementManagement() {
         setCategory(item.category);
         setPriority(item.priority);
         setImageData(item.image_data || null);
-        setCesDate(item.ces_date ? new Date(item.ces_date).toISOString().split('T')[0] : "");
+        setCesDate(item.ces_date ? item.ces_date.toString().split('T')[0] : "");
         setIsDialogOpen(true);
     };
 
@@ -324,13 +324,16 @@ export function AnnouncementManagement() {
                             </div>
                             <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
                             <CardDescription className="text-xs">
-                                {format(new Date(item.created_at), 'MMM d, yyyy')} • {item.author_name}
-                                {item.ces_date && (
+                                <span>
+                                    {(() => { try { return format(new Date(item.created_at), 'MMM d, yyyy'); } catch { return String(item.created_at).split('T')[0]; } })()}
+                                    {' \u2022 '}{item.author_name}
+                                </span>
+                                {item.ces_date ? (
                                     <span className="block mt-1 text-blue-600 dark:text-blue-400 font-medium">
                                         <CalendarDays className="inline-block w-3 h-3 mr-1 -mt-0.5" />
-                                        CES: {format(new Date(item.ces_date + 'T00:00:00'), 'MMM d, yyyy')}
+                                        CES: {(() => { try { return format(new Date(String(item.ces_date).split('T')[0] + 'T00:00:00'), 'MMM d, yyyy'); } catch { return String(item.ces_date).split('T')[0]; } })()}
                                     </span>
-                                )}
+                                ) : null}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
