@@ -337,9 +337,16 @@ export const getResetPasswordEmailHtml = (resetLink: string) => {
     return getBaseLayout(content, 'Reset Password');
 };
 
-export const getReminderEmailHtml = (title: string, content: string, category: string, eventDate: string) => {
-    // Format the date for display
-    const dateObj = new Date(eventDate + 'T00:00:00');
+export const getReminderEmailHtml = (title: string, content: string, category: string, eventDate: string | Date) => {
+    // Format the date for display — handle both Date objects (from PostgreSQL) and strings
+    let dateObj: Date;
+    if (eventDate instanceof Date) {
+        dateObj = eventDate;
+    } else {
+        // If it's a string like "2026-02-22", parse safely
+        const dateStr = String(eventDate).split('T')[0];
+        dateObj = new Date(dateStr + 'T00:00:00');
+    }
     const formattedDate = dateObj.toLocaleDateString('en-IN', {
         weekday: 'long',
         year: 'numeric',

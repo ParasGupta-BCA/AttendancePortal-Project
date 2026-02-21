@@ -190,7 +190,7 @@ export const sendAnnouncementEmail = async (bcc: string[], title: string, conten
 // Import reminder template
 import { getReminderEmailHtml } from './email-templates';
 
-export const sendReminderEmail = async (emails: string[], title: string, content: string, category: string, eventDate: string) => {
+export const sendReminderEmail = async (emails: string[], title: string, content: string, category: string, eventDate: string | Date) => {
     try {
         if (emails.length === 0) return { success: true, sent: 0 };
 

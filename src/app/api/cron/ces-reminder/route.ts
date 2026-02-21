@@ -9,7 +9,7 @@ export async function GET(req: Request) {
         // 1. Security Check (CRON_SECRET)
         const authHeader = req.headers.get('authorization');
         if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-            // Allow bypassing in development if needed
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         // 2. Find ALL announcements with event_date scheduled for TOMORROW (any category)
