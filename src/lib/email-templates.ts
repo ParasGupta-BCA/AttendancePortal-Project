@@ -336,3 +336,116 @@ export const getResetPasswordEmailHtml = (resetLink: string) => {
 
     return getBaseLayout(content, 'Reset Password');
 };
+
+export const getCesReminderEmailHtml = (title: string, content: string, cesDate: string) => {
+    // Format the date for display
+    const dateObj = new Date(cesDate + 'T00:00:00');
+    const formattedDate = dateObj.toLocaleDateString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+
+    const safeBodyContent = `
+        <!-- Icon Circle — No emoji, pure HTML/CSS -->
+        <div style="text-align: center; margin-bottom: 32px;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center">
+                        <table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" valign="middle" width="64" height="64" style="width: 64px; height: 64px; background-color: rgba(0, 113, 227, 0.1); border-radius: 50%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #0071e3; line-height: 64px; text-align: center;">
+                                    C
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <h1 style="font-size: 28px; font-weight: 700; margin: 20px 0 8px 0; letter-spacing: -0.8px; line-height: 1.1; color: #1d1d1f;">
+                CES Tomorrow
+            </h1>
+            <p class="secondary-text" style="font-size: 15px; color: #86868b; margin: 0; font-weight: 400;">
+                Continuous Evaluation System
+            </p>
+        </div>
+
+        <!-- Tomorrow Badge -->
+        <div style="text-align: center; margin-bottom: 28px;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center">
+                        <table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="center" style="background-color: #0071e3; color: #ffffff; padding: 10px 24px; border-radius: 980px; font-size: 13px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                                    SCHEDULED FOR TOMORROW
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Announcement Title -->
+        <div style="margin-bottom: 20px;">
+            <span class="badge-text" style="background-color: rgba(255, 149, 0, 0.1); color: #ff9500; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: inline-block;">
+                CES
+            </span>
+            <h2 style="font-size: 24px; font-weight: 700; margin: 14px 0 0 0; letter-spacing: -0.4px; line-height: 1.2; color: #1d1d1f;">
+                ${title}
+            </h2>
+        </div>
+
+        <!-- Content -->
+        <div class="secondary-text" style="font-size: 15px; line-height: 1.65; color: #424245; margin-bottom: 28px;">
+            ${content.replace(/\n/g, '<br>')}
+        </div>
+
+        <!-- Date Details Card -->
+        <div class="status-box" style="background-color: rgba(0,0,0,0.03); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
+            <table width="100%" style="border-collapse: collapse;">
+                <tr>
+                    <td class="secondary-text" style="padding: 10px 0; color: #86868b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;">
+                        Date
+                    </td>
+                    <td style="padding: 10px 0; text-align: right; font-weight: 600; font-size: 15px; color: #1d1d1f;">
+                        ${formattedDate}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="secondary-text divider" style="padding: 10px 0; color: #86868b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; border-top: 1px solid rgba(0,0,0,0.05);">
+                        Type
+                    </td>
+                    <td class="divider" style="padding: 10px 0; text-align: right; font-weight: 600; font-size: 15px; color: #ff9500; border-top: 1px solid rgba(0,0,0,0.05);">
+                        Continuous Evaluation
+                    </td>
+                </tr>
+                <tr>
+                    <td class="secondary-text divider" style="padding: 10px 0; color: #86868b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; border-top: 1px solid rgba(0,0,0,0.05);">
+                        Status
+                    </td>
+                    <td class="divider" style="padding: 10px 0; text-align: right; font-weight: 600; font-size: 15px; color: #0071e3; border-top: 1px solid rgba(0,0,0,0.05);">
+                        Upcoming
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Preparation Note -->
+        <div style="background-color: rgba(255, 149, 0, 0.06); border-radius: 12px; padding: 16px 20px; margin-bottom: 32px; border-left: 3px solid #ff9500;">
+            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #1d1d1f; font-weight: 500;">
+                Please ensure you are well-prepared. Review your notes and coursework for tomorrow's evaluation.
+            </p>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="divider" style="text-align: center; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 32px;">
+            <a href="${process.env.NEXTAUTH_URL || '#'}" style="display: inline-block; background-color: #0071e3; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 980px; font-weight: 500; font-size: 15px;">View Dashboard</a>
+        </div>
+    `;
+
+    return getBaseLayout(safeBodyContent, `CES Reminder: ${title}`);
+};

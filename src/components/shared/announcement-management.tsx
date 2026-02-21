@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
-import { Trash2, Edit, Plus, Upload, X, Save, AlertCircle } from "lucide-react";
+import { Trash2, Edit, Plus, Upload, X, Save, AlertCircle, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,7 @@ interface Announcement {
     category: string;
     priority: string;
     image_data?: string;
+    ces_date?: string;
     created_at: string;
     author_name: string;
 }
@@ -36,6 +37,7 @@ export function AnnouncementManagement() {
     const [category, setCategory] = useState("General");
     const [priority, setPriority] = useState("Normal");
     const [imageData, setImageData] = useState<string | null>(null);
+    const [cesDate, setCesDate] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -85,7 +87,8 @@ export function AnnouncementManagement() {
                     content,
                     category,
                     priority,
-                    image_data: imageData
+                    image_data: imageData,
+                    ces_date: category === 'CES' ? cesDate : undefined
                 }),
             });
 
@@ -100,6 +103,7 @@ export function AnnouncementManagement() {
             setCategory("General");
             setPriority("Normal");
             setImageData(null);
+            setCesDate("");
             setIsDialogOpen(false);
             fetchAnnouncements();
         } catch (error) {
@@ -196,6 +200,26 @@ export function AnnouncementManagement() {
                                 />
                             </div>
 
+                            {category === "CES" && (
+                                <div className="space-y-2">
+                                    <Label htmlFor="cesDate">
+                                        <CalendarDays className="inline-block w-4 h-4 mr-1.5 -mt-0.5" />
+                                        CES Date
+                                    </Label>
+                                    <Input
+                                        id="cesDate"
+                                        type="date"
+                                        value={cesDate}
+                                        onChange={(e) => setCesDate(e.target.value)}
+                                        required
+                                        min={new Date().toISOString().split('T')[0]}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Students will receive an automatic reminder email the day before this date.
+                                    </p>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <Label>Attachment (Image)</Label>
                                 <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
@@ -267,6 +291,12 @@ export function AnnouncementManagement() {
                             <CardTitle className="text-lg line-clamp-1">{item.title}</CardTitle>
                             <CardDescription className="text-xs">
                                 {format(new Date(item.created_at), 'MMM d, yyyy')} • {item.author_name}
+                                {item.ces_date && (
+                                    <span className="block mt-1 text-blue-600 dark:text-blue-400 font-medium">
+                                        <CalendarDays className="inline-block w-3 h-3 mr-1 -mt-0.5" />
+                                        CES: {format(new Date(item.ces_date + 'T00:00:00'), 'MMM d, yyyy')}
+                                    </span>
+                                )}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

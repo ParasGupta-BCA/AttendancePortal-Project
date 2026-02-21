@@ -3,6 +3,10 @@
         {
             "path": "/api/cron/weekly-report",
             "schedule": "0 17 * * 5"
+        },
+        {
+            "path": "/api/cron/ces-reminder",
+            "schedule": "30 12 * * *"
         }
     ]
 }
