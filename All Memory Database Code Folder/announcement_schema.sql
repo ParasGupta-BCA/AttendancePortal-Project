@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS announcements (
     image_data TEXT, -- Base64 string for image
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     is_active BOOLEAN DEFAULT TRUE,
+    event_date DATE, -- Optional date for reminders (required for CES, optional for others)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -15,3 +16,5 @@ CREATE TABLE IF NOT EXISTS announcements (
 -- Index for faster queries by category and date
 CREATE INDEX idx_announcements_created_at ON announcements(created_at DESC);
 CREATE INDEX idx_announcements_category ON announcements(category);
+CREATE INDEX idx_announcements_event_date ON announcements(event_date);
+

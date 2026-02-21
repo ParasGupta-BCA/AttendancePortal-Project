@@ -337,15 +337,26 @@ export const getResetPasswordEmailHtml = (resetLink: string) => {
     return getBaseLayout(content, 'Reset Password');
 };
 
-export const getCesReminderEmailHtml = (title: string, content: string, cesDate: string) => {
+export const getReminderEmailHtml = (title: string, content: string, category: string, eventDate: string) => {
     // Format the date for display
-    const dateObj = new Date(cesDate + 'T00:00:00');
+    const dateObj = new Date(eventDate + 'T00:00:00');
     const formattedDate = dateObj.toLocaleDateString('en-IN', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
     });
+
+    // Category-specific styling
+    const categoryConfig: Record<string, { icon: string; color: string; bgColor: string; subtitle: string; prepNote: string }> = {
+        'CES': { icon: 'C', color: '#ff9500', bgColor: 'rgba(255, 149, 0, 0.1)', subtitle: 'Continuous Evaluation System', prepNote: 'Please ensure you are well-prepared. Review your notes and coursework for tomorrow\'s evaluation.' },
+        'Exam': { icon: 'E', color: '#ff3b30', bgColor: 'rgba(255, 59, 48, 0.1)', subtitle: 'Upcoming Examination', prepNote: 'Please ensure you are well-prepared. Review your notes and syllabus for tomorrow\'s exam.' },
+        'Event': { icon: 'E', color: '#5856d6', bgColor: 'rgba(88, 86, 214, 0.1)', subtitle: 'Upcoming Event', prepNote: 'Don\'t miss out! Make sure to attend tomorrow\'s event on time.' },
+        'Holiday': { icon: 'H', color: '#34c759', bgColor: 'rgba(52, 199, 89, 0.1)', subtitle: 'Holiday Notice', prepNote: 'Enjoy your holiday! Classes will resume as per the regular schedule.' },
+        'General': { icon: 'G', color: '#0071e3', bgColor: 'rgba(0, 113, 227, 0.1)', subtitle: 'General Announcement', prepNote: 'Please take note of this important announcement for tomorrow.' },
+    };
+
+    const config = categoryConfig[category] || categoryConfig['General'];
 
     const safeBodyContent = `
         <!-- Icon Circle — No emoji, pure HTML/CSS -->
@@ -355,8 +366,8 @@ export const getCesReminderEmailHtml = (title: string, content: string, cesDate:
                     <td align="center">
                         <table border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td align="center" valign="middle" width="64" height="64" style="width: 64px; height: 64px; background-color: rgba(0, 113, 227, 0.1); border-radius: 50%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #0071e3; line-height: 64px; text-align: center;">
-                                    C
+                                <td align="center" valign="middle" width="64" height="64" style="width: 64px; height: 64px; background-color: ${config.bgColor}; border-radius: 50%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: ${config.color}; line-height: 64px; text-align: center;">
+                                    ${config.icon}
                                 </td>
                             </tr>
                         </table>
@@ -365,10 +376,10 @@ export const getCesReminderEmailHtml = (title: string, content: string, cesDate:
             </table>
 
             <h1 style="font-size: 28px; font-weight: 700; margin: 20px 0 8px 0; letter-spacing: -0.8px; line-height: 1.1; color: #1d1d1f;">
-                CES Tomorrow
+                ${category} Tomorrow
             </h1>
             <p class="secondary-text" style="font-size: 15px; color: #86868b; margin: 0; font-weight: 400;">
-                Continuous Evaluation System
+                ${config.subtitle}
             </p>
         </div>
 
@@ -391,8 +402,8 @@ export const getCesReminderEmailHtml = (title: string, content: string, cesDate:
 
         <!-- Announcement Title -->
         <div style="margin-bottom: 20px;">
-            <span class="badge-text" style="background-color: rgba(255, 149, 0, 0.1); color: #ff9500; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: inline-block;">
-                CES
+            <span class="badge-text" style="background-color: ${config.bgColor}; color: ${config.color}; padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: inline-block;">
+                ${category}
             </span>
             <h2 style="font-size: 24px; font-weight: 700; margin: 14px 0 0 0; letter-spacing: -0.4px; line-height: 1.2; color: #1d1d1f;">
                 ${title}
@@ -419,8 +430,8 @@ export const getCesReminderEmailHtml = (title: string, content: string, cesDate:
                     <td class="secondary-text divider" style="padding: 10px 0; color: #86868b; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; border-top: 1px solid rgba(0,0,0,0.05);">
                         Type
                     </td>
-                    <td class="divider" style="padding: 10px 0; text-align: right; font-weight: 600; font-size: 15px; color: #ff9500; border-top: 1px solid rgba(0,0,0,0.05);">
-                        Continuous Evaluation
+                    <td class="divider" style="padding: 10px 0; text-align: right; font-weight: 600; font-size: 15px; color: ${config.color}; border-top: 1px solid rgba(0,0,0,0.05);">
+                        ${category}
                     </td>
                 </tr>
                 <tr>
@@ -435,9 +446,9 @@ export const getCesReminderEmailHtml = (title: string, content: string, cesDate:
         </div>
 
         <!-- Preparation Note -->
-        <div style="background-color: rgba(255, 149, 0, 0.06); border-radius: 12px; padding: 16px 20px; margin-bottom: 32px; border-left: 3px solid #ff9500;">
+        <div style="background-color: ${config.bgColor}; border-radius: 12px; padding: 16px 20px; margin-bottom: 32px; border-left: 3px solid ${config.color};">
             <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #1d1d1f; font-weight: 500;">
-                Please ensure you are well-prepared. Review your notes and coursework for tomorrow's evaluation.
+                ${config.prepNote}
             </p>
         </div>
 
@@ -447,5 +458,6 @@ export const getCesReminderEmailHtml = (title: string, content: string, cesDate:
         </div>
     `;
 
-    return getBaseLayout(safeBodyContent, `CES Reminder: ${title}`);
+    return getBaseLayout(safeBodyContent, `${category} Reminder: ${title}`);
 };
+

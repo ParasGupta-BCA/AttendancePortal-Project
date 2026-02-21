@@ -43,15 +43,15 @@ export async function PUT(
         }
 
         const body = await request.json();
-        const { title, content, category, priority, image_data, ces_date } = body;
+        const { title, content, category, priority, image_data, event_date } = body;
 
         if (!title || !content || !category) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
-        // Validate CES date is required for CES category
-        if (category === 'CES' && !ces_date) {
-            return NextResponse.json({ error: 'CES Date is required for CES announcements' }, { status: 400 });
+        // Validate event date is required for CES category
+        if (category === 'CES' && !event_date) {
+            return NextResponse.json({ error: 'Date is required for CES announcements' }, { status: 400 });
         }
 
         // Validate image size
@@ -61,10 +61,10 @@ export async function PUT(
 
         const result = await query(
             `UPDATE announcements 
-             SET title = $1, content = $2, category = $3, priority = $4, image_data = $5, ces_date = $6, updated_at = NOW()
+             SET title = $1, content = $2, category = $3, priority = $4, image_data = $5, event_date = $6, updated_at = NOW()
              WHERE id = $7 AND is_active = true
              RETURNING *`,
-            [title, content, category, priority || 'Normal', image_data, category === 'CES' ? ces_date : null, id]
+            [title, content, category, priority || 'Normal', image_data, event_date || null, id]
         );
 
         if (result.rows.length === 0) {

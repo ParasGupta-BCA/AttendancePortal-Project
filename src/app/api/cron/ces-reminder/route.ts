@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db';
-import { sendCesReminderEmail } from '@/lib/email';
+import { sendReminderEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic'; // Prevent static caching
 
@@ -12,21 +12,20 @@ export async function GET(req: Request) {
             // Allow bypassing in development if needed
         }
 
-        // 2. Find CES announcements scheduled for TOMORROW
-        const cesAnnouncementsRes = await query(`
-            SELECT id, title, content, ces_date
+        // 2. Find ALL announcements with event_date scheduled for TOMORROW (any category)
+        const upcomingAnnouncementsRes = await query(`
+            SELECT id, title, content, category, event_date
             FROM announcements
-            WHERE category = 'CES'
-              AND is_active = true
-              AND ces_date = CURRENT_DATE + INTERVAL '1 day'
+            WHERE is_active = true
+              AND event_date = CURRENT_DATE + INTERVAL '1 day'
         `);
 
-        const cesAnnouncements = cesAnnouncementsRes.rows;
+        const upcomingAnnouncements = upcomingAnnouncementsRes.rows;
 
-        if (cesAnnouncements.length === 0) {
+        if (upcomingAnnouncements.length === 0) {
             return NextResponse.json({
                 success: true,
-                message: 'No CES announcements scheduled for tomorrow.',
+                message: 'No announcements scheduled for tomorrow.',
                 processed: 0
             });
         }
@@ -43,26 +42,28 @@ export async function GET(req: Request) {
             });
         }
 
-        // 4. Send reminders for each CES announcement
+        // 4. Send reminders for each upcoming announcement
         const results: any[] = [];
 
-        for (const announcement of cesAnnouncements) {
+        for (const announcement of upcomingAnnouncements) {
             try {
-                const result = await sendCesReminderEmail(
+                const result = await sendReminderEmail(
                     studentEmails,
                     announcement.title,
                     announcement.content,
-                    announcement.ces_date
+                    announcement.category,
+                    announcement.event_date
                 );
 
                 results.push({
                     announcementId: announcement.id,
                     title: announcement.title,
-                    cesDate: announcement.ces_date,
+                    category: announcement.category,
+                    eventDate: announcement.event_date,
                     ...result
                 });
             } catch (err: any) {
-                console.error(`Failed to send CES reminder for: ${announcement.title}`, err);
+                console.error(`Failed to send reminder for: ${announcement.title}`, err);
                 results.push({
                     announcementId: announcement.id,
                     title: announcement.title,
@@ -74,13 +75,13 @@ export async function GET(req: Request) {
 
         return NextResponse.json({
             success: true,
-            announcementsProcessed: cesAnnouncements.length,
+            announcementsProcessed: upcomingAnnouncements.length,
             totalStudents: studentEmails.length,
             details: results
         });
 
     } catch (error: any) {
-        console.error("CES Reminder Cron Error:", error);
+        console.error("Reminder Cron Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

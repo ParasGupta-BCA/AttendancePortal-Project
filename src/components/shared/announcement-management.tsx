@@ -20,7 +20,7 @@ interface Announcement {
     category: string;
     priority: string;
     image_data?: string;
-    ces_date?: string;
+    event_date?: string;
     created_at: string;
     author_name: string;
 }
@@ -38,7 +38,7 @@ export function AnnouncementManagement() {
     const [category, setCategory] = useState("General");
     const [priority, setPriority] = useState("Normal");
     const [imageData, setImageData] = useState<string | null>(null);
-    const [cesDate, setCesDate] = useState("");
+    const [eventDate, setEventDate] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export function AnnouncementManagement() {
         setCategory("General");
         setPriority("Normal");
         setImageData(null);
-        setCesDate("");
+        setEventDate("");
         setEditingId(null);
     };
 
@@ -92,7 +92,7 @@ export function AnnouncementManagement() {
         setCategory(item.category);
         setPriority(item.priority);
         setImageData(item.image_data || null);
-        setCesDate(item.ces_date ? item.ces_date.toString().split('T')[0] : "");
+        setEventDate(item.event_date ? item.event_date.toString().split('T')[0] : "");
         setIsDialogOpen(true);
     };
 
@@ -113,7 +113,7 @@ export function AnnouncementManagement() {
                     category,
                     priority,
                     image_data: imageData,
-                    ces_date: category === 'CES' ? cesDate : undefined
+                    event_date: eventDate || undefined
                 }),
             });
 
@@ -222,25 +222,23 @@ export function AnnouncementManagement() {
                                 />
                             </div>
 
-                            {category === "CES" && (
-                                <div className="space-y-2">
-                                    <Label htmlFor="cesDate">
-                                        <CalendarDays className="inline-block w-4 h-4 mr-1.5 -mt-0.5" />
-                                        CES Date
-                                    </Label>
-                                    <Input
-                                        id="cesDate"
-                                        type="date"
-                                        value={cesDate}
-                                        onChange={(e) => setCesDate(e.target.value)}
-                                        required
-                                        min={new Date().toISOString().split('T')[0]}
-                                    />
-                                    <p className="text-xs text-muted-foreground">
-                                        Students will receive an automatic reminder email the day before this date.
-                                    </p>
-                                </div>
-                            )}
+                            <div className="space-y-2">
+                                <Label htmlFor="eventDate">
+                                    <CalendarDays className="inline-block w-4 h-4 mr-1.5 -mt-0.5" />
+                                    {category === 'CES' ? 'CES Date' : 'Event Date'} {category !== 'CES' && <span className="text-muted-foreground font-normal">(Optional)</span>}
+                                </Label>
+                                <Input
+                                    id="eventDate"
+                                    type="date"
+                                    value={eventDate}
+                                    onChange={(e) => setEventDate(e.target.value)}
+                                    required={category === 'CES'}
+                                    min={new Date().toISOString().split('T')[0]}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    {eventDate ? 'Students will receive an automatic reminder email the day before this date.' : 'Set a date to auto-send a reminder the day before.'}
+                                </p>
+                            </div>
 
                             <div className="space-y-2">
                                 <Label>Attachment (Image)</Label>
@@ -328,10 +326,10 @@ export function AnnouncementManagement() {
                                     {(() => { try { return format(new Date(item.created_at), 'MMM d, yyyy'); } catch { return String(item.created_at).split('T')[0]; } })()}
                                     {' \u2022 '}{item.author_name}
                                 </span>
-                                {item.ces_date ? (
+                                {item.event_date ? (
                                     <span className="block mt-1 text-blue-600 dark:text-blue-400 font-medium">
                                         <CalendarDays className="inline-block w-3 h-3 mr-1 -mt-0.5" />
-                                        CES: {(() => { try { return format(new Date(String(item.ces_date).split('T')[0] + 'T00:00:00'), 'MMM d, yyyy'); } catch { return String(item.ces_date).split('T')[0]; } })()}
+                                        {(() => { try { return format(new Date(String(item.event_date).split('T')[0] + 'T00:00:00'), 'MMM d, yyyy'); } catch { return String(item.event_date).split('T')[0]; } })()}
                                     </span>
                                 ) : null}
                             </CardDescription>

@@ -187,15 +187,15 @@ export const sendAnnouncementEmail = async (bcc: string[], title: string, conten
     }
 };
 
-// Import CES template
-import { getCesReminderEmailHtml } from './email-templates';
+// Import reminder template
+import { getReminderEmailHtml } from './email-templates';
 
-export const sendCesReminderEmail = async (emails: string[], title: string, content: string, cesDate: string) => {
+export const sendReminderEmail = async (emails: string[], title: string, content: string, category: string, eventDate: string) => {
     try {
         if (emails.length === 0) return { success: true, sent: 0 };
 
-        const html = getCesReminderEmailHtml(title, content, cesDate);
-        const subject = `CES Tomorrow: ${title}`;
+        const html = getReminderEmailHtml(title, content, category, eventDate);
+        const subject = `${category} Tomorrow: ${title}`;
 
         // Check Global Limit
         if (!(await checkGlobalRateLimit())) return { success: false, error: "Global limit reached" };
@@ -206,22 +206,22 @@ export const sendCesReminderEmail = async (emails: string[], title: string, cont
         // Send to each student individually for proper logging
         for (const email of emails) {
             try {
-                const result = await sendEmail(email, subject, html, 'CES Reminder');
+                const result = await sendEmail(email, subject, html, `${category} Reminder`);
                 if (result.success) {
                     sentCount++;
                 } else {
                     errors.push(`${email}: ${result.error || 'Unknown error'}`);
                 }
             } catch (err: any) {
-                console.error(`Failed to send CES reminder to ${email}:`, err);
+                console.error(`Failed to send ${category} reminder to ${email}:`, err);
                 errors.push(`${email}: ${err.message}`);
             }
         }
 
-        console.log(`CES Reminder sent to ${sentCount}/${emails.length} students`);
+        console.log(`${category} Reminder sent to ${sentCount}/${emails.length} students`);
         return { success: sentCount > 0, sent: sentCount, total: emails.length, errors };
     } catch (error: any) {
-        console.error('Error sending CES reminders:', error);
+        console.error(`Error sending ${category} reminders:`, error);
         return { success: false, error: error.message };
     }
 };
