@@ -356,11 +356,11 @@ export const getReminderEmailHtml = (title: string, content: string, category: s
 
     // Category-specific styling
     const categoryConfig: Record<string, { icon: string; color: string; bgColor: string; subtitle: string; prepNote: string }> = {
-        'CES': { icon: 'C', color: '#ff9500', bgColor: 'rgba(255, 149, 0, 0.1)', subtitle: 'Continuous Evaluation System', prepNote: 'Please ensure you are well-prepared. Review your notes and coursework for tomorrow\'s evaluation.' },
-        'Exam': { icon: 'E', color: '#ff3b30', bgColor: 'rgba(255, 59, 48, 0.1)', subtitle: 'Upcoming Examination', prepNote: 'Please ensure you are well-prepared. Review your notes and syllabus for tomorrow\'s exam.' },
-        'Event': { icon: 'E', color: '#5856d6', bgColor: 'rgba(88, 86, 214, 0.1)', subtitle: 'Upcoming Event', prepNote: 'Don\'t miss out! Make sure to attend tomorrow\'s event on time.' },
-        'Holiday': { icon: 'H', color: '#34c759', bgColor: 'rgba(52, 199, 89, 0.1)', subtitle: 'Holiday Notice', prepNote: 'Enjoy your holiday! Classes will resume as per the regular schedule.' },
-        'General': { icon: 'G', color: '#0071e3', bgColor: 'rgba(0, 113, 227, 0.1)', subtitle: 'General Announcement', prepNote: 'Please take note of this important announcement for tomorrow.' },
+        'CES': { icon: '📝', color: '#ff9500', bgColor: 'rgba(255, 149, 0, 0.1)', subtitle: 'Continuous Evaluation System', prepNote: 'Please ensure you are well-prepared. Review your notes and coursework for tomorrow\'s evaluation.' },
+        'Exam': { icon: '✍️', color: '#ff3b30', bgColor: 'rgba(255, 59, 48, 0.1)', subtitle: 'Upcoming Examination', prepNote: 'Please ensure you are well-prepared. Review your notes and syllabus for tomorrow\'s exam.' },
+        'Event': { icon: '🎉', color: '#5856d6', bgColor: 'rgba(88, 86, 214, 0.1)', subtitle: 'Upcoming Event', prepNote: 'Don\'t miss out! Make sure to attend tomorrow\'s event on time.' },
+        'Holiday': { icon: '🌴', color: '#34c759', bgColor: 'rgba(52, 199, 89, 0.1)', subtitle: 'Holiday Notice', prepNote: 'Enjoy your holiday! Classes will resume as per the regular schedule.' },
+        'General': { icon: '📢', color: '#0071e3', bgColor: 'rgba(0, 113, 227, 0.1)', subtitle: 'General Announcement', prepNote: 'Please take note of this important announcement for tomorrow.' },
     };
 
     const config = categoryConfig[category] || categoryConfig['General'];
@@ -373,8 +373,14 @@ export const getReminderEmailHtml = (title: string, content: string, category: s
                     <td align="center">
                         <table border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td align="center" valign="middle" width="64" height="64" style="width: 64px; height: 64px; background-color: ${config.bgColor}; border-radius: 50%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: ${config.color}; line-height: 64px; text-align: center;">
-                                    ${config.icon}
+                                <td align="center" valign="middle" width="54" height="54" style="width: 54px; height: 54px; background-color: ${config.bgColor}; border-radius: 50%; display: inline-block; margin-bottom: 16px;">
+                                    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td align="center" valign="middle" style="font-size: 24px; line-height: 1;">
+                                                ${config.icon}
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
                             </tr>
                         </table>
