@@ -11,7 +11,7 @@ export const exportSubjectReportToPDF = (data: any[], meta: any) => {
     doc.setFontSize(11);
     doc.text(`Class: ${meta.class_name} (${meta.section})`, 14, 30);
     doc.text(`Subject: ${meta.subject_name} (${meta.subject_code})`, 14, 35);
-    doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 14, 40);
+    doc.text(`Date Generated: ${new Date().toLocaleDateString('en-GB')}`, 14, 40);
 
     // Table Data
     const tableBody = data.map(st => [
@@ -65,9 +65,9 @@ export const exportDailyReportToPDF = (reportData: any) => {
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100); // Grey
-        doc.text(`${session_info.class_name} (${session_info.section}) | ${new Date(session_info.start_time).toLocaleDateString()} ${new Date(session_info.start_time).toLocaleTimeString()}`, 14, finalY + 6);
+        doc.text(`${session_info.class_name} (${session_info.section}) | ${new Date(session_info.start_time).toLocaleDateString('en-GB')} ${new Date(session_info.start_time).toLocaleTimeString()}`, 14, finalY + 6);
 
-        const sessionDate = new Date(session_info.start_time).toLocaleDateString();
+        const sessionDate = new Date(session_info.start_time).toLocaleDateString('en-GB');
 
         const tableBody = attendance.map((st: any) => [
             sessionDate,
