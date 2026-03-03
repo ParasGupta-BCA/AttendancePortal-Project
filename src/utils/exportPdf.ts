@@ -30,19 +30,19 @@ export const exportSubjectReportToPDF = async (data: any[], meta: any) => {
     // Add Logo if available
     if (logoBase64) {
         // Adjust width and height based on your logo aspect ratio and size
-        doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
+        doc.addImage(logoBase64, 'PNG', 14, 12, 14, 14);
     }
 
     // Header Text
     doc.setFontSize(22);
     doc.setTextColor(33, 37, 41);
-    doc.text("Attendance Report", logoBase64 ? 45 : 14, 22);
+    doc.text("Attendance Report", logoBase64 ? 32 : 14, 22);
 
     doc.setFontSize(10);
     doc.setTextColor(108, 117, 125); // muted text
-    doc.text(`Class: ${meta.class_name} (${meta.section})`, logoBase64 ? 45 : 14, 28);
-    doc.text(`Subject: ${meta.subject_name} (${meta.subject_code})`, logoBase64 ? 45 : 14, 33);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, logoBase64 ? 45 : 14, 38);
+    doc.text(`Class: ${meta.class_name} (${meta.section})`, logoBase64 ? 32 : 14, 28);
+    doc.text(`Subject: ${meta.subject_name} (${meta.subject_code})`, logoBase64 ? 32 : 14, 33);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, logoBase64 ? 32 : 14, 38);
 
     doc.setDrawColor(222, 226, 230);
     doc.line(14, 45, 196, 45);
@@ -89,16 +89,16 @@ export const exportDailyReportToPDF = async (reportData: any) => {
     doc.rect(0, 0, 210, 45, 'F');
 
     if (logoBase64) {
-        doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
+        doc.addImage(logoBase64, 'PNG', 14, 15, 14, 14);
     }
 
     doc.setFontSize(22);
     doc.setTextColor(33, 37, 41);
-    doc.text("Daily Attendance Report", logoBase64 ? 45 : 14, 25);
+    doc.text("Daily Attendance Report", logoBase64 ? 32 : 14, 25);
 
     doc.setFontSize(10);
     doc.setTextColor(108, 117, 125);
-    doc.text(`Period: ${dateRangeStr}`, logoBase64 ? 45 : 14, 33);
+    doc.text(`Period: ${dateRangeStr}`, logoBase64 ? 32 : 14, 33);
 
     doc.setDrawColor(222, 226, 230);
     doc.line(14, 45, 196, 45);
