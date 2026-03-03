@@ -1,50 +1,109 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export const exportSubjectReportToPDF = (data: any[], meta: any) => {
+const getBase64ImageFromUrl = async (imageUrl: string): Promise<string> => {
+    try {
+        const res = await fetch(imageUrl);
+        const blob = await res.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error("Error loading image", error);
+        return "";
+    }
+};
+
+export const exportSubjectReportToPDF = async (data: any[], meta: any) => {
     const doc = new jsPDF();
+    const logoBase64 = await getBase64ImageFromUrl("/logo.png");
 
-    // Header
-    doc.setFontSize(18);
-    doc.text("Attendance Report", 14, 20);
+    let finalY = 15;
 
-    doc.setFontSize(11);
-    doc.text(`Class: ${meta.class_name} (${meta.section})`, 14, 30);
-    doc.text(`Subject: ${meta.subject_name} (${meta.subject_code})`, 14, 35);
-    doc.text(`Date Generated: ${new Date().toLocaleDateString('en-GB')}`, 14, 40);
+    // Header Backround
+    doc.setFillColor(248, 249, 250);
+    doc.rect(0, 0, 210, 45, 'F');
+
+    // Add Logo if available
+    if (logoBase64) {
+        // Adjust width and height based on your logo aspect ratio and size
+        doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
+    }
+
+    // Header Text
+    doc.setFontSize(22);
+    doc.setTextColor(33, 37, 41);
+    doc.text("Attendance Report", logoBase64 ? 45 : 14, 22);
+
+    doc.setFontSize(10);
+    doc.setTextColor(108, 117, 125); // muted text
+    doc.text(`Class: ${meta.class_name} (${meta.section})`, logoBase64 ? 45 : 14, 28);
+    doc.text(`Subject: ${meta.subject_name} (${meta.subject_code})`, logoBase64 ? 45 : 14, 33);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, logoBase64 ? 45 : 14, 38);
+
+    doc.setDrawColor(222, 226, 230);
+    doc.line(14, 45, 196, 45);
+
+    finalY = 55;
 
     // Table Data
     const tableBody = data.map(st => [
         st.enrollment_no,
         st.name,
-        st.total_sessions,
-        st.total_present,
-        st.total_absent,
+        st.total_sessions.toString(),
+        st.total_present.toString(),
+        st.total_absent.toString(),
         st.percentage + '%'
     ]);
 
     autoTable(doc, {
-        startY: 50,
+        startY: finalY,
         head: [['Enrollment', 'Name', 'Total Classes', 'Present', 'Absent', '%']],
         body: tableBody,
         theme: 'grid',
-        headStyles: { fillColor: [41, 128, 185], textColor: 255 }, // Blue header
-        alternateRowStyles: { fillColor: [240, 240, 240] }
+        headStyles: { fillColor: [15, 23, 42], textColor: 255, halign: 'center' }, // dark slate modern header
+        bodyStyles: { textColor: [51, 65, 85], halign: 'center' },
+        columnStyles: {
+            0: { halign: 'left' },
+            1: { halign: 'left' }
+        },
+        alternateRowStyles: { fillColor: [248, 250, 252] }, // very light blue/grey
+        styles: { font: 'helvetica', fontSize: 9, cellPadding: 4 }
     });
 
     doc.save(`${meta.subject_name}_Attendance_Report.pdf`);
 };
 
-export const exportDailyReportToPDF = (reportData: any) => {
+export const exportDailyReportToPDF = async (reportData: any) => {
     const doc = new jsPDF();
+    const logoBase64 = await getBase64ImageFromUrl("/logo.png");
     const dateRangeStr = `${reportData.startDate} to ${reportData.endDate}`;
+
     let finalY = 15;
 
+    // Header Backround
+    doc.setFillColor(248, 249, 250);
+    doc.rect(0, 0, 210, 45, 'F');
+
+    if (logoBase64) {
+        doc.addImage(logoBase64, 'PNG', 14, 10, 25, 25);
+    }
+
     doc.setFontSize(22);
-    doc.text("Attendance Report", 105, finalY, { align: "center" });
-    doc.setFontSize(12);
-    doc.text(`Period: ${dateRangeStr}`, 105, finalY + 8, { align: "center" });
-    finalY += 20;
+    doc.setTextColor(33, 37, 41);
+    doc.text("Daily Attendance Report", logoBase64 ? 45 : 14, 25);
+
+    doc.setFontSize(10);
+    doc.setTextColor(108, 117, 125);
+    doc.text(`Period: ${dateRangeStr}`, logoBase64 ? 45 : 14, 33);
+
+    doc.setDrawColor(222, 226, 230);
+    doc.line(14, 45, 196, 45);
+
+    finalY = 55;
 
     if (reportData.sessions.length === 0) {
         doc.text("No classes conducted in this period.", 14, finalY);
@@ -59,12 +118,14 @@ export const exportDailyReportToPDF = (reportData: any) => {
             finalY = 20;
         }
 
+        // Section Title
         doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0); // Black
+        doc.setTextColor(15, 23, 42); // slate 900
         doc.text(`${session_info.subject_name}`, 14, finalY);
 
+        // Section Subtitle
         doc.setFontSize(10);
-        doc.setTextColor(100, 100, 100); // Grey
+        doc.setTextColor(100, 116, 139); // slate 500
         doc.text(`${session_info.class_name} (${session_info.section}) | ${new Date(session_info.start_time).toLocaleDateString('en-GB')} ${new Date(session_info.start_time).toLocaleTimeString()}`, 14, finalY + 6);
 
         const sessionDate = new Date(session_info.start_time).toLocaleDateString('en-GB');
@@ -78,11 +139,14 @@ export const exportDailyReportToPDF = (reportData: any) => {
         ]);
 
         autoTable(doc, {
-            startY: finalY + 12,
+            startY: finalY + 10,
             head: [['Date', 'Enrollment', 'Student Name', 'Status', 'Time']],
             body: tableBody,
             theme: 'striped',
-            headStyles: { fillColor: [52, 73, 94] }, // Dark header
+            headStyles: { fillColor: [15, 23, 42], textColor: 255 }, // slate 900
+            bodyStyles: { textColor: [51, 65, 85] }, // slate 700
+            alternateRowStyles: { fillColor: [248, 250, 252] }, // slate 50
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 4 }
         });
 
         // @ts-ignore
