@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     // If we are already on a login page, DO NOT redirect if unauthenticated.
     // If we ARE authenticated, redirect them to the correct dashboard.
     const isCollegeLoginPage = path === '/login' || path === '/signup' || path.startsWith('/forgot-password') || path.startsWith('/reset-password');
-    const isTuitionLoginPage = path === '/tuition/login';
+    const isTuitionLoginPage = path === '/tuition/login' || path === '/tuition/register';
 
     const token = await getToken({ req: request });
     const isAuth = !!token;
@@ -64,5 +64,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     // We must include login paths in the matcher so the middleware can redirect them AWAY from login if they are already authenticated.
-    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*", "/login", "/tuition/login", "/signup", "/forgot-password", "/reset-password"],
+    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*", "/login", "/tuition/login", "/tuition/register", "/signup", "/forgot-password", "/reset-password"],
 };
