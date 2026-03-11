@@ -5,7 +5,7 @@ import { AnnouncementManagement } from "@/components/shared/announcement-managem
 export default function AdminAnnouncementsPage() {
     return (
         <div className="p-8">
-            <AnnouncementManagement />
+            <AnnouncementManagement apiBase="/api/tuition" />
         </div>
     );
 }

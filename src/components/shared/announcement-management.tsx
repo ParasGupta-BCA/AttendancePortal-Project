@@ -25,7 +25,11 @@ interface Announcement {
     author_name: string;
 }
 
-export function AnnouncementManagement() {
+interface AnnouncementManagementProps {
+    apiBase?: string;
+}
+
+export function AnnouncementManagement({ apiBase = '/api' }: AnnouncementManagementProps) {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -47,7 +51,7 @@ export function AnnouncementManagement() {
 
     const fetchAnnouncements = async () => {
         try {
-            const res = await fetch('/api/announcements');
+            const res = await fetch(`${apiBase}/announcements`);
             const data = await res.json();
             if (Array.isArray(data)) {
                 setAnnouncements(data);
@@ -101,7 +105,7 @@ export function AnnouncementManagement() {
         setSubmitting(true);
 
         try {
-            const url = editingId ? `/api/announcements/${editingId}` : '/api/announcements';
+            const url = editingId ? `${apiBase}/announcements/${editingId}` : `${apiBase}/announcements`;
             const method = editingId ? 'PUT' : 'POST';
 
             const res = await fetch(url, {
@@ -137,7 +141,7 @@ export function AnnouncementManagement() {
         if (!confirm("Are you sure you want to delete this announcement?")) return;
 
         try {
-            await fetch(`/api/announcements/${id}`, { method: 'DELETE' });
+            await fetch(`${apiBase}/announcements/${id}`, { method: 'DELETE' });
             setAnnouncements(announcements.filter(a => a.id !== id));
         } catch (error) {
             console.error("Failed to delete", error);
