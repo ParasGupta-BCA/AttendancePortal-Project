@@ -9,8 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, BookOpen, Loader2, Search } from "lucide-react";
-import { toast } from "sonner";
+import { Plus, Pencil, Trash2, BookOpen, Loader2, Search, CheckCircle } from "lucide-react";
 
 interface Subject {
     id: string;
@@ -33,6 +32,12 @@ export default function SubjectsPage() {
     const [form, setForm] = useState({ ...emptyForm });
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+    const showSuccess = (msg: string) => {
+        setSuccessMsg(msg);
+        setTimeout(() => setSuccessMsg(null), 3000);
+    };
 
     const fetchSubjects = async () => {
         setLoading(true);
@@ -41,7 +46,7 @@ export default function SubjectsPage() {
             const data = await res.json();
             setSubjects(data.subjects || []);
         } catch (e) {
-            toast.error("Failed to load subjects");
+            alert("Failed to load subjects");
         } finally {
             setLoading(false);
         }
@@ -74,11 +79,11 @@ export default function SubjectsPage() {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Failed");
-            toast.success(editingId ? "Subject updated!" : "Subject added!");
+            showSuccess(editingId ? "Subject updated successfully!" : "Subject added successfully!");
             setShowModal(false);
             fetchSubjects();
         } catch (err: any) {
-            toast.error(err.message);
+            alert(err.message);
         } finally {
             setSubmitting(false);
         }
@@ -93,10 +98,10 @@ export default function SubjectsPage() {
                 const d = await res.json();
                 throw new Error(d.error || "Failed to delete");
             }
-            toast.success("Subject deleted");
+            showSuccess("Subject deleted successfully");
             setSubjects(prev => prev.filter(s => s.id !== id));
         } catch (err: any) {
-            toast.error(err.message);
+            alert(err.message);
         } finally {
             setDeletingId(null);
         }
@@ -113,6 +118,13 @@ export default function SubjectsPage() {
 
     return (
         <div className="flex-1 space-y-6 p-8 pt-6">
+            {/* Success Banner */}
+            {successMsg && (
+                <div className="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-lg">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="text-sm font-medium">{successMsg}</span>
+                </div>
+            )}
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
