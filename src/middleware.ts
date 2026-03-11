@@ -12,6 +12,11 @@ export async function middleware(request: NextRequest) {
 
     // If accessing protected routes without auth
     if (!isAuth) {
+        // Allow access to the tuition login page itself
+        if (request.nextUrl.pathname.startsWith('/tuition/login')) {
+            return NextResponse.next();
+        }
+        
         // Redirect to specific login based on path
         if (request.nextUrl.pathname.startsWith('/tuition')) {
             return NextResponse.redirect(new URL('/tuition/login', request.url));
