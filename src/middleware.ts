@@ -5,11 +5,29 @@ import { getToken } from 'next-auth/jwt';
 export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request });
     const isAuth = !!token;
-    const isAuthPage = request.nextUrl.pathname.startsWith('/login');
+    
+    // Check if accessing an old college route or a new tuition route
+    const isTuitionRoute = request.nextUrl.pathname.startsWith('/tuition') && !request.nextUrl.pathname.startsWith('/tuition/login');
+    const isCollegeRoute = !request.nextUrl.pathname.startsWith('/tuition');
 
-    // If user is not authenticated and trying to access protected routes
+    // If accessing protected routes without auth
     if (!isAuth) {
+        // Redirect to specific login based on path
+        if (request.nextUrl.pathname.startsWith('/tuition')) {
+            return NextResponse.redirect(new URL('/tuition/login', request.url));
+        }
         return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    // Safety constraint: Prevent cross-contamination
+    // If a Neon user tries to access /tuition, or a Supabase user tries to access /student
+    if (isAuth) {
+        if (isTuitionRoute && !token.is_tuition_user) {
+            return NextResponse.redirect(new URL('/login', request.url)); // Send back to origin
+        }
+        if (isCollegeRoute && token.is_tuition_user) {
+            return NextResponse.redirect(new URL('/tuition/dashboard', request.url)); // Send back to origin
+        }
     }
 
     const response = NextResponse.next();
@@ -24,5 +42,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*"],
+    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*"],
 };
