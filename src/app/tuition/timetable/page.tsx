@@ -8,30 +8,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import QRCode from "qrcode";
 import { Loader2, Trash2, Plus, Edit } from "lucide-react";
-import { generateToken } from "@/utils/dynamicQrClient";
 import { DynamicQRDisplay } from "@/components/common/DynamicQRDisplay";
 
 export default function TimetablePage() {
     const [timetable, setTimetable] = useState<any[]>([]);
     const [qrInterval, setQrInterval] = useState(5);
     const [loading, setLoading] = useState(true);
-    const [activeSession, setActiveSession] = useState<any>(null); // Details of session just created
+    const [activeSession, setActiveSession] = useState<any>(null);
 
-    // Edit Mode State
     const [isEditing, setIsEditing] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
 
-    // Form Data Lists
-    const [classes, setClasses] = useState<any[]>([]);
+    // Form Data Lists — Supabase has subjects & faculty
     const [subjects, setSubjects] = useState<any[]>([]);
     const [faculty, setFaculty] = useState<any[]>([]);
 
-    // New Slot Form
+    // New Slot Form — uses course_year + section (not class_id)
     const [newSlot, setNewSlot] = useState({
-        class_id: "",
+        course_year: "",
+        section: "",
         subject_id: "",
         faculty_id: "",
         day_of_week: "Monday",
@@ -45,11 +42,11 @@ export default function TimetablePage() {
         fetch("/api/tuition/timetable")
             .then((res) => res.json())
             .then((data) => {
-                setTimetable(data.timetable);
+                setTimetable(data.timetable || []);
                 if (data.qrInterval) setQrInterval(data.qrInterval);
                 setLoading(false);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => { console.error(err); setLoading(false); });
     };
 
     useEffect(() => {
@@ -60,11 +57,9 @@ export default function TimetablePage() {
     useEffect(() => {
         if (showAddModal) {
             Promise.all([
-                fetch("/api/tuition/classes").then(res => res.json()),
                 fetch("/api/tuition/subjects").then(res => res.json()),
                 fetch("/api/tuition/faculty").then(res => res.json())
-            ]).then(([classesData, subjectsData, facultyData]) => {
-                setClasses(classesData.classes || []);
+            ]).then(([subjectsData, facultyData]) => {
                 setSubjects(subjectsData.subjects || []);
                 setFaculty(facultyData.faculty || []);
             });
@@ -72,13 +67,8 @@ export default function TimetablePage() {
     }, [showAddModal]);
 
     const handleGenerateQR = async (slot: any) => {
-        // If already active, just show it
         if (slot.active_session) {
-            setActiveSession({
-                ...slot,
-                qr_code: slot.active_session.qr_code,
-                expiry: new Date(Date.now() + 10 * 60 * 1000) // Visual only
-            });
+            setActiveSession({ ...slot, qr_code: slot.active_session.qr_code });
             return;
         }
 
@@ -91,7 +81,6 @@ export default function TimetablePage() {
             const data = await res.json();
             if (!res.ok) { alert(data.error || "Failed"); return; }
 
-            // Optimistically update the list so the button turns green immediately
             const updatedTimetable = timetable.map(t => {
                 if (t.id === slot.id) {
                     return { ...t, active_session: { id: data.session_id, qr_code: data.qr_code } };
@@ -99,13 +88,12 @@ export default function TimetablePage() {
                 return t;
             });
             setTimetable(updatedTimetable);
-
             setActiveSession({ ...slot, qr_code: data.qr_code });
         } catch (error) { alert("Error generating QR"); }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Delete this class? History will be preserved.")) return;
+        if (!confirm("Delete this class? This action cannot be undone.")) return;
         try {
             const res = await fetch(`/api/tuition/timetable/manage?id=${id}`, { method: "DELETE" });
             if (res.ok) {
@@ -129,19 +117,10 @@ export default function TimetablePage() {
             if (res.ok) {
                 setShowAddModal(false);
                 refreshTimetable();
-                setNewSlot({
-                    class_id: "",
-                    subject_id: "",
-                    faculty_id: "",
-                    day_of_week: "Monday",
-                    start_time: "",
-                    end_time: "",
-                    room_no: "Lab 1"
-                });
-                setEditingSlotId(null);
+                resetForm();
             } else {
                 const d = await res.json();
-                alert(d.error || "Failed using Add/Edit API");
+                alert(d.error || "Failed to save");
             }
         } catch (e) { alert("Error saving"); }
     };
@@ -149,34 +128,36 @@ export default function TimetablePage() {
     const handleEdit = (slot: any) => {
         setEditingSlotId(slot.id);
         setNewSlot({
-            class_id: slot.class_id,
+            course_year: slot.course_year || "",
+            section: slot.section || "",
             subject_id: slot.subject_id,
-            faculty_id: slot.faculty_id,
+            faculty_id: slot.faculty_id || "",
             day_of_week: slot.day_of_week,
             start_time: slot.start_time,
             end_time: slot.end_time,
-            room_no: slot.room_no
+            room_no: slot.room_no || ""
         });
         setShowAddModal(true);
     };
 
-    // Reset when modal closes (if cancelled)
+    const resetForm = () => {
+        setEditingSlotId(null);
+        setNewSlot({
+            course_year: "",
+            section: "",
+            subject_id: "",
+            faculty_id: "",
+            day_of_week: "Monday",
+            start_time: "",
+            end_time: "",
+            room_no: "Lab 1"
+        });
+    };
+
     useEffect(() => {
-        if (!showAddModal) {
-            setEditingSlotId(null);
-            setNewSlot({
-                class_id: "",
-                subject_id: "",
-                faculty_id: "",
-                day_of_week: "Monday",
-                start_time: "",
-                end_time: "",
-                room_no: "Lab 1"
-            });
-        }
+        if (!showAddModal) resetForm();
     }, [showAddModal]);
 
-    // Group by Day
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const grouped = days.reduce((acc, day) => {
         acc[day] = timetable.filter((t) => t.day_of_week === day);
@@ -188,7 +169,7 @@ export default function TimetablePage() {
     return (
         <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold tracking-tight">Timetable & Attendance</h2>
+                <h2 className="text-3xl font-bold tracking-tight">Timetable &amp; Attendance</h2>
                 <div className="flex gap-2">
                     <Button variant={isEditing ? "secondary" : "default"} onClick={() => setIsEditing(!isEditing)}>
                         {isEditing ? "Done Editing" : "Edit Timetable"}
@@ -212,7 +193,7 @@ export default function TimetablePage() {
                                 <Card key={slot.id} className={`relative overflow-hidden ${isEditing ? 'border-dashed border-2' : ''} ${slot.active_session ? 'border-green-500 border-2' : ''}`}>
                                     <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                                         <Badge variant={slot.active_session ? "default" : "outline"} className={`w-fit ${slot.active_session ? 'bg-green-600 hover:bg-green-700' : ''}`}>
-                                            {slot.active_session ? 'Live Now' : `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}`}
+                                            {slot.active_session ? 'Live Now' : `${String(slot.start_time).slice(0, 5)} - ${String(slot.end_time).slice(0, 5)}`}
                                         </Badge>
                                         {isEditing && (
                                             <div className="flex gap-1">
@@ -227,7 +208,8 @@ export default function TimetablePage() {
                                     </CardHeader>
                                     <CardContent>
                                         <CardTitle className="text-base mb-1">{slot.subject_name}</CardTitle>
-                                        <p className="text-sm text-muted-foreground mb-4">{slot.faculty_name || "Unknown Faculty"}</p>
+                                        <p className="text-xs text-muted-foreground mb-1">{slot.course_year} • {slot.section}</p>
+                                        <p className="text-sm text-muted-foreground mb-4">{slot.faculty_name || "No Faculty Assigned"}</p>
 
                                         {!isEditing && (
                                             <Button size="sm" className={`w-full ${slot.active_session ? 'bg-green-600 hover:bg-green-700' : ''}`} onClick={() => handleGenerateQR(slot)}>
@@ -254,9 +236,9 @@ export default function TimetablePage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Add Class Modal */}
+            {/* Add/Edit Class Modal */}
             <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[475px]">
                     <DialogHeader>
                         <DialogTitle>{editingSlotId ? "Edit Class" : "Add New Class"}</DialogTitle>
                     </DialogHeader>
@@ -271,13 +253,12 @@ export default function TimetablePage() {
                             </Select>
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label className="text-right">Class</Label>
-                            <Select onValueChange={(v) => setNewSlot({ ...newSlot, class_id: v })} value={newSlot.class_id}>
-                                <SelectTrigger className="col-span-3"><SelectValue placeholder="Select Class" /></SelectTrigger>
-                                <SelectContent>
-                                    {classes.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name} {c.section}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                            <Label className="text-right">Year</Label>
+                            <Input className="col-span-3" placeholder="e.g. BCA VI, MCA II" value={newSlot.course_year} onChange={e => setNewSlot({ ...newSlot, course_year: e.target.value })} />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">Section</Label>
+                            <Input className="col-span-3" placeholder="e.g. A, B, Morning" value={newSlot.section} onChange={e => setNewSlot({ ...newSlot, section: e.target.value })} />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label className="text-right">Subject</Label>
@@ -291,9 +272,9 @@ export default function TimetablePage() {
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label className="text-right">Faculty</Label>
                             <Select onValueChange={(v) => setNewSlot({ ...newSlot, faculty_id: v })} value={newSlot.faculty_id}>
-                                <SelectTrigger className="col-span-3"><SelectValue placeholder="Faculty" /></SelectTrigger>
+                                <SelectTrigger className="col-span-3"><SelectValue placeholder="Faculty (optional)" /></SelectTrigger>
                                 <SelectContent>
-                                    {faculty.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.full_name} ({f.designation})</SelectItem>)}
+                                    {faculty.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.full_name} ({f.designation || 'Faculty'})</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -311,9 +292,7 @@ export default function TimetablePage() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <DialogFooter>
-                            <Button onClick={handleSaveSlot}>{editingSlotId ? "Update Class" : "Save Class"}</Button>
-                        </DialogFooter>
+                        <Button onClick={handleSaveSlot}>{editingSlotId ? "Update Class" : "Save Class"}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

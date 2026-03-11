@@ -6,6 +6,8 @@ import { authOptions } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 // ADD Timetable Slot
+// Supabase timetable schema: id, subject_id, faculty_id, day_of_week, start_time, end_time, room_no, course_year, section, institution_id
+// NO class_id, NO is_active columns exist in Supabase schema
 export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -15,19 +17,17 @@ export async function POST(request: Request) {
         const institutionId = (session.user as any).institution_id;
 
         const body = await request.json();
-        const { class_id, subject_id, faculty_id, day_of_week, start_time, end_time, room_no } = body;
+        const { course_year, section, subject_id, faculty_id, day_of_week, start_time, end_time, room_no } = body;
 
-        // Validation
-        if (!class_id || !subject_id || !day_of_week || !start_time || !end_time) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        if (!subject_id || !day_of_week || !start_time || !end_time || !course_year || !section) {
+            return NextResponse.json({ error: 'Missing required fields (subject_id, day_of_week, start_time, end_time, course_year, section)' }, { status: 400 });
         }
 
-        // Logic: Insert new slot. (We could check for conflicts here, but basic insert first)
         const res = await query(`
-            INSERT INTO timetable (class_id, subject_id, faculty_id, day_of_week, start_time, end_time, room_no, is_active, institution_id)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, $8)
+            INSERT INTO timetable (subject_id, faculty_id, day_of_week, start_time, end_time, room_no, course_year, section, institution_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING id
-        `, [class_id, subject_id, faculty_id || null, day_of_week, start_time, end_time, room_no, institutionId]);
+        `, [subject_id, faculty_id || null, day_of_week, start_time, end_time, room_no || null, course_year, section, institutionId]);
 
         return NextResponse.json({ success: true, id: res.rows[0].id });
 
@@ -35,7 +35,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-
 
 // UPDATE Timetable Slot
 export async function PUT(request: Request) {
@@ -47,17 +46,17 @@ export async function PUT(request: Request) {
         const institutionId = (session.user as any).institution_id;
 
         const body = await request.json();
-        const { id, class_id, subject_id, faculty_id, day_of_week, start_time, end_time, room_no } = body;
+        const { id, course_year, section, subject_id, faculty_id, day_of_week, start_time, end_time, room_no } = body;
 
-        if (!id || !class_id || !subject_id || !day_of_week || !start_time || !end_time) {
+        if (!id || !subject_id || !day_of_week || !start_time || !end_time || !course_year || !section) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
         await query(`
             UPDATE timetable
-            SET class_id = $1, subject_id = $2, faculty_id = $3, day_of_week = $4, start_time = $5, end_time = $6, room_no = $7
-            WHERE id = $8 AND institution_id = $9
-        `, [class_id, subject_id, faculty_id || null, day_of_week, start_time, end_time, room_no, id, institutionId]);
+            SET subject_id = $1, faculty_id = $2, day_of_week = $3, start_time = $4, end_time = $5, room_no = $6, course_year = $7, section = $8
+            WHERE id = $9 AND institution_id = $10
+        `, [subject_id, faculty_id || null, day_of_week, start_time, end_time, room_no || null, course_year, section, id, institutionId]);
 
         return NextResponse.json({ success: true });
 
@@ -66,7 +65,7 @@ export async function PUT(request: Request) {
     }
 }
 
-// DELETE Timetable Slot (Soft Delete)
+// DELETE Timetable Slot (Hard delete since no is_active column)
 export async function DELETE(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -82,8 +81,8 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
         }
 
-        // SOFT DELETE: Set is_active = FALSE
-        await query(`UPDATE timetable SET is_active = FALSE WHERE id = $1 AND institution_id = $2`, [id, institutionId]);
+        // Hard delete (Supabase timetable has no is_active column)
+        await query(`DELETE FROM timetable WHERE id = $1 AND institution_id = $2`, [id, institutionId]);
 
         return NextResponse.json({ success: true });
 
