@@ -188,16 +188,35 @@ export default function LoginPage() {
                     </form>
                 </CardContent>
                 <CardFooter className="flex justify-center border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                    <div className="flex flex-col items-center space-y-2 w-full">
+                    <div className="flex flex-col items-center space-y-3 w-full">
                         <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             New Student? <Link href="/signup" className="text-zinc-900 dark:text-zinc-50 font-medium hover:underline underline-offset-4">Register Here</Link>
                         </p>
-                        <div className="h-px bg-zinc-200 dark:bg-zinc-800 w-full my-2"></div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                            Are you a Tuition Center? <Link href="/tuition/login" className="text-blue-600 dark:text-blue-400 font-medium hover:underline flex items-center gap-1 mt-1 justify-center">Switch to Tuition Portal &rarr;</Link>
-                        </p>
+                        <div className="h-px bg-zinc-200 dark:bg-zinc-800 w-full my-1"></div>
+                        {/* Modern Tuition Portal Switch */}
+                        <Link
+                            href="/tuition/login"
+                            className="group w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-100 dark:border-blue-900 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 p-2 rounded-lg bg-blue-600 text-white shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                                    </svg>
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">Tuition Center?</p>
+                                    <p className="text-xs text-blue-500 dark:text-blue-400">Switch to Tuition Portal</p>
+                                </div>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </Link>
                     </div>
                 </CardFooter>
+
             </Card>
         </div>
     );
