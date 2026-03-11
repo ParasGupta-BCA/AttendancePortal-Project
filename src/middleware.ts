@@ -3,36 +3,52 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
+    const path = request.nextUrl.pathname;
+
+    // --- 1. Bypass all checks for login/public pages ---
+    // If we are already on a login page, DO NOT redirect if unauthenticated.
+    // If we ARE authenticated, redirect them to the correct dashboard.
+    const isCollegeLoginPage = path === '/login' || path === '/signup' || path.startsWith('/forgot-password') || path.startsWith('/reset-password');
+    const isTuitionLoginPage = path === '/tuition/login';
+
     const token = await getToken({ req: request });
     const isAuth = !!token;
-    
-    // Check if accessing an old college route or a new tuition route
-    const isTuitionRoute = request.nextUrl.pathname.startsWith('/tuition') && !request.nextUrl.pathname.startsWith('/tuition/login');
-    const isCollegeRoute = !request.nextUrl.pathname.startsWith('/tuition');
 
+    if (isCollegeLoginPage || isTuitionLoginPage) {
+        if (isAuth) {
+            // They are logged in but trying to view a login page. Send to dashboard.
+            if (token.is_tuition_user) {
+                 return NextResponse.redirect(new URL('/tuition/dashboard', request.url));
+            } else {
+                 // Send to respective college dashboard based on role
+                 if (token.role === 'admin' || token.role === 'superadmin') return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+                 if (token.role === 'faculty') return NextResponse.redirect(new URL('/faculty/dashboard', request.url));
+                 if (token.role === 'student') return NextResponse.redirect(new URL('/student/dashboard', request.url));
+            }
+        }
+        // If they are not logged in and viewing a login page, just let them see it!
+        return NextResponse.next();
+    }
+
+    // --- 2. Protect Authenticated Routes ---
+    
     // If accessing protected routes without auth
     if (!isAuth) {
-        // Allow access to the tuition login page itself
-        if (request.nextUrl.pathname.startsWith('/tuition/login')) {
-            return NextResponse.next();
-        }
-        
-        // Redirect to specific login based on path
-        if (request.nextUrl.pathname.startsWith('/tuition')) {
+        if (path.startsWith('/tuition')) {
             return NextResponse.redirect(new URL('/tuition/login', request.url));
         }
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Safety constraint: Prevent cross-contamination
-    // If a Neon user tries to access /tuition, or a Supabase user tries to access /student
-    if (isAuth) {
-        if (isTuitionRoute && !token.is_tuition_user) {
-            return NextResponse.redirect(new URL('/login', request.url)); // Send back to origin
-        }
-        if (isCollegeRoute && token.is_tuition_user) {
-            return NextResponse.redirect(new URL('/tuition/dashboard', request.url)); // Send back to origin
-        }
+    // --- 3. Safety constraint: Prevent cross-contamination ---
+    const isTuitionRoute = path.startsWith('/tuition');
+    const isCollegeRoute = !path.startsWith('/tuition') && (path.startsWith('/student') || path.startsWith('/faculty') || path.startsWith('/admin'));
+
+    if (isTuitionRoute && !token.is_tuition_user) {
+        return NextResponse.redirect(new URL('/login', request.url)); // College user tried to access tuition route
+    }
+    if (isCollegeRoute && token.is_tuition_user) {
+        return NextResponse.redirect(new URL('/tuition/dashboard', request.url)); // Tuition user tried to access college route
     }
 
     const response = NextResponse.next();
@@ -47,5 +63,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*"],
+    // We must include login paths in the matcher so the middleware can redirect them AWAY from login if they are already authenticated.
+    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*", "/login", "/tuition/login", "/signup", "/forgot-password", "/reset-password"],
 };
