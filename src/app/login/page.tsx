@@ -187,10 +187,15 @@ export default function LoginPage() {
                         </Button>
                     </form>
                 </CardContent>
-                <CardFooter className="flex justify-center border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        New Student? <Link href="/signup" className="text-zinc-900 dark:text-zinc-50 font-medium hover:underline underline-offset-4">Register Here</Link>
-                    </p>
+                    <div className="flex flex-col items-center space-y-2 w-full">
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            New Student? <Link href="/signup" className="text-zinc-900 dark:text-zinc-50 font-medium hover:underline underline-offset-4">Register Here</Link>
+                        </p>
+                        <div className="h-px bg-zinc-200 dark:bg-zinc-800 w-full my-2"></div>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            Are you a Tuition Center? <Link href="/tuition/login" className="text-blue-600 dark:text-blue-400 font-medium hover:underline flex items-center gap-1 mt-1 justify-center">Switch to Tuition Portal &rarr;</Link>
+                        </p>
+                    </div>
                 </CardFooter>
             </Card>
         </div>

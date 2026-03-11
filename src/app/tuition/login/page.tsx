@@ -76,6 +76,15 @@ export default function TuitionLogin() {
                     >
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
+                    
+                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 text-center space-y-2">
+                        <p className="text-sm text-gray-500 dark:text-zinc-400">
+                            Looking for the main college portal? 
+                        </p>
+                        <a href="/login" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                            Return to College Login &rarr;
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
