@@ -5,14 +5,14 @@ import { authOptions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session || !(session.user as any).is_tuition_user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const institutionId = (session.user as any).institution_id;
-        const { id } = params;
+        const { id } = await context.params;
 
         const { title, content, category, event_date } = await request.json();
 
@@ -31,14 +31,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session || !(session.user as any).is_tuition_user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const institutionId = (session.user as any).institution_id;
-        const { id } = params;
+        const { id } = await context.params;
 
         await query(`DELETE FROM announcements WHERE id = $1 AND institution_id = $2`, [id, institutionId]);
 
