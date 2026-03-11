@@ -47,25 +47,18 @@ export async function POST(req: Request) {
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
         // 1. Create User
-        // Note: In a real app, use a transaction (BEGIN...COMMIT)
         let userId;
         try {
             const userRes = await query(
-                `INSERT INTO users (full_name, email, password_hash, role, must_change_password, institution_id) VALUES ($1, $2, $3, 'faculty', TRUE, $4) RETURNING id`,
+                `INSERT INTO users (full_name, email, password_hash, role, institution_id) VALUES ($1, $2, $3, 'faculty', $4) RETURNING id`,
                 [full_name, email, hashedPassword, institutionId]
             );
             userId = userRes.rows[0].id;
         } catch (e: any) {
-            if (e.code === '42703' || e.message?.includes('must_change_password')) {
-                await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT FALSE');
-                const userRes = await query(
-                    `INSERT INTO users (full_name, email, password_hash, role, must_change_password, institution_id) VALUES ($1, $2, $3, 'faculty', TRUE, $4) RETURNING id`,
-                    [full_name, email, hashedPassword, institutionId]
-                );
-                userId = userRes.rows[0].id;
-            } else {
-                throw e;
+            if (e.code === '23505') {
+                return NextResponse.json({ error: 'A user with this email already exists' }, { status: 409 });
             }
+            throw e;
         }
 
         // 2. Create Faculty Profile
