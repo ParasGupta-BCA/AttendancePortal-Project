@@ -165,7 +165,7 @@ export const authOptions: NextAuthOptions = {
         },
     },
     pages: {
-        signIn: '/login', // Fallback, though we specify endpoints in the frontend
+        signIn: '/login', // Default for college portal
     },
 };
 

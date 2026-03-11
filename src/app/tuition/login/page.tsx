@@ -80,7 +80,7 @@ export default function TuitionLogin() {
                     <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 space-y-3">
                         {/* Create Institution */}
                         <a
-                            href="/tuition/register"
+                            href="/register-tuition"
                             className="group w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-100 dark:border-blue-900 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
                         >
                             <div className="flex items-center gap-3">

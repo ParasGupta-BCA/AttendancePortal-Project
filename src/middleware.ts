@@ -5,8 +5,8 @@ import { getToken } from 'next-auth/jwt';
 export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
-    // Allow register page through ALWAYS — no auth check needed
-    if (path === '/tuition/register') {
+    // Allow tuition register page through ALWAYS — it's a public page
+    if (path === '/register-tuition') {
         return NextResponse.next();
     }
 
@@ -69,5 +69,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     // We must include login paths in the matcher so the middleware can redirect them AWAY from login if they are already authenticated.
-    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*", "/login", "/tuition/login", "/tuition/register", "/signup", "/forgot-password", "/reset-password"],
+    matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/tuition/:path*", "/login", "/tuition/login", "/register-tuition", "/signup", "/forgot-password", "/reset-password"],
 };
