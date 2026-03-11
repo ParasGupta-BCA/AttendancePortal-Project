@@ -5,6 +5,11 @@ import { getToken } from 'next-auth/jwt';
 export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
+    // Allow register page through ALWAYS — no auth check needed
+    if (path === '/tuition/register') {
+        return NextResponse.next();
+    }
+
     // --- 1. Bypass all checks for login/public pages ---
     // If we are already on a login page, DO NOT redirect if unauthenticated.
     // If we ARE authenticated, redirect them to the correct dashboard.
