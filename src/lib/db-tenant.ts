@@ -5,6 +5,7 @@ import { Pool } from 'pg';
 // We'll fall back to a standard SUPABASE_DATABASE_URL if you define it manually in .env.local
 
 let connectionString = 
+  process.env.SUPABASE__POSTGRES_URL_NON_POOLING || 
   process.env.SUPABASE_POSTGRES_URL_NON_POOLING || 
   process.env.SUPABASE_DATABASE_URL;
 
