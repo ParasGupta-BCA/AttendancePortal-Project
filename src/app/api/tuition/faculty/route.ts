@@ -15,12 +15,12 @@ export async function GET() {
         const institutionId = (session.user as any).institution_id;
 
         const res = await query(`
-      SELECT f.id, f.designation, f.department, u.full_name, u.email 
-      FROM faculty f
-      JOIN users u ON f.user_id = u.id
-      WHERE f.institution_id = $1
-      ORDER BY u.full_name
-    `, [institutionId]);
+            SELECT f.id, f.designation, f.department, u.full_name, u.email 
+            FROM faculty f
+            JOIN users u ON f.user_id = u.id
+            WHERE f.institution_id = $1
+            ORDER BY u.full_name
+        `, [institutionId]);
         return NextResponse.json({ faculty: res.rows });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -41,27 +41,38 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
-        // Default password for new faculty
-        // They will be forced to change it on first login
         const defaultPassword = "faculty";
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-        // 1. Create User
+        // 1. Check if user already exists (same email + institution)
         let userId;
-        try {
+        const existingUser = await query(
+            `SELECT id FROM users WHERE email = $1 AND institution_id = $2`,
+            [email, institutionId]
+        );
+
+        if (existingUser.rows.length > 0) {
+            // Reuse existing user instead of failing
+            userId = existingUser.rows[0].id;
+        } else {
+            // Create new user
             const userRes = await query(
                 `INSERT INTO users (full_name, email, password_hash, role, institution_id) VALUES ($1, $2, $3, 'faculty', $4) RETURNING id`,
                 [full_name, email, hashedPassword, institutionId]
             );
             userId = userRes.rows[0].id;
-        } catch (e: any) {
-            if (e.code === '23505') {
-                return NextResponse.json({ error: 'A user with this email already exists' }, { status: 409 });
-            }
-            throw e;
         }
 
-        // 2. Create Faculty Profile
+        // 2. Check if already a faculty member (avoid duplicates)
+        const existingFaculty = await query(
+            `SELECT id FROM faculty WHERE user_id = $1 AND institution_id = $2`,
+            [userId, institutionId]
+        );
+        if (existingFaculty.rows.length > 0) {
+            return NextResponse.json({ error: 'This person is already a faculty member' }, { status: 409 });
+        }
+
+        // 3. Create Faculty Profile
         await query(
             `INSERT INTO faculty (user_id, designation, institution_id) VALUES ($1, $2, $3)`,
             [userId, designation, institutionId]
