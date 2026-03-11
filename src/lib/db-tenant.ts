@@ -9,11 +9,15 @@ let connectionString =
   process.env.SUPABASE_POSTGRES_URL_NON_POOLING || 
   process.env.SUPABASE_DATABASE_URL;
 
-if (!connectionString) {
+if (connectionString) {
+  // Strip out sslmode from connection string 
+  // so that pg doesn't get confused and override our explicit ssl config below
+  connectionString = connectionString.replace(/([?&])sslmode=[^&]+/g, '');
+  if (connectionString.endsWith('?')) {
+     connectionString = connectionString.slice(0, -1);
+  }
+} else {
   console.error("Missing Supabase Database URL environment variable. Check Vercel settings.");
-} else if (!connectionString.includes('sslmode=')) {
-  // Ensure SSL is required for Vercel/Supabase
-  connectionString += (connectionString.includes('?') ? '&' : '?') + 'sslmode=require';
 }
 
 const pool = new Pool({
