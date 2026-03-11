@@ -16,7 +16,7 @@ export default function TuitionLogin() {
         setIsLoading(true);
         setError('');
 
-        const res = await signIn('credentials', {
+        const res = await signIn('tuition', {
             redirect: false,
             email,
             password,
