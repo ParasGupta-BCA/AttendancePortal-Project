@@ -1,0 +1,130 @@
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import tenantPool, { tenantQuery as query } from '@/lib/db-tenant';
+import { hash } from 'bcryptjs';
+
+export async function GET(req: Request) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !(session.user as any).is_tuition_user) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const institutionId = (session.user as any).institution_id;
+
+    try {
+        // Enriched query to check for existence of email or enrollment_no in the main tables
+        const result = await query(
+            `SELECT 
+                sr.*,
+                CASE WHEN u.email IS NOT NULL THEN true ELSE false END as email_exists,
+                CASE WHEN s.enrollment_no IS NOT NULL THEN true ELSE false END as enrollment_exists
+             FROM student_requests sr
+             LEFT JOIN users u ON sr.email = u.email AND u.institution_id = $1
+             LEFT JOIN students s ON sr.enrollment_no = s.enrollment_no AND s.institution_id = $1
+             WHERE sr.status = 'pending' AND sr.institution_id = $1
+             ORDER BY sr.created_at ASC`,
+             [institutionId]
+        );
+        return NextResponse.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching requests:', error);
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    }
+}
+
+export async function POST(req: Request) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !(session.user as any).is_tuition_user) {
+        return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+    const institutionId = (session.user as any).institution_id;
+
+    try {
+        const body = await req.json();
+        const { requestId, action } = body; // action: 'approve' | 'reject'
+
+        if (!requestId || !action) {
+            return NextResponse.json({ message: 'Missing requestId or action' }, { status: 400 });
+        }
+
+        if (action === 'reject') {
+            await query(`UPDATE student_requests SET status = 'rejected' WHERE id = $1 AND institution_id = $2`, [requestId, institutionId]);
+            return NextResponse.json({ message: 'Request rejected' });
+        }
+
+        if (action === 'approve') {
+            // Get request details
+            const reqResult = await query(`SELECT * FROM student_requests WHERE id = $1 AND institution_id = $2`, [requestId, institutionId]);
+
+            if (reqResult.rowCount === 0) {
+                return NextResponse.json({ message: 'Request not found' }, { status: 404 });
+            }
+
+            const request = reqResult.rows[0];
+
+            // Double check if user already exists to avoid DB unique constraint errors mid-transaction
+            const userCheck = await query('SELECT id FROM users WHERE email = $1 AND institution_id = $2', [request.email, institutionId]);
+            if (userCheck.rowCount && userCheck.rowCount > 0) {
+                return NextResponse.json({ message: 'User with this email already exists.' }, { status: 409 });
+            }
+
+            const client = await tenantPool.connect();
+
+            try {
+                await client.query('BEGIN');
+
+                // 1. Create User with default password 'student'
+                const passwordHash = await hash('student', 10);
+                const insertUserText = `
+          INSERT INTO users (email, password_hash, full_name, role, institution_id)
+          VALUES ($1, $2, $3, 'student', $4)
+          RETURNING id
+        `;
+                const userRes = await client.query(insertUserText, [
+                    request.email,
+                    passwordHash,
+                    request.full_name,
+                    institutionId
+                ]);
+                const userId = userRes.rows[0].id;
+
+                // 2. Create Student Profile
+                const insertStudentText = `
+          INSERT INTO students (user_id, enrollment_no, erp_id, course_year, section, institution_id)
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `;
+                await client.query(insertStudentText, [
+                    userId,
+                    request.enrollment_no,
+                    request.erp_id,
+                    request.course_year,
+                    request.section,
+                    institutionId
+                ]);
+
+                // 3. Mark request as approved
+                await client.query(
+                    `UPDATE student_requests SET status = 'approved' WHERE id = $1 AND institution_id = $2`,
+                    [requestId, institutionId]
+                );
+
+                await client.query('COMMIT');
+                return NextResponse.json({ message: 'Request approved and student created.' });
+            } catch (err) {
+                await client.query('ROLLBACK');
+                console.error('Transaction error:', err);
+                return NextResponse.json({ message: 'Failed to approve request' }, { status: 500 });
+            } finally {
+                client.release();
+            }
+        }
+
+        return NextResponse.json({ message: 'Invalid action' }, { status: 400 });
+
+    } catch (error) {
+        console.error('Error processing request:', error);
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    }
+}

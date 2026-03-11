@@ -1,0 +1,205 @@
+"use client";
+import * as React from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { LayoutDashboard, Users, BookOpen, Calendar, Settings, LogOut, UserPlus, Megaphone, GraduationCap, Layers, LayoutGrid, LucideIcon, ChevronRight, ChevronDown, Mail } from "lucide-react";
+import { signOut } from "next-auth/react";
+
+const routes = [
+    {
+        label: "General",
+        layout: "general",
+        routes: [
+            {
+                label: "Dashboard",
+                icon: LayoutDashboard,
+                href: "/tuition/dashboard",
+                color: "text-sky-500",
+            },
+            {
+                label: "Timetable & Attendance",
+                icon: Calendar,
+                href: "/tuition/timetable",
+                color: "text-violet-500",
+            },
+            {
+                label: "Announcements",
+                icon: Megaphone,
+                href: "/tuition/announcements",
+                color: "text-red-500",
+            },
+            {
+                label: "Email Center",
+                icon: Mail,
+                href: "/tuition/emails",
+                color: "text-blue-500",
+            },
+        ]
+    },
+    {
+        label: "Student Management",
+        layout: "student",
+        routes: [
+            {
+                label: "Student Requests",
+                icon: UserPlus,
+                href: "/tuition/requests",
+                color: "text-amber-500",
+            },
+            {
+                label: "Students",
+                icon: Users,
+                href: "/tuition/students",
+                color: "text-pink-700",
+            },
+        ]
+    },
+    {
+        label: "Academic Management",
+        layout: "academic",
+        routes: [
+            {
+                label: "Courses",
+                icon: GraduationCap,
+                href: "/tuition/settings/courses",
+                color: "text-cyan-500",
+            },
+            {
+                label: "Sections",
+                icon: Layers,
+                href: "/tuition/settings/sections",
+                color: "text-lime-500",
+            },
+            {
+                label: "Classes",
+                icon: LayoutGrid,
+                href: "/tuition/settings/classes",
+                color: "text-indigo-500",
+            },
+            {
+                label: "Subjects",
+                icon: BookOpen,
+                href: "/tuition/subjects",
+                color: "text-emerald-500",
+            },
+        ]
+    },
+    {
+        label: "Institution",
+        layout: "institution",
+        routes: [
+            {
+                label: "Faculty",
+                icon: Users,
+                href: "/tuition/faculty",
+                color: "text-orange-700",
+            },
+            {
+                label: "Settings",
+                icon: Settings,
+                href: "/tuition/settings",
+            },
+        ]
+    },
+];
+
+interface SidebarProps {
+    onNavigate?: () => void;
+}
+
+export function TuitionSidebar({ onNavigate }: SidebarProps) {
+    const pathname = usePathname();
+    const [openSections, setOpenSections] = useState<string[]>(["general", "student"]);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        const saved = localStorage.getItem("sidebarOpenSections");
+        if (saved) {
+            try {
+                setOpenSections(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse sidebar state", e);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        if (isMounted) {
+            localStorage.setItem("sidebarOpenSections", JSON.stringify(openSections));
+        }
+    }, [openSections, isMounted]);
+
+    const toggleSection = (section: string) => {
+        setOpenSections((prev: string[]) =>
+            prev.includes(section)
+                ? prev.filter((s: string) => s !== section)
+                : [...prev, section]
+        );
+    };
+
+    return (
+        <div className="space-y-4 py-4 flex flex-col h-full bg-[#111827] text-white">
+            <div className="px-3 py-2 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <Link href="/tuition/dashboard" className="flex items-center pl-3 mb-10" onClick={onNavigate}>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text tracking-wide">
+                        Tuition <span className="text-white">Portal</span>
+                    </h1>
+                </Link>
+                <div className="space-y-2">
+                    {routes.map((section) => (
+                        <div key={section.label} className="space-y-1">
+                            <button
+                                onClick={() => toggleSection(section.layout)}
+                                className="flex items-center w-full px-3 py-2 text-xs font-semibold uppercase text-gray-400 hover:text-white transition-colors"
+                            >
+                                <span className="flex-1 text-left">{section.label}</span>
+                                {openSections.includes(section.layout) ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                )}
+                            </button>
+
+                            {openSections.includes(section.layout) && (
+                                <div className="space-y-1 mt-1">
+                                    {section.routes.map((route) => (
+                                        <Link
+                                            key={route.href}
+                                            href={route.href}
+                                            onClick={onNavigate}
+                                            className={cn(
+                                                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition pl-6",
+                                                pathname === route.href ? "bg-white/10 text-white" : "text-zinc-400"
+                                            )}
+                                        >
+                                            <div className="flex items-center flex-1">
+                                                <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
+                                                {route.label}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="px-3 py-2">
+                <div
+                    onClick={() => {
+                        localStorage.removeItem("sidebarOpenSections");
+                        signOut({ callbackUrl: "/tuition/login" });
+                    }}
+                    className="text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition text-red-500"
+                >
+                    <LogOut className="h-5 w-5 mr-3" />
+                    Logout
+                </div>
+            </div>
+        </div>
+    );
+}

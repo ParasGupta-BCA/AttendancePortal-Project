@@ -1,4 +1,6 @@
 "use client";
+import * as React from "react";
+import { useState, useEffect } from "react";
 
 import { Menu } from "lucide-react";
 
@@ -6,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar as AdminSidebar } from "@/components/admin-sidebar";
 import { FacultySidebar } from "@/components/faculty-sidebar";
-import { useEffect, useState } from "react";
+import { TuitionSidebar } from "@/components/tuition-sidebar";
 
 interface MobileSidebarProps {
-    role: "admin" | "faculty";
+    role: "admin" | "faculty" | "tuition";
 }
 
 export const MobileSidebar = ({ role }: MobileSidebarProps) => {
@@ -38,6 +40,8 @@ export const MobileSidebar = ({ role }: MobileSidebarProps) => {
                 </SheetHeader>
                 {role === "admin" ? (
                     <AdminSidebar onNavigate={() => setOpen(false)} />
+                ) : role === "tuition" ? (
+                    <TuitionSidebar onNavigate={() => setOpen(false)} />
                 ) : (
                     <FacultySidebar onNavigate={() => setOpen(false)} />
                 )}
