@@ -16,11 +16,11 @@ export default function FacultyPage() {
     const [open, setOpen] = useState(false);
     const router = useRouter();
 
-    // Form state
     const [formData, setFormData] = useState({
         full_name: "",
         email: "",
-        designation: ""
+        designation: "",
+        employee_id: ""
     });
 
     const fetchFaculty = () => {
@@ -107,6 +107,16 @@ export default function FacultyPage() {
                                     className="col-span-3"
                                     placeholder="e.g. Professor"
                                     required
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="employee_id" className="text-right">Employee ID</Label>
+                                <Input
+                                    id="employee_id"
+                                    value={formData.employee_id}
+                                    onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
+                                    className="col-span-3"
+                                    placeholder="e.g. EMP001 (auto-generated if blank)"
                                 />
                             </div>
                             <DialogFooter>

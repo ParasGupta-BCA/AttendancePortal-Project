@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         }
         const institutionId = (session.user as any).institution_id;
 
-        const { full_name, email, designation } = await req.json();
+        const { full_name, email, designation, employee_id } = await req.json();
 
         if (!full_name || !email || !designation) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -43,6 +43,9 @@ export async function POST(req: Request) {
 
         const defaultPassword = "faculty";
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+        // Auto-generate employee_id if not provided
+        const finalEmployeeId = employee_id || `EMP-${Date.now()}`;
 
         // 1. Check if user already exists (same email + institution)
         let userId;
@@ -72,10 +75,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'This person is already a faculty member' }, { status: 409 });
         }
 
-        // 3. Create Faculty Profile
+        // 3. Create Faculty Profile (include employee_id — required NOT NULL in Supabase)
         await query(
-            `INSERT INTO faculty (user_id, designation, institution_id) VALUES ($1, $2, $3)`,
-            [userId, designation, institutionId]
+            `INSERT INTO faculty (user_id, designation, employee_id, institution_id) VALUES ($1, $2, $3, $4)`,
+            [userId, designation, finalEmployeeId, institutionId]
         );
 
         return NextResponse.json({ success: true });
