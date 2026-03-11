@@ -65,23 +65,33 @@ export async function POST(request: Request) {
         const defaultPassword = 'student';
         const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-        // 1. Create User — try with must_change_password first, fallback if column missing
+        // 1. Check if user already exists — reuse if so (avoid unique constraint error)
         let userId;
-        try {
-            const res = await query(
+        const existingUser = await query(
+            `SELECT id FROM users WHERE email = $1 AND institution_id = $2`,
+            [email, institutionId]
+        );
+
+        if (existingUser.rows.length > 0) {
+            userId = existingUser.rows[0].id;
+        } else {
+            const userRes = await query(
                 `INSERT INTO users (full_name, email, password_hash, role, institution_id) VALUES ($1, $2, $3, 'student', $4) RETURNING id`,
                 [full_name, email, hashedPassword, institutionId]
             );
-            userId = res.rows[0].id;
-        } catch (e: any) {
-            // If email already exists
-            if (e.code === '23505') {
-                return NextResponse.json({ error: 'A user with this email already exists' }, { status: 409 });
-            }
-            throw e;
+            userId = userRes.rows[0].id;
         }
 
-        // 2. Create Student Profile
+        // 2. Check if already a student (avoid duplicate profiles)
+        const existingStudent = await query(
+            `SELECT id FROM students WHERE user_id = $1 AND institution_id = $2`,
+            [userId, institutionId]
+        );
+        if (existingStudent.rows.length > 0) {
+            return NextResponse.json({ error: 'This student is already enrolled' }, { status: 409 });
+        }
+
+        // 3. Create Student Profile
         await query(`
             INSERT INTO students (user_id, enrollment_no, erp_id, course_year, section, institution_id)
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -93,3 +103,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
+
