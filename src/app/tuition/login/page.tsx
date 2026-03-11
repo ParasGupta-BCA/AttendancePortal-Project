@@ -77,7 +77,28 @@ export default function TuitionLogin() {
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
                     
-                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800">
+                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 space-y-3">
+                        {/* Create Institution */}
+                        <a
+                            href="/tuition/register"
+                            className="group w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-100 dark:border-blue-900 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 p-2 rounded-lg bg-blue-600 text-white shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                                    </svg>
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">New here?</p>
+                                    <p className="text-xs text-blue-500 dark:text-blue-400">Create an Institution</p>
+                                </div>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </a>
+                        {/* Return to college */}
                         <a
                             href="/login"
                             className="group w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-zinc-50 to-gray-50 dark:from-zinc-800/60 dark:to-zinc-900/60 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:shadow-md transition-all duration-200"
