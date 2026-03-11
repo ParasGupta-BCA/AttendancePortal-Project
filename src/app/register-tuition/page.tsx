@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function TuitionRegister() {
     const router = useRouter();
@@ -47,13 +48,26 @@ export default function TuitionRegister() {
         });
 
         const json = await res.json();
-        setIsLoading(false);
 
         if (!res.ok) {
+            setIsLoading(false);
             setError(json.error || 'Something went wrong');
         } else {
-            setSuccess('Institution created! Redirecting to login...');
-            setTimeout(() => router.push('/tuition/login'), 2000);
+            setSuccess('Institution created! Logging you in...');
+            // Auto-login with the tuition provider
+            const result = await signIn('tuition', {
+                email: form.admin_email,
+                password: form.admin_password,
+                redirect: false,
+            });
+            setIsLoading(false);
+            if (result?.ok) {
+                router.push('/tuition/dashboard');
+            } else {
+                // Login failed but institution was created — go to login page
+                setSuccess('Institution created! Please log in.');
+                setTimeout(() => router.push('/tuition/login'), 2000);
+            }
         }
     };
 

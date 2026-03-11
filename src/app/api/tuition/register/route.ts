@@ -52,8 +52,8 @@ export async function POST(req: Request) {
         // 4. Hash password and create admin user
         const hashedPassword = await bcrypt.hash(admin_password, 12);
         await query(
-            `INSERT INTO users (full_name, email, password_hash, role, institution_id, is_tuition_user)
-             VALUES ($1, $2, $3, 'admin', $4, true)`,
+            `INSERT INTO users (full_name, email, password_hash, role, institution_id)
+             VALUES ($1, $2, $3, 'admin', $4)`,
             [admin_name, admin_email, hashedPassword, institutionId]
         );
 
