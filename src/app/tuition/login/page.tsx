@@ -77,12 +77,26 @@ export default function TuitionLogin() {
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
                     
-                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800 text-center space-y-2">
-                        <p className="text-sm text-gray-500 dark:text-zinc-400">
-                            Looking for the main college portal? 
-                        </p>
-                        <a href="/login" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                            Return to College Login &rarr;
+                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800">
+                        <a
+                            href="/login"
+                            className="group w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-zinc-50 to-gray-50 dark:from-zinc-800/60 dark:to-zinc-900/60 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 hover:shadow-md transition-all duration-200"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 p-2 rounded-lg bg-zinc-800 dark:bg-zinc-200 text-white dark:text-zinc-900 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                        <polyline points="9 22 9 12 15 12 15 22"/>
+                                    </svg>
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">Main College Portal</p>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Return to College Login</p>
+                                </div>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-zinc-400 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
                         </a>
                     </div>
                 </form>
