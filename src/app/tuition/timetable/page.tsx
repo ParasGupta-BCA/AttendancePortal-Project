@@ -42,7 +42,7 @@ export default function TimetablePage() {
 
     const refreshTimetable = () => {
         setLoading(true);
-        fetch("/api/timetable")
+        fetch("/api/tuition/timetable")
             .then((res) => res.json())
             .then((data) => {
                 setTimetable(data.timetable);
@@ -60,7 +60,7 @@ export default function TimetablePage() {
     useEffect(() => {
         if (showAddModal) {
             Promise.all([
-                fetch("/api/classes").then(res => res.json()),
+                fetch("/api/tuition/classes").then(res => res.json()),
                 fetch("/api/tuition/subjects").then(res => res.json()),
                 fetch("/api/tuition/faculty").then(res => res.json())
             ]).then(([classesData, subjectsData, facultyData]) => {

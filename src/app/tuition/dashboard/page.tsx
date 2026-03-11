@@ -133,7 +133,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <SubjectAnalytics className="flex-1" />
+                    <SubjectAnalytics className="flex-1" apiBase="/api/tuition" />
                 </div>
 
                 {/* Active Sessions & Recent Activity Column */}
@@ -159,7 +159,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <RadarAnalytics />
+                    <RadarAnalytics apiBase="/api/tuition" />
                 </div>
             </div>
         </div >

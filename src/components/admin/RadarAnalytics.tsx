@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Target, Signal } from "lucide-react";
 
-export function RadarAnalytics() {
+export function RadarAnalytics({ apiBase = "/api/admin" }: { apiBase?: string }) {
     const [logs, setLogs] = useState<any[]>([]);
     const [radiusSettings, setRadiusSettings] = useState(200);
 
@@ -14,8 +14,8 @@ export function RadarAnalytics() {
         const fetchData = async () => {
             try {
                 const [logsRes, settingsRes] = await Promise.all([
-                    fetch("/api/admin/scan-logs"),
-                    fetch("/api/admin/settings")
+                    fetch(`${apiBase}/scan-logs`),
+                    fetch(`${apiBase}/settings`)
                 ]);
 
                 if (logsRes.ok) {
@@ -36,7 +36,7 @@ export function RadarAnalytics() {
         fetchData();
         const interval = setInterval(fetchData, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [apiBase]);
 
     const radarBlips = logs.slice(0, 15).map((log, i) => {
         const idChar = log.id ? log.id.charCodeAt(log.id.length - 1) : Math.random() * 100;

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 
-export function SubjectAnalytics({ className }: { className?: string }) {
+export function SubjectAnalytics({ className, apiBase = "/api/admin" }: { className?: string; apiBase?: string }) {
     const [subjects, setSubjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
@@ -13,7 +13,7 @@ export function SubjectAnalytics({ className }: { className?: string }) {
     useEffect(() => {
         async function fetchStats() {
             try {
-                const res = await fetch("/api/admin/stats");
+                const res = await fetch(`${apiBase}/stats`);
                 const data = await res.json();
                 if (data.subjectPerformance) {
                     setSubjects(data.subjectPerformance);
@@ -25,7 +25,7 @@ export function SubjectAnalytics({ className }: { className?: string }) {
             }
         }
         fetchStats();
-    }, []);
+    }, [apiBase]);
 
     const displayedSubjects = showAll ? subjects : subjects.slice(0, 2);
 
