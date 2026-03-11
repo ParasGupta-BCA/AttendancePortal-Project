@@ -48,7 +48,7 @@ export default function FacultyPage() {
 
             if (res.ok) {
                 setOpen(false);
-                setFormData({ full_name: "", email: "", designation: "" });
+                setFormData({ full_name: "", email: "", designation: "", employee_id: "" });
                 fetchFaculty(); // Refresh list
                 router.refresh();
             } else {
