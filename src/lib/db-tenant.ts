@@ -4,12 +4,15 @@ import { Pool } from 'pg';
 // e.g., SUPABASE_POSTGRES_URL_NON_POOLING or however Vercel named it.
 // We'll fall back to a standard SUPABASE_DATABASE_URL if you define it manually in .env.local
 
-const connectionString = 
+let connectionString = 
   process.env.SUPABASE_POSTGRES_URL_NON_POOLING || 
   process.env.SUPABASE_DATABASE_URL;
 
 if (!connectionString) {
   console.error("Missing Supabase Database URL environment variable. Check Vercel settings.");
+} else if (!connectionString.includes('sslmode=')) {
+  // Ensure SSL is required for Vercel/Supabase
+  connectionString += (connectionString.includes('?') ? '&' : '?') + 'sslmode=require';
 }
 
 const pool = new Pool({
