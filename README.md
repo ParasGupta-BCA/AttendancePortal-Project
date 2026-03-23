@@ -1,6 +1,6 @@
 <div align="center">
 
-#  Attendance Portal Project
+<h1>Attendance Portal Project</h1>
 
 <b>A modern and efficient Attendance Management System</b><br>
 Built to simplify student attendance tracking with clean UI & powerful backend.
