@@ -58,7 +58,3 @@ It provides a simple, fast, and user-friendly interface for handling attendance 
 | Tools     | Git, GitHub |
 
 ---
-
-## 📸 Screenshots
-
-> Add your screenshots here 👇
