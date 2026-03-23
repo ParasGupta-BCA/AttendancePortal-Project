@@ -1,16 +1,18 @@
+<div align="center">
+
 # 📊 Attendance Portal Project
 
-<p align="center">
-  <b>A modern and efficient Attendance Management System</b><br>
-  Built to simplify student attendance tracking with clean UI & powerful backend.
-</p>
+<b>A modern and efficient Attendance Management System</b><br>
+Built to simplify student attendance tracking with clean UI & powerful backend.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Version-1.0-blue?style=for-the-badge">
-  <img src="https://img.shields.io/badge/Deployment-Live-brightgreen?style=for-the-badge">
-  <img src="https://img.shields.io/badge/License-Educational-orange?style=for-the-badge">
-</p>
+<br>
+
+<img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge">
+<img src="https://img.shields.io/badge/Version-1.0-blue?style=for-the-badge">
+<img src="https://img.shields.io/badge/Deployment-Live-brightgreen?style=for-the-badge">
+<img src="https://img.shields.io/badge/License-Educational-orange?style=for-the-badge">
+
+</div>
 
 ---
 
