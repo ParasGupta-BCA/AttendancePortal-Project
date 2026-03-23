@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📊 Attendance Portal Project
+#  Attendance Portal Project
 
 <b>A modern and efficient Attendance Management System</b><br>
 Built to simplify student attendance tracking with clean UI & powerful backend.
