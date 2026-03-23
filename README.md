@@ -57,4 +57,3 @@ It provides a simple, fast, and user-friendly interface for handling attendance 
 | Hosting   | Vercel / Custom Domain |
 | Tools     | Git, GitHub |
 
----
