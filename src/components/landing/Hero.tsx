@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { PlayCircle, AlertCircle } from "lucide-react";
+import { PlayCircle, Volume2, Settings, Maximize } from "lucide-react";
 
 export function Hero() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -75,22 +75,57 @@ export function Hero() {
 
       {/* Video Demo Modal */}
       <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
-        <DialogContent className="sm:max-w-[600px] border-none bg-white/80 backdrop-blur-2xl rounded-3xl p-0 overflow-hidden shadow-2xl">
-           <div className="aspect-video w-full bg-slate-900/10 flex flex-col items-center justify-center p-12 text-center group">
-              <div className="h-20 w-20 rounded-full bg-white/50 backdrop-blur-md flex items-center justify-center mb-6 shadow-inner border border-white/20 group-hover:scale-110 transition-transform duration-500">
-                 <AlertCircle className="h-10 w-10 text-[#2d3338]/40" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#2d3338] mb-3">
-                Watch Demo
-              </h3>
-              <p className="text-[#2d3338]/60 text-lg max-w-xs leading-relaxed">
-                Currently we not have recorded Demo video Sorry!
-              </p>
+        <DialogContent className="sm:max-w-[800px] border-none bg-slate-950 rounded-[32px] p-0 overflow-hidden shadow-2xl transition-all duration-500">
+           <div className="relative aspect-video w-full bg-black group overflow-hidden">
+              {/* Fake Video Player Grain/Overlay */}
+              <div className="absolute inset-0 bg-[#0A0A0B] opacity-50" />
               
-              <div className="mt-8 flex gap-3">
-                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30 animate-pulse" />
-                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30 animate-pulse delay-75" />
-                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30 animate-pulse delay-150" />
+              {/* Play Button + Placeholder Content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+                 <div className="h-24 w-24 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center mb-8 border border-white/10 group-hover:bg-blue-600 group-hover:scale-110 transition-all duration-700 shadow-2xl">
+                    <PlayCircle className="h-12 w-12 text-white/40 group-hover:text-white" fill="currentColor" />
+                 </div>
+                 <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">
+                   Training & Demo Preview
+                 </h3>
+                 <p className="text-slate-400 text-xl max-w-sm leading-relaxed font-medium">
+                   "Currently we not have recorded Demo video Sorry!"
+                 </p>
+                 
+                 <div className="mt-8 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-slate-500 text-sm uppercase tracking-[0.2em] font-bold inline-flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                    Pending Record
+                 </div>
+              </div>
+
+              {/* Mock Video Controls (YouTube Style) */}
+              <div className="absolute bottom-0 inset-x-0 p-4 pt-16 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                 {/* Progress Bar */}
+                 <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden relative group/progress cursor-pointer">
+                    <div className="absolute left-0 top-0 h-full w-[0%] bg-blue-500 group-hover/progress:h-1.5 transition-all" />
+                    <div className="absolute left-[30%] top-1/2 -translate-y-1/2 h-3 w-3 bg-blue-500 rounded-full shadow-lg scale-0 group-hover/progress:scale-100 transition-transform" />
+                 </div>
+                 
+                 <div className="flex items-center justify-between text-white/80">
+                    <div className="flex items-center gap-6">
+                       <PlayCircle className="h-6 w-6 cursor-pointer hover:text-white transition-colors" />
+                       <div className="flex items-center gap-4">
+                          <Volume2 className="h-6 w-6 cursor-pointer hover:text-white transition-colors" />
+                          <span className="text-sm font-medium tabular-nums">0:00 / 4:12</span>
+                       </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-6">
+                       <Settings className="h-6 w-6 cursor-pointer hover:text-white transition-colors" />
+                       <Maximize className="h-6 w-6 cursor-pointer hover:text-white transition-colors" />
+                    </div>
+                 </div>
+              </div>
+
+              {/* Top Watermark */}
+              <div className="absolute top-6 left-6 flex items-center gap-3">
+                 <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-black shadow-lg">AP</div>
+                 <span className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Portal Demo</span>
               </div>
            </div>
         </DialogContent>
