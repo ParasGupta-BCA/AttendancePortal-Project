@@ -5,23 +5,24 @@ import { getToken } from 'next-auth/jwt';
 export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
-    // Allow tuition register and root page through ALWAYS — they're public
-    if (path === '/register-tuition' || path === '/' || path === '/schedule' || path === '/reports' || path === '/settings') {
+    // Allow tuition register through ALWAYS — they're public
+    if (path === '/register-tuition' || path === '/schedule' || path === '/reports' || path === '/settings') {
         return NextResponse.next();
     }
 
     // --- 1. Bypass all checks for login/public pages ---
-    // If we are already on a login page, DO NOT redirect if unauthenticated.
+    // If we are already on a login page or root page, DO NOT redirect if unauthenticated.
     // If we ARE authenticated, redirect them to the correct dashboard.
+    const isRootPage = path === '/';
     const isCollegeLoginPage = path === '/login' || path === '/signup' || path.startsWith('/forgot-password') || path.startsWith('/reset-password');
     const isTuitionLoginPage = path === '/tuition/login' || path === '/tuition/register';
 
     const token = await getToken({ req: request });
     const isAuth = !!token;
 
-    if (isCollegeLoginPage || isTuitionLoginPage) {
+    if (isCollegeLoginPage || isTuitionLoginPage || isRootPage) {
         if (isAuth) {
-            // They are logged in but trying to view a login page. Send to dashboard.
+            // They are logged in but trying to view a login page or landing page. Send to dashboard.
             if (token.is_tuition_user) {
                  return NextResponse.redirect(new URL('/tuition/dashboard', request.url));
             } else {
@@ -31,7 +32,7 @@ export async function middleware(request: NextRequest) {
                  if (token.role === 'student') return NextResponse.redirect(new URL('/student/dashboard', request.url));
             }
         }
-        // If they are not logged in and viewing a login page, just let them see it!
+        // If they are not logged in and viewing a login/root page, just let them see it!
         return NextResponse.next();
     }
 

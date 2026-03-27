@@ -1,13 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function TuitionRegister() {
+    const { data: session, status } = useSession();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    useEffect(() => {
+        if (status === "authenticated" && session?.user) {
+            const user = session.user as any;
+            if (user.is_tuition_user) {
+                router.replace("/tuition/dashboard");
+            } else {
+                // College user tried to access tuition register, redirect to college dashboard
+                if (user.role === 'student') router.replace("/student/dashboard");
+                else if (user.role === 'faculty') router.replace("/faculty/dashboard");
+                else router.replace("/admin/dashboard");
+            }
+        }
+    }, [status, session, router]);
+
+    if (status === "loading") {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-zinc-950">
+                <p className="text-sm text-gray-500 animate-pulse">Checking session...</p>
+            </div>
+        );
+    }
 
     const [form, setForm] = useState({
         institution_name: '',

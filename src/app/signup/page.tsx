@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -9,7 +10,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from 'next/link';
 
 export default function SignupPage() {
+    const { data: session, status } = useSession();
     const router = useRouter();
+
+    useEffect(() => {
+        if (status === "authenticated" && session?.user) {
+            const user = session.user as any;
+            if (user.role === 'student') {
+                router.replace("/student/dashboard");
+            } else if (user.role === 'faculty') {
+                router.replace("/faculty/dashboard");
+            } else {
+                router.replace("/admin/dashboard");
+            }
+        }
+    }, [status, session, router]);
+
+    if (status === "loading") {
+        return (
+            <div className="flex h-screen w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                <p className="text-zinc-500 animate-pulse">Checking session...</p>
+            </div>
+        );
+    }
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
