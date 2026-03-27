@@ -86,7 +86,7 @@ export function Hero() {
                     <PlayCircle className="h-12 w-12 text-white/40 group-hover:text-white" fill="currentColor" />
                  </div>
                  <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">
-                   Training & Demo Preview
+                   Demo Preview
                  </h3>
                  <p className="text-slate-400 text-xl max-w-sm leading-relaxed font-medium">
                    "Currently we not have recorded Demo video Sorry!"
@@ -125,7 +125,7 @@ export function Hero() {
               {/* Top Watermark */}
               <div className="absolute top-6 left-6 flex items-center gap-3">
                  <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-xs font-black shadow-lg">AP</div>
-                 <span className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Portal Demo</span>
+                 <span className="text-white/40 font-bold uppercase tracking-widest text-[10px]">Attendance Portal</span>
               </div>
            </div>
         </DialogContent>
