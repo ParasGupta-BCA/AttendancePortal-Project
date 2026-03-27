@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { PlayCircle, Volume2, Settings, Maximize } from "lucide-react";
+import { PlayCircle, Volume2, Settings, Maximize, X } from "lucide-react";
 
 export function Hero() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -75,8 +75,18 @@ export function Hero() {
 
       {/* Video Demo Modal */}
       <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
-        <DialogContent className="sm:max-w-[800px] border-none bg-slate-950 rounded-[32px] p-0 overflow-hidden shadow-2xl transition-all duration-500">
+        <DialogContent 
+           showCloseButton={false} 
+           className="sm:max-w-[800px] border-none bg-slate-950 rounded-[32px] p-0 overflow-hidden shadow-2xl transition-all duration-500"
+        >
            <div className="relative aspect-video w-full bg-black group overflow-hidden">
+              {/* Custom Close Button */}
+              <button
+                onClick={() => setIsVideoOpen(false)}
+                className="absolute top-6 right-6 z-50 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white/50 hover:text-white transition-all border border-white/10 group-hover:scale-105"
+              >
+                 <X className="h-5 w-5" />
+              </button>
               {/* Fake Video Player Grain/Overlay */}
               <div className="absolute inset-0 bg-[#0A0A0B] opacity-50" />
               
