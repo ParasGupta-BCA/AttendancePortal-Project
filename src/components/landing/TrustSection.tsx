@@ -5,8 +5,8 @@ import Image from "next/image";
 
 export function TrustSection() {
   const logos = [
-    { src: "/landing/logo-bvimr.png", alt: "BVIMR Logo", scale: "scale-100" },
-    { src: "/landing/logo-tuition.png", alt: "Tuition Point Logo", scale: "scale-150" },
+    { src: "/landing/logo-bvimr.png", alt: "BVIMR Logo", className: "h-12 w-48 scale-100" },
+    { src: "/landing/logo-tuition.png", alt: "Tuition Point Logo", className: "h-20 w-64 scale-[2.2]" },
   ];
 
   return (
@@ -32,7 +32,7 @@ export function TrustSection() {
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.1 }}
-                  className={`relative h-12 w-48 transition-all duration-500 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 ${logo.scale}`}
+                  className={`relative transition-all duration-500 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 ${logo.className}`}
                 >
                   <Image 
                     src={logo.src} 
