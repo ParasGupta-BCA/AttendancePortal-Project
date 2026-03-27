@@ -1,25 +1,13 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
 
 export function Hero() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-
-  const shadowY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const shadowScale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
-  const shadowOpacity = useTransform(scrollYProgress, [0, 1], [0.15, 0.05]);
-  const imageRotate = useTransform(scrollYProgress, [0, 1], [0, -2]);
-
   return (
-    <section ref={containerRef} className="relative pt-32 pb-20 overflow-hidden">
+    <section className="relative pt-32 pb-20 overflow-hidden">
       <div className="container mx-auto px-6 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -53,19 +41,8 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          style={{ rotateX: imageRotate }}
-          className="relative max-w-5xl mx-auto perspective-1000"
+          className="relative max-w-5xl mx-auto"
         >
-          {/* Moving Shadow */}
-          <motion.div 
-            style={{ 
-              y: shadowY, 
-              scale: shadowScale, 
-              opacity: shadowOpacity 
-            }}
-            className="absolute -inset-10 bg-black blur-[100px] rounded-full -z-10"
-          />
-          
           <div className="absolute -inset-4 bg-gradient-to-b from-blue-500/10 to-purple-500/5 blur-3xl rounded-3xl -z-10" />
           <div className="relative bg-white/40 backdrop-blur-md p-2 rounded-3xl border border-white/50 shadow-2xl">
             <Image
