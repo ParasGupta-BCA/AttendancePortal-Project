@@ -43,14 +43,14 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="relative max-w-5xl mx-auto"
         >
-          <div className="absolute -inset-4 bg-gradient-to-b from-blue-500/10 to-purple-500/5 blur-3xl rounded-[3rem] -z-10" />
-          <div className="relative bg-white/40 backdrop-blur-md p-2 rounded-[2.5rem] border border-white/50 shadow-2xl">
+          <div className="absolute -inset-4 bg-gradient-to-b from-blue-500/10 to-purple-500/5 blur-3xl rounded-3xl -z-10" />
+          <div className="relative bg-white/40 backdrop-blur-md p-2 rounded-3xl border border-white/50 shadow-2xl">
             <Image
               src="/landing/dashboard-preview.png"
               alt="Dashboard Preview"
               width={1200}
               height={800}
-              className="rounded-[2rem] shadow-lg w-full h-auto object-cover"
+              className="rounded-2xl shadow-lg w-full h-auto object-cover"
               priority
             />
           </div>

@@ -35,7 +35,7 @@ export function Operations() {
 
           <div className="lg:w-1/2 relative w-full max-w-xl mx-auto">
             <div className="absolute -inset-10 bg-blue-500/5 blur-[100px] rounded-full -z-10" />
-            <div className="bg-white rounded-[3rem] shadow-2xl p-8 border border-[#ebeef2]">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 border border-[#ebeef2]">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h4 className="text-xl font-bold text-[#2d3338]">Current Attendance</h4>
