@@ -14,6 +14,25 @@ import {
 } from "@/components/ui/dialog";
 import { PlayCircle, Volume2, Settings, Maximize, X } from "lucide-react";
 
+const YouTubeSmiley = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 100 70" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <rect width="100" height="70" rx="18" fill="#FF0000" />
+    <circle cx="34" cy="28" r="6" fill="white" />
+    <circle cx="66" cy="28" r="6" fill="white" />
+    <path 
+      d="M30 52L70 42" 
+      stroke="white" 
+      strokeWidth="6" 
+      strokeLinecap="round" 
+    />
+  </svg>
+);
+
 export function Hero() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
@@ -92,8 +111,8 @@ export function Hero() {
               
               {/* Play Button + Placeholder Content */}
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-                 <div className="h-24 w-24 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center mb-8 border border-white/10 group-hover:bg-blue-600 group-hover:scale-110 transition-all duration-700 shadow-2xl">
-                    <PlayCircle className="h-12 w-12 text-white/40 group-hover:text-white" fill="currentColor" />
+                 <div className="h-28 w-28 rounded-full bg-white/5 backdrop-blur-xl flex items-center justify-center mb-8 border border-white/10 group-hover:scale-110 transition-all duration-700 shadow-2xl overflow-hidden p-4">
+                    <YouTubeSmiley className="w-full h-auto drop-shadow-xl" />
                  </div>
                  <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">
                    Demo Preview
