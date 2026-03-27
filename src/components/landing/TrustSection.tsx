@@ -5,8 +5,8 @@ import Image from "next/image";
 
 export function TrustSection() {
   const logos = [
-    { src: "/landing/logo-bvimr.png", alt: "BVIMR Logo" },
-    { src: "/landing/logo-tuition.png", alt: "Tuition Point Logo" },
+    { src: "/landing/logo-bvimr.png", alt: "BVIMR Logo", scale: "scale-100" },
+    { src: "/landing/logo-tuition.png", alt: "Tuition Point Logo", scale: "scale-[1.35]" },
   ];
 
   return (
@@ -27,12 +27,12 @@ export function TrustSection() {
             {/* Logo Cloud Background */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             
-            <div className="relative flex flex-wrap justify-center items-center gap-12 md:gap-24 px-8 py-10 bg-white border border-[#2d3338]/5 rounded-3xl shadow-sm hover:shadow-md transition-all duration-500">
+            <div className="relative flex flex-wrap justify-center items-center gap-16 md:gap-32 px-10 py-12 bg-white border border-[#2d3338]/5 rounded-3xl shadow-sm hover:shadow-md transition-all duration-500">
               {logos.map((logo, index) => (
                 <motion.div
                   key={index}
-                  whileHover={{ scale: 1.05 }}
-                  className="relative h-12 w-48 transition-all duration-500 grayscale opacity-40 hover:grayscale-0 hover:opacity-100"
+                  whileHover={{ scale: 1.1 }}
+                  className={`relative h-16 w-60 transition-all duration-500 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 ${logo.scale}`}
                 >
                   <Image 
                     src={logo.src} 
