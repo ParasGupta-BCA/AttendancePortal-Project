@@ -11,14 +11,14 @@ const items = [
 
 export function Operations() {
   return (
-    <section className="py-32 overflow-hidden">
+    <section className="py-20 md:py-32 overflow-hidden">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col lg:flex-row items-center gap-20">
-          <div className="lg:w-1/2">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#2d3338] mb-8 leading-[1.2]">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+          <div className="lg:w-1/2 text-center lg:text-left">
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#2d3338] mb-6 md:mb-8 leading-[1.2]">
               The Hub of Operations
             </h2>
-            <p className="text-lg text-[#2d3338]/60 mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg text-[#2d3338]/60 mb-8 md:mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
               The interface is built to fade away, leaving only your data. With liquid transitions and tactile feedback, managing 10 or 10,000 users feels equally effortless.
             </p>
             <div className="space-y-6">

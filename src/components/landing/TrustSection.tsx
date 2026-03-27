@@ -27,7 +27,7 @@ export function TrustSection() {
             {/* Logo Cloud Background */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             
-            <div className="relative flex flex-wrap justify-center items-center gap-16 md:gap-32 px-10 py-12 bg-white border border-[#2d3338]/5 rounded-3xl shadow-sm hover:shadow-md transition-all duration-500">
+            <div className="relative flex flex-wrap justify-center items-center gap-12 sm:gap-16 md:gap-32 px-6 sm:px-10 py-8 sm:py-12 bg-white border border-[#2d3338]/5 rounded-3xl shadow-sm hover:shadow-md transition-all duration-500">
               {logos.map((logo, index) => (
                 <motion.div
                   key={index}
