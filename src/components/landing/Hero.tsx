@@ -21,10 +21,6 @@ export function Hero() {
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[#2d3338] mb-6 md:mb-8 max-w-4xl mx-auto leading-[1.2] md:leading-[1.1]">
             Effortless Attendance tracking for the Modern Institution
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-[#2d3338]/60 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed px-4 md:px-0">
-            Streamline your organization with our high-fidelity tracking system.
-            Designed for clarity, built for speed, and refined for the modern workspace.
-          </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
             <Link href="/login" className="w-full sm:w-auto">
