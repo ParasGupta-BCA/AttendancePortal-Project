@@ -11,7 +11,7 @@ export function SessionGuard({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         // Public paths that don't require authentication
-        const publicPaths = ["/", "/login", "/signup", "/setup-password", "/forgot-password", "/reset-password", "/tuition/login", "/tuition/register", "/register-tuition"];
+        const publicPaths = ["/", "/login", "/signup", "/setup-password", "/forgot-password", "/reset-password", "/tuition/login", "/tuition/register", "/register-tuition", "/schedule", "/reports", "/settings"];
 
         // If user is unauthenticated and not on a public page
         if (status === "unauthenticated" && !publicPaths.includes(pathname)) {

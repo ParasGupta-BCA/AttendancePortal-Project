@@ -12,10 +12,10 @@ export function Navbar() {
         </div>
         
         <div className="hidden lg:flex items-center gap-8">
-          <Link href="#" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Dashboard</Link>
-          <Link href="#" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Schedule</Link>
-          <Link href="#" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Reports</Link>
-          <Link href="#" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Settings</Link>
+          <Link href="/" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Dashboard</Link>
+          <Link href="/schedule" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Schedule</Link>
+          <Link href="/reports" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Reports</Link>
+          <Link href="/settings" className="text-sm font-medium text-[#2d3338]/70 hover:text-[#2d3338] transition-colors">Settings</Link>
         </div>
 
         <div>
