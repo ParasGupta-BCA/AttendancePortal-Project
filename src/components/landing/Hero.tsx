@@ -1,11 +1,22 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { PlayCircle, AlertCircle } from "lucide-react";
 
 export function Hero() {
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
   return (
     <section className="relative pt-20 pb-16 md:pt-32 md:pb-20 overflow-hidden">
       <div className="container mx-auto px-6 text-center">
@@ -31,7 +42,13 @@ export function Hero() {
                 Get Started
               </Button>
             </Link>
-            <Button size="lg" variant="ghost" className="w-full sm:w-auto rounded-full px-10 h-14 text-[#2d3338] hover:bg-[#ebeef2] text-base">
+            <Button 
+              size="lg" 
+              variant="ghost" 
+              onClick={() => setIsVideoOpen(true)}
+              className="w-full sm:w-auto rounded-full px-10 h-14 text-[#2d3338] hover:bg-[#ebeef2] text-base group"
+            >
+              <PlayCircle className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
               Watch Demo
             </Button>
           </div>
@@ -56,6 +73,29 @@ export function Hero() {
           </div>
         </motion.div>
       </div>
+
+      {/* Video Demo Modal */}
+      <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+        <DialogContent className="sm:max-w-[600px] border-none bg-white/80 backdrop-blur-2xl rounded-3xl p-0 overflow-hidden shadow-2xl">
+           <div className="aspect-video w-full bg-slate-900/10 flex flex-col items-center justify-center p-12 text-center group">
+              <div className="h-20 w-20 rounded-full bg-white/50 backdrop-blur-md flex items-center justify-center mb-6 shadow-inner border border-white/20 group-hover:scale-110 transition-transform duration-500">
+                 <AlertCircle className="h-10 w-10 text-[#2d3338]/40" />
+              </div>
+              <h3 className="text-2xl font-bold text-[#2d3338] mb-3">
+                Watch Demo
+              </h3>
+              <p className="text-[#2d3338]/60 text-lg max-w-xs leading-relaxed">
+                Currently we not have recorded Demo video Sorry!
+              </p>
+              
+              <div className="mt-8 flex gap-3">
+                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30 animate-pulse" />
+                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30 animate-pulse delay-75" />
+                 <div className="h-1.5 w-1.5 rounded-full bg-blue-500/30 animate-pulse delay-150" />
+              </div>
+           </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
