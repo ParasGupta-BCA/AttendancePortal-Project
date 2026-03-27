@@ -90,19 +90,27 @@ export default function ReportsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="h-64 flex items-end gap-3 px-4 relative">
-                      {[30, 60, 40, 80, 50, 90, 70, 85].map((h, i) => (
-                        <div key={i} className="flex-1 group relative">
+                    <div className="h-64 flex items-end gap-3 px-4 relative overflow-hidden">
+                      {/* Grid Background Lines (Optional) */}
+                      <div className="absolute inset-0 flex flex-col justify-between py-2 pointer-events-none opacity-[0.03]">
+                        {[1, 2, 3, 4, 5].map((_, i) => (
+                          <div key={i} className="w-full h-px bg-[#2d3338]" />
+                        ))}
+                      </div>
+
+                      {[30, 60, 45, 90, 55, 95, 75, 85].map((h, i) => (
+                        <div key={i} className="flex-1 group relative h-full flex items-end">
                           <motion.div
-                            initial={{ height: 0 }}
-                            whileInView={{ height: `${h}%` }}
-                            transition={{ duration: 1.5, delay: i * 0.1 }}
-                            className="bg-gradient-to-t from-purple-600 to-blue-400 rounded-t-xl opacity-80 group-hover:opacity-100 transition-opacity"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: `${h}%`, opacity: 0.8 }}
+                            transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
+                            whileHover={{ opacity: 1, scaleX: 1.05 }}
+                            className="w-full bg-gradient-to-t from-purple-600 to-blue-400 rounded-t-xl shadow-lg shadow-purple-500/10 transition-all"
                           />
                         </div>
                       ))}
                     </div>
-                    <div className="flex justify-between mt-6 px-4 text-[10px] font-bold text-[#2d3338]/20 tracking-[0.2em] uppercase">
+                    <div className="flex justify-between mt-6 px-4 text-[10px] font-black text-[#2d3338]/20 tracking-[0.2em] uppercase">
                       <span>Wk 01</span><span>Wk 02</span><span>Wk 03</span><span>Wk 04</span>
                     </div>
                   </div>
