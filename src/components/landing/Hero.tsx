@@ -46,9 +46,8 @@ export function Hero() {
               size="lg" 
               variant="ghost" 
               onClick={() => setIsVideoOpen(true)}
-              className="w-full sm:w-auto rounded-full px-10 h-14 text-[#2d3338] hover:bg-[#ebeef2] text-base group"
+              className="w-full sm:w-auto rounded-full px-10 h-14 text-[#2d3338] hover:bg-[#ebeef2] text-base"
             >
-              <PlayCircle className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
               Watch Demo
             </Button>
           </div>
